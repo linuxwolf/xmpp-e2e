@@ -64,8 +64,8 @@
             <t>The plaintext stanza S</t>
           </list>
           </t>
-          <t>Generates any additional unprotected block cipher factors (IV); e.g. initialization vector/nonce.  A sending agent MUST ensure that no two sets of factors are used with the same CMK, and SHOULD NOT reuse such factors for other stanzas.<vspace blankLines="1"/></t>
           <t>Convert the forwarding envelope M to a UTF-8 encoded string (M'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. P' = UTF8-encode(P).  We call P' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
+          <t>Generates any additional unprotected block cipher factors (IV); e.g. initialization vector/nonce.  A sending agent MUST ensure that no two sets of factors are used with the same CMK, and SHOULD NOT reuse such factors for other stanzas.<vspace blankLines="1"/></t>
           <t>Performs the message encryption steps from <xref target='JOSE-JWE'/> to generate the JWE Header H, JWE Ciphertext C, and JWE Integrity Value I; using the following inputs:<vspace blankLines="1"/>
             <list style="symbols">
               <t>The 'alg' property is set to "none"; recipients use 'keyreq' in <xref target='keyreq'/> to obtain the CMK.<vspace blankLines="1"/></t>
@@ -136,8 +136,9 @@
 </forwarded>
           ]]></artwork>
         </figure>
-        <t>Then the sending agent performs steps 3 and 4 to generate the <xref target="JOSE-JWE"/> header:</t>
+        <t>Then the sending agent performs steps 3, 4, and 5 to generate the <xref target="JOSE-JWE"/> outputs:</t>
         <figure>
+          <preamble>JWE Header</preamble>
           <artwork><![CDATA[
 {
   "alg":"none",
@@ -146,8 +147,8 @@
 }
           ]]></artwork>
         </figure>
-        <t>Then the sending agent performs steps 5 and 6 to generate the protected content:</t>
         <figure>
+          <preamble>JWE Ciphertext</preamble>
           <artwork><![CDATA[
 7LlMXd-qqPAQ_LZm6u9AR2csyDgT09z5DWdn8K5GLr_qbWRDKw2ufZrmO9YZ-jHl
 1IDeXeQ9azbNNViv8gpa-prDYkXOo3QoqYOJiA0RAkPU-UjN41wqqVvV62gad_OB
@@ -162,7 +163,8 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
 93Fr1nfFLNhXLCZYhZ7By6T9NN8omp4ZYE92HMpPzgo-eCGP
           ]]></artwork>
         </figure>
-        <t>Then the sending agent performs step 7 and sends the following:</t>
+        <t>NOTE: For CCM, the integrity value is encoded as part of the ciphertext, therefore the resulting Integrity Value is an octet string of length 0.</t>
+        <t>Then the sending agent performs steps 6 and 7, and sends the following:</t>
         <figure>
           <artwork><![CDATA[
 <message xmlns='jabber:client'
@@ -189,6 +191,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
       y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
       93Fr1nfFLNhXLCZYhZ7By6T9NN8omp4ZYE92HMpPzgo-eCGP
     </data>
+    <mac/>
   </e2e>
 </message>
           ]]></artwork>
