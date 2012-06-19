@@ -49,7 +49,7 @@
         <list style="symbols">
           <t>The JID of the sender (i.e. its own JID).  This SHOULD be the bare JID (localpart@domainpart).<vspace blankLines="1"/></t>
           <t>The JID of the recipient.  This SHOULD be the bare JID (localpart@domainpart).<vspace blankLines="1"/></t>
-          <t>A random Content Master Key (CMK).  The CMK MUST have a length at least equal to that of the required encryption keys and MUST be generated randomly. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
+          <t>A Content Master Key (CMK).  The CMK MUST have a length at least equal to that of the required encryption keys and MUST be generated randomly. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
           <t>A CMK identifier (CID). The CID MUST be unique for a given (sender, recipient, CMK) tuple, and MUST NOT be derived from CMK itself.<vspace blankLines="1"/></t>
         </list>
       </t>
@@ -58,28 +58,27 @@
         <t>For a given plaintext stanza (S), the sending agent performs the following:<vspace blankLines="1"/>
         <list style="numbers">
           <t>Notes the current UTC date and time N when this stanza is constructed, formatted as described under <xref target="timestamps"/>.</t>
-          <t>Constructs a forwarding envelope P using a &lt;forwarded/&gt; element qualified by the "urn:xmpp:forward:0" namespace (as defined in <xref target="MSG-FWD"/>) as follows:<vspace blankLines="1"/>
+          <t>Constructs a forwarding envelope M using a &lt;forwarded/&gt; element qualified by the "urn:xmpp:forward:0" namespace (as defined in <xref target="MSG-FWD"/>) as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The child element &lt;delay/&gt; qualified by the "urn:xmpp:delay" namespace (as defined in <xref target="DELAY"/>) with the attribute 'stamp' set to the UTC date and time value N<vspace blankLines="1"/></t>
             <t>The plaintext stanza S</t>
           </list>
           </t>
           <t>Generates any additional unprotected block cipher factors (IV); e.g. initialization vector/nonce.  A sending agent MUST ensure that no two sets of factors are used with the same CMK, and SHOULD NOT reuse such factors for other stanzas.<vspace blankLines="1"/></t>
-          <t>Constructs a partial <xref target="JOSE-JWE"/> header (H) with the following information:<vspace blankLines="1"/>
-          <list style="symbols">
-            <t>The property 'alg' set to "none", as the encryption key is agreed to using the 'key-req' protocol in <xref target='keyreq'/>.<vspace blankLines="1"/></t> 
-            <t>The property 'enc' indicating the algorithm used to encrypt the content.<vspace blankLines="1"/></t>
-            <t>The property 'iv' indicating the initialization vector, if required by the algorithm.<vspace blankLines="1"/></t>
-          </list>
-          </t>
-          <t>Convert the stanza to a UTF-8 encoded string (P'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. P' = UTF8-encode(P).  We call P' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
-          <t>Encrypts P' using the intended block cipher, i.e. T = block-encrypt(CMK, IV, P').<vspace blankLines="1"/>
+          <t>Convert the forwarding envelope M to a UTF-8 encoded string (M'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. P' = UTF8-encode(P).  We call P' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
+          <t>Performs the message encryption steps from <xref target='JOSE-JWE'/> to generate the JWE Ciphertext C and JWE Integrity Value I, using the following inputs:<vspace blankLines="1"/>
+            <list style="symbols">
+              <t>The 'alg' property is set to "none"; recipients use 'keyreq' in <xref target='keyreq'/> to obtain the CMK.<vspace blankLines="1"/></t>
+              <t>The 'enc' property is set to the intended content encryption algorithm.<vspace blankLines="1"/></t>
+              <t>M' as the plaintext content to encrypt.<vspace blankLines="1"/></t>
+            </list>
           </t>
           <t>Constructs an &lt;e2e/&gt; element qualified by the  "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the identifier value CID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as the base64url-encoded form of H.<vspace blankLines="1"/></t>
-            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as the base64url-encoded form of T.<vspace blankLines="1"/></t>
+            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as H, encoded base64url as per <xref target='BASE64'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as C, encoded base64url as per <xref target='BASE64'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;mac/&gt; qualified by the "urn"ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as I, encoded base64url as per <xref target='BASE64'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;e2e/&gt; element as the payload of a stanza that SHOULD match the stanza from step 1 in kind (e.g., &lt;message/&gt;), type (e.g., "chat"), and addressing (e.g. to="romeo@montague.net" from="juliet@capulet.net/balcony"). If the original stanza (S) has a value for the "id" attribute, this stanza MUST NOT use the same value for its "id" attribute.<vspace blankLines="1"/></t>
@@ -205,7 +204,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
           <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the CMK identifier value CID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;pkey/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as the base64url-encoded form of KS.<vspace blankLines="1"/></t>
+            <t>The child element &lt;pkey/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as KS, encoded base64url as pre <xref target='BASE64'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;keyreq/&gt; element as the payload of an &lt;iq/&gt; stanza with the attribute 'type' set to "get", the attribute 'to' set to the full JID of the original encrypted stanza's sender, and the attribute 'id' set to an opaque string value the receiving agent uses to track the &lt;iq/&gt; response.<vspace blankLines="1"/></t>
@@ -226,8 +225,8 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
           <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the CMK identifier CID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML cahracter data as the base64url-encoded form of H.<vspace blankLines="1"/></t>
-            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as the base64url-encoded form of CMK'.<vspace blankLines="1"/></t>
+            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as H, encoded base64url as per <xref target='BASE64'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as CMK', encoded base64url as per <xref target='BASE64'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;keyreq/&gt; element as the payload of an &lt;iq/&gt; stanza with the attribute 'type' set to "result", the attribute 'to' set to the full JID from the request &lt;iq/&gt;'s 'from' attribute, and the attribute 'id' set to the value of the request &lt;iq/&gt;'s 'id' attribute.<vspace blankLines="1"/></t>
@@ -529,6 +528,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <seriesInfo name="RFC" value="4648"/>
         <format type="TXT" octets="35491" target="ftp://ftp.isi.edu/in-notes/rfc4648.txt"/>
       </reference>
+      <!--
       <reference anchor="CMS-AES">
         <front>
           <title>Use of the Advanced Encryption Standard (AES) Encryption Algorithm in Cryptographic Message Syntax (CMS)</title>
@@ -540,6 +540,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <seriesInfo name="RFC" value="3565"/>
         <format type="TXT" octets="26773" target="ftp://ftp.isi.edu/in-notes/rfc3565.txt"/>
       </reference>
+      -->
       <reference anchor="DATETIME">
         <front>
           <title>XMPP Date and Time Profiles</title>
@@ -630,6 +631,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <seriesInfo name="BCP" value="14"/>
         <seriesInfo name="RFC" value="2119"/>
       </reference>
+      <!--
       <reference anchor="HMAC">
         <front>
           <title>US Secure Hash Algorithms (SHA and HMAC-SHA)</title>
@@ -647,6 +649,8 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <seriesInfo name="RFC" value="4634"/>
         <format type="TXT" octets="197147" target="ftp://ftp.isi.edu/in-notes/rfc4634.txt"/>
       </reference>
+      -->
+      <!--
       <reference anchor="JOSE-JWA">
         <front>
           <title>JSON Web Algorithms (JWA)</title>
@@ -661,6 +665,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-algorithms-00"/>
         <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-algorithms-00.txt"/>
       </reference>
+      -->
       <reference anchor="JOSE-JWE">
         <front>
           <title>JSON Web Encryption (JWE)</title>
@@ -701,6 +706,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-key-00"/>
         <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-key-00.txt"/>
       </reference>
+      <!--
       <reference anchor="PKIX">
         <front>
           <title>Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile</title>
@@ -730,6 +736,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <seriesInfo name="RFC" value="5280"/>
         <format type="TXT" octets="352580" target="ftp://ftp.isi.edu/in-notes/rfc5280.txt"/>
       </reference>
+      -->
       <reference anchor="SECTERMS">
         <front>
           <title>Internet Security Glossary, Version 2</title>
@@ -744,6 +751,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <seriesInfo name="RFC" value="4949"/>
         <format type="TXT" octets="867626" target="ftp://ftp.isi.edu/in-notes/rfc4949.txt"/>
       </reference>
+      <!--
       <reference anchor="X509-ALGO">
         <front>
           <title>Public-Key Cryptography Standards (PKCS) #1: RSA Cryptography Specifications Version 2.1</title>
@@ -761,6 +769,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <seriesInfo name="RFC" value="3447"/>
         <format type="TXT" octets="143173" target="ftp://ftp.isi.edu/in-notes/rfc3447.txt"/>
       </reference>
+      -->
     </references>
     <references title="Informative References">
       <reference anchor="OFFLINE">
