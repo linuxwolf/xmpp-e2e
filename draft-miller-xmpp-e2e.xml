@@ -49,8 +49,8 @@
         <list style="symbols">
           <t>The JID of the sender (i.e. its own JID).  This SHOULD be the bare JID (localpart@domainpart).<vspace blankLines="1"/></t>
           <t>The JID of the recipient.  This SHOULD be the bare JID (localpart@domainpart).<vspace blankLines="1"/></t>
-          <t>A random Content Encryption Key (CEK).  The CEK MUST have a length at least equal to that of the required encryption keys and MUST be generated randomly. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
-          <t>A CEK identifier (CID). The CID MUST be unique for a given (sender, recipient, CEK) tuple, and MUST NOT be derived from CEK itself.<vspace blankLines="1"/></t>
+          <t>A random Content Master Key (CMK).  The CMK MUST have a length at least equal to that of the required encryption keys and MUST be generated randomly. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
+          <t>A CMK identifier (CID). The CID MUST be unique for a given (sender, recipient, CMK) tuple, and MUST NOT be derived from CMK itself.<vspace blankLines="1"/></t>
         </list>
       </t>
       </section>
@@ -64,21 +64,22 @@
             <t>The plaintext stanza S</t>
           </list>
           </t>
-          <t>Generates any additional unprotected block cipher factors (IV); e.g. initialization vector, nonce, and/or associated authentication data.  A sending agent MUST ensure that no two sets of factors are used with the same CEK, and SHOULD NOT reuse such factors for other stanzas.<vspace blankLines="1"/></t>
+          <t>Generates any additional unprotected block cipher factors (IV); e.g. initialization vector/nonce.  A sending agent MUST ensure that no two sets of factors are used with the same CMK, and SHOULD NOT reuse such factors for other stanzas.<vspace blankLines="1"/></t>
           <t>Constructs a partial <xref target="JOSE-JWE"/> header (H) with the following information:<vspace blankLines="1"/>
           <list style="symbols">
+            <t>The property 'alg' set to "none", as the encryption key is agreed to using the 'key-req' protocol in <xref target='keyreq'/>.<vspace blankLines="1"/></t> 
             <t>The property 'enc' indicating the algorithm used to encrypt the content.<vspace blankLines="1"/></t>
             <t>The property 'iv' indicating the initialization vector, if required by the algorithm.<vspace blankLines="1"/></t>
           </list>
-          NOTE: this header is intentionally lacking required attributes. The receiving agent is responsible for assembling a final, valid JWE header.</t>
-          <t>Convert the stanza to a UTF-8 encoded string (P'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. P' = UTF8-encode(P).  We call P' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
-          <t>Encrypts P' using the intended block cipher, i.e. T = block-encrypt(CEK, IV, P').<vspace blankLines="1"/>
           </t>
-          <t>Constructs an &lt;e2e/&gt; element qualified by the  "urn:ietf:params:xml:ns:xmpp-e2e:1" namespace as follows:<vspace blankLines="1"/>
+          <t>Convert the stanza to a UTF-8 encoded string (P'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. P' = UTF8-encode(P).  We call P' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
+          <t>Encrypts P' using the intended block cipher, i.e. T = block-encrypt(CMK, IV, P').<vspace blankLines="1"/>
+          </t>
+          <t>Constructs an &lt;e2e/&gt; element qualified by the  "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the identifier value CID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:1" namespace and with XML character data as the base64url-encoded form of H.<vspace blankLines="1"/></t>
-            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:1" namespace and with XML character data as the base64url-encoded form of T.<vspace blankLines="1"/></t>
+            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as the base64url-encoded form of H.<vspace blankLines="1"/></t>
+            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as the base64url-encoded form of T.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;e2e/&gt; element as the payload of a stanza that SHOULD match the stanza from step 1 in kind (e.g., &lt;message/&gt;), type (e.g., "chat"), and addressing (e.g. to="romeo@montague.net" from="juliet@capulet.net/balcony"). If the original stanza (S) has a value for the "id" attribute, this stanza MUST NOT use the same value for its "id" attribute.<vspace blankLines="1"/></t>
@@ -109,8 +110,8 @@
           <list style="symbols">
             <t>Sender JID as "juliet@capulet.lit"<vspace blankLines="1"/></t>
             <t>Recipient JID as "romeo@montegue.lit"<vspace blankLines="1"/></t>
-            <t>Content encryption key 'CEK' as (base64 encoded) "-ElMo6FndEkMxWP3TIkp1dDfVKqmqAAgrlcvVnUVpOc="<vspace blankLines="1"/></t>
-            <t>CEK identifier CID as "835c92a8-94cd-4e96-b3f3-b2e75a438f92"<vspace blankLines="1"/></t>
+            <t>Content encryption key 'CMK' as (base64 encoded) "-ElMo6FndEkMxWP3TIkp1dDfVKqmqAAgrlcvVnUVpOc="<vspace blankLines="1"/></t>
+            <t>CMK identifier CID as "835c92a8-94cd-4e96-b3f3-b2e75a438f92"<vspace blankLines="1"/></t>
           </list>
         </t>
         <t>The sending agent performs steps 1 and 2 to generate the envelope:</t>
@@ -139,10 +140,9 @@
         <figure>
           <artwork><![CDATA[
 {
+  "alg":"none",
   "enc":"A256CCM",
-  "iv":"B7waCj2vF_sLaJfe-1GHrA==",
-  "adata":"1492-05-12T20:07:37.012Z",
-  "msize":"16"
+  "iv":"B7waCj2vF_sLaJfe-1GHrA=="
 }
           ]]></artwork>
         </figure>
@@ -170,7 +170,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:1'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>
       eyJlbmMiOiJBMjU2Q0NNIiwiaXYiOiJCN3dhQ2oydkZfc0xhSmZlLTFHSHJBPT0i
@@ -198,14 +198,14 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
     <section title="Requesting Content Keys" anchor="keyreq">
       <t>A receiving agent might not have the conetnt encryption key to decrypt the stanza.</t>
       <section title="Request Process" anchor="keyreq-process-request">
-        <t>Before a CEK can be requested, the receiving agent MUST have at least one public key for which it also has the private key.</t>
-        <t>To request a CEK, the receiving agent performs the following:<vspace blankLines="1"/>
+        <t>Before a CMK can be requested, the receiving agent MUST have at least one public key for which it also has the private key.</t>
+        <t>To request a CMK, the receiving agent performs the following:<vspace blankLines="1"/>
         <list style="numbers">
           <t>Constructs a <xref target="JOSE-JWK"/> container object (KS), containing information about each public key the requesting agent wishes to use.  Each key SHOULD include a value for the property 'kid' which uniquely identifies it within the context of all provided keys.  Each key MUST include a value for the property 'kid' if any two keys use the same algorithm.<vspace blankLines="1"/></t>
-          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:1" namespace as follows:<vspace blankLines="1"/>
+          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
-            <t>The attribute 'id' set to the CEK identifier value CID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;pkey/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:1" namespace and with XML character data as the base64url-encoded form of KS.<vspace blankLines="1"/></t>
+            <t>The attribute 'id' set to the CMK identifier value CID.<vspace blankLines="1"/></t>
+            <t>The child element &lt;pkey/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as the base64url-encoded form of KS.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;keyreq/&gt; element as the payload of an &lt;iq/&gt; stanza with the attribute 'type' set to "get", the attribute 'to' set to the full JID of the original encrypted stanza's sender, and the attribute 'id' set to an opaque string value the receiving agent uses to track the &lt;iq/&gt; response.<vspace blankLines="1"/></t>
@@ -218,16 +218,16 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
           <t>Chooses a key (PK) from the list provided via KS, and notes its identifier value 'kid'.</t>
           <t>Constructs a parial <xref target="JOSE-JWE"/> header (H) as follows:<vspace blankLines="1"/>
           <list style="symbols">
-            <t>The property 'alg' set to the cryptographic algorithm for PK, which is used to secure the content encryption key CEK.<vspace blankLines="1"/></t>
+            <t>The property 'alg' set to the cryptographic algorithm for PK, which is used to secure the content encryption key CMK.<vspace blankLines="1"/></t>
             <t>The property 'kid' set to the identifier matching PK.<vspace blankLines="1"/></t>
           </list>
           NOTE: this header is intentionally lacking required attributes. The receiving agent is responsible for assembling a final, valid JWE header.</t>
-          <t>Encrypts the content encryption key CEK using the key PK, i.e. CEK' = pki-encrypt(PK, CEK).<vspace blankLines="1"/></t>
-          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:1" namespace as follows:<vspace blankLines="1"/>
+          <t>Encrypts the content encryption key CMK using the key PK, i.e. CMK' = pki-encrypt(PK, CMK).<vspace blankLines="1"/></t>
+          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
-            <t>The attribute 'id' set to the CEK identifier CID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:1" namespace and with XML cahracter data as the base64url-encoded form of H.<vspace blankLines="1"/></t>
-            <t>The child element &lt;cek/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:1" namespace and with XML character data as the base64url-encoded form of CEK'.<vspace blankLines="1"/></t>
+            <t>The attribute 'id' set to the CMK identifier CID.<vspace blankLines="1"/></t>
+            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML cahracter data as the base64url-encoded form of H.<vspace blankLines="1"/></t>
+            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as the base64url-encoded form of CMK'.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;keyreq/&gt; element as the payload of an &lt;iq/&gt; stanza with the attribute 'type' set to "result", the attribute 'to' set to the full JID from the request &lt;iq/&gt;'s 'from' attribute, and the attribute 'id' set to the value of the request &lt;iq/&gt;'s 'id' attribute.<vspace blankLines="1"/></t>
@@ -264,7 +264,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
         <t>Then the receiving agent performs step 2 to generate the &lt;keyreq/&gt;:</t>
         <figure>
           <artwork><![CDATA[
-<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:1'
+<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
         id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
   <pkey>
     W3siYWxnIjoiUlNBIiwibW9kIjoiQUw3YW5vNURCZE5ZZktDaEdoM3h4R0R0QXR
@@ -288,7 +288,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
     id='xdJbWMA+'
     to='juliet@capulet.lit/balcony'
     type='get'>
-  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:1'
+  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
           id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <pkey>
       W3siYWxnIjoiUlNBIiwibW9kIjoiQUw3YW5vNURCZE5ZZktDaEdoM3h4R0R0QXR
@@ -314,7 +314,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
 }
           ]]></artwork>
         </figure>
-        <t>Then the sending agent performs step 3 to generate the encrypted CEK:</t>
+        <t>Then the sending agent performs step 3 to generate the encrypted CMK:</t>
         <figure>
           <artwork><![CDATA[
 DCKrJpLd8XYze7joNKsyvpzGD4MffVQF7apQMkPK8_vKx4J3xEqWB3tXxp6oxJF
@@ -328,20 +328,20 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <t>Then the sending agent performs step 4 to generate the &lt;keyreq/&gt; response:</t>
         <figure>
           <artwork><![CDATA[
-<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:1'
+<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
         id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
   <header>
     eyJhbGciOiJSU0EtT0VBUCIsImtpZCI6InJvbWVvQG1vbnRlZ3VlLmxpc3QvZ2F
     yZGVuIn0=
   </header>
-  <cek>
+  <cmk>
     DCKrJpLd8XYze7joNKsyvpzGD4MffVQF7apQMkPK8_vKx4J3xEqWB3tXxp6oxJF
     4YHla4SFiMp44LccMEd6JchPp_23OXrBo8i7Fwo8jVH6QoQa71T_1rQj6CWQ1eF
     vXiU4Qmp52F-gjuUhlKfe3qccdlFp3kLy8Mpq5mDdq6deOq0_qusqr8QTqrT5LN
     IgsXYzrdiDdKx8KSKpI4FBB_H1x-A1C97DfJk9s5H7GzKVm2BRWVXWjJfO4lckE
     Z45ZJkA3CKq86Yth3YBetoScPVLhoRoO2qqBg4gR9dDO5mXnOgPslVfXWvegexH
     AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
-  </cek>
+  </cmk>
 </keyreq>
           ]]></artwork>
         </figure>
@@ -353,20 +353,20 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
     id='xdJbWMA+'
     to='romeo@montegue.lit/garden'
     type='result'>
-  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:1'
+  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
           id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>
       eyJhbGciOiJSU0EtT0VBUCIsImtpZCI6InJvbWVvQG1vbnRlZ3VlLmxpc3QvZ2F
       yZGVuIn0=
     </header>
-    <cek>
+    <cmk>
       DCKrJpLd8XYze7joNKsyvpzGD4MffVQF7apQMkPK8_vKx4J3xEqWB3tXxp6oxJF
       4YHla4SFiMp44LccMEd6JchPp_23OXrBo8i7Fwo8jVH6QoQa71T_1rQj6CWQ1eF
       vXiU4Qmp52F-gjuUhlKfe3qccdlFp3kLy8Mpq5mDdq6deOq0_qusqr8QTqrT5LN
       IgsXYzrdiDdKx8KSKpI4FBB_H1x-A1C97DfJk9s5H7GzKVm2BRWVXWjJfO4lckE
       Z45ZJkA3CKq86Yth3YBetoScPVLhoRoO2qqBg4gR9dDO5mXnOgPslVfXWvegexH
       AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
-    </cek>
+    </cmk>
   </keyreq>
 </iq>
           ]]></artwork>
@@ -398,7 +398,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:1'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
     <data>[XML character data]</header>
@@ -421,7 +421,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:1'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
     <data>[XML character data]</header>
@@ -444,7 +444,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:1'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
     <data>[XML character data]</header>
@@ -494,9 +494,9 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
       <section title="Storage of Encrypted Stanzas" anchor="security-storage">
         <t>The recipient's server might store any &lt;message/&gt; stanzas received until the recipient is next available; this duration could be anywhere from a few minutes to several months.</t>
       </section>
-      <section title="Re-use of Content Encryption Keys" anchor="security-cek">
-        <t>A sender SHOULD NOT use the same CEK for stanzas intended for different recipients.</t>
-        <t>A sender MAY re-use a CEK for several stanzas to the same recpient.  In this case, the CID remains the same, but MUST generate a new IV (and other data) for each encrypted stanza.  The sender SHOULD periodically generate a new CEK; however, this specification does not mandate any specific algorithms or processes.</t>
+      <section title="Re-use of Content Master Keys" anchor="security-cmk">
+        <t>A sender SHOULD NOT use the same CMK for stanzas intended for different recipients.</t>
+        <t>A sender MAY re-use a CMK for several stanzas to the same recpient.  In this case, the CID remains the same, but MUST generate a new IV (and other data) for each encrypted stanza.  The sender SHOULD periodically generate a new CMK; however, this specification does not mandate any specific algorithms or processes.</t>
       </section>
     </section>
     <section title="IANA Considerations" anchor="iana">
@@ -504,7 +504,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <t>A URN sub-namespace of encrypted content for the Extensible Messaging and Presence Protocol (XMPP) is defined as follows.</t>
         <t>
           <list style="hanging">
-            <t hangText="URI:">urn:ietf:params:xml:ns:xmpp-e2e:1</t>
+            <t hangText="URI:">urn:ietf:params:xml:ns:xmpp-e2e:2</t>
             <t hangText="Specification:">RFC XXXX</t>
             <t hangText="Description:">This is an XML namespace name of encrypted content for the Extensible Messaging and Presence Protocol as defined by RFC XXXX.</t>
             <t hangText="Registrant Contact:">IESG, &lt;iesg@ietf.org&gt;</t>
@@ -843,7 +843,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <format type="TXT"  target="http://tools.ietf.org/rfc/rfc6121.txt"/>
       </reference>
     </references>
-    <section title="Schema for urn:ietf:params:xml:ns:xmpp-e2e:1" anchor="schemas-e2e">
+    <section title="Schema for urn:ietf:params:xml:ns:xmpp-e2e:2" anchor="schemas-e2e">
       <t>The following XML schema is descriptive, not normative.</t>
       <figure>
         <artwork><![CDATA[
@@ -851,8 +851,8 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
 
 <xs:schema
     xmlns:xs='http://www.w3.org/2001/XMLSchema'
-    targetNamespace='urn:ietf:params:xml:ns:xmpp-e2e:1'
-    xmlns='urn:ietf:params:xml:ns:xmpp-e2e:1'
+    targetNamespace='urn:ietf:params:xml:ns:xmpp-e2e:2'
+    xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
     elementFormDefault='qualified'>
 
   <xs:element name='e2e'>
@@ -871,12 +871,12 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
       <xs:sequence>
         <xs:element ref='header' minOccurs='0' maxOccurs='1'/>
         <xs:element ref='pkey' minOccurs='0' maxOccurs='1'/>
-        <xs:element ref='cek' minOccurs='0' maxOccurs='1'/>
+        <xs:element ref='cmk' minOccurs='0' maxOccurs='1'/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   
-  <xs:element name='cek'>
+  <xs:element name='cmk'>
     <xs:complexType>
       <xs:simpleType>
         <xs:extension base='xs:string'>
