@@ -39,8 +39,8 @@
     </section>
     <section title="Terminology" anchor="terms">
       <t>This document inherits terminology defined in <xref target="RFC6120"/>.</t>
-      <t>Security-related terms are to be understood in the sense defined in <xref target="SECTERMS"/>.</t>
-      <t>The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="KEYWORDS"/>.</t>
+      <t>Security-related terms are to be understood in the sense defined in <xref target="RFC4949"/>.</t>
+      <t>The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
     </section>
     <section title="Encrypting XMPP Stanzas" anchor="encrypt">
       <t>The process that a sending agent follows for securing stanzas is the same regardless of the form of stanza (i.e., &lt;iq/&gt;, &lt;message/&gt;, or &lt;presence/&gt;).</t>
@@ -58,27 +58,28 @@
         <t>For a given plaintext stanza (S), the sending agent performs the following:<vspace blankLines="1"/>
         <list style="numbers">
           <t>Notes the current UTC date and time N when this stanza is constructed, formatted as described under <xref target="timestamps"/>.</t>
-          <t>Constructs a forwarding envelope M using a &lt;forwarded/&gt; element qualified by the "urn:xmpp:forward:0" namespace (as defined in <xref target="MSG-FWD"/>) as follows:<vspace blankLines="1"/>
+          <t>Constructs a forwarding envelope M using a &lt;forwarded/&gt; element qualified by the "urn:xmpp:forward:0" namespace (as defined in <xref target="XEP-0297"/>) as follows:<vspace blankLines="1"/>
           <list style="symbols">
-            <t>The child element &lt;delay/&gt; qualified by the "urn:xmpp:delay" namespace (as defined in <xref target="DELAY"/>) with the attribute 'stamp' set to the UTC date and time value N<vspace blankLines="1"/></t>
+            <t>The child element &lt;delay/&gt; qualified by the "urn:xmpp:delay" namespace (as defined in <xref target="XEP-0203"/>) with the attribute 'stamp' set to the UTC date and time value N<vspace blankLines="1"/></t>
             <t>The plaintext stanza S</t>
           </list>
           </t>
           <t>Generates any additional unprotected block cipher factors (IV); e.g. initialization vector/nonce.  A sending agent MUST ensure that no two sets of factors are used with the same CMK, and SHOULD NOT reuse such factors for other stanzas.<vspace blankLines="1"/></t>
           <t>Convert the forwarding envelope M to a UTF-8 encoded string (M'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. P' = UTF8-encode(P).  We call P' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
-          <t>Performs the message encryption steps from <xref target='JOSE-JWE'/> to generate the JWE Ciphertext C and JWE Integrity Value I, using the following inputs:<vspace blankLines="1"/>
+          <t>Performs the message encryption steps from <xref target='JOSE-JWE'/> to generate the JWE Header H, JWE Ciphertext C, and JWE Integrity Value I; using the following inputs:<vspace blankLines="1"/>
             <list style="symbols">
               <t>The 'alg' property is set to "none"; recipients use 'keyreq' in <xref target='keyreq'/> to obtain the CMK.<vspace blankLines="1"/></t>
               <t>The 'enc' property is set to the intended content encryption algorithm.<vspace blankLines="1"/></t>
-              <t>M' as the plaintext content to encrypt.<vspace blankLines="1"/></t>
+              <t>CMK as the Content Master Key.<vspace blankLines="1"/></t>
+              <t>M' as the plaintext content to encrypt.<vspace blankLines="1"/></t>  
             </list>
           </t>
           <t>Constructs an &lt;e2e/&gt; element qualified by the  "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the identifier value CID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as H, encoded base64url as per <xref target='BASE64'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as C, encoded base64url as per <xref target='BASE64'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;mac/&gt; qualified by the "urn"ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as I, encoded base64url as per <xref target='BASE64'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as C, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;mac/&gt; qualified by the "urn"ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as I, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;e2e/&gt; element as the payload of a stanza that SHOULD match the stanza from step 1 in kind (e.g., &lt;message/&gt;), type (e.g., "chat"), and addressing (e.g. to="romeo@montague.net" from="juliet@capulet.net/balcony"). If the original stanza (S) has a value for the "id" attribute, this stanza MUST NOT use the same value for its "id" attribute.<vspace blankLines="1"/></t>
@@ -204,7 +205,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
           <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the CMK identifier value CID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;pkey/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as KS, encoded base64url as pre <xref target='BASE64'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;pkey/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as KS, encoded base64url as pre <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;keyreq/&gt; element as the payload of an &lt;iq/&gt; stanza with the attribute 'type' set to "get", the attribute 'to' set to the full JID of the original encrypted stanza's sender, and the attribute 'id' set to an opaque string value the receiving agent uses to track the &lt;iq/&gt; response.<vspace blankLines="1"/></t>
@@ -225,8 +226,8 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
           <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the CMK identifier CID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as H, encoded base64url as per <xref target='BASE64'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as CMK', encoded base64url as per <xref target='BASE64'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as CMK', encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;keyreq/&gt; element as the payload of an &lt;iq/&gt; stanza with the attribute 'type' set to "result", the attribute 'to' set to the full JID from the request &lt;iq/&gt;'s 'from' attribute, and the attribute 'id' set to the value of the request &lt;iq/&gt;'s 'id' attribute.<vspace blankLines="1"/></t>
@@ -462,7 +463,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
       </section>
     </section>
     <section title="Inclusion and Checking of Timestamps" anchor="timestamps">
-      <t>Timestamps are included to help prevent replay attacks.  All timestamps MUST conform to <xref target="DATETIME"/> and be presented as UTC with no offset, and SHOULD include the seconds and fractions of a second to three digits.  Absent a local adjustment to the sending agent's perceived time or the underlying clock time, the sending agent MUST ensure that the timestamps it sends to the receiver increase monotonically (if necessary by incrementing the seconds fraction in the timestamp if the clock returns the same time for multiple requests).  The following rules apply to the receiving agent:</t>
+      <t>Timestamps are included to help prevent replay attacks.  All timestamps MUST conform to <xref target="XEP-0082"/> and be presented as UTC with no offset, and SHOULD include the seconds and fractions of a second to three digits.  Absent a local adjustment to the sending agent's perceived time or the underlying clock time, the sending agent MUST ensure that the timestamps it sends to the receiver increase monotonically (if necessary by incrementing the seconds fraction in the timestamp if the clock returns the same time for multiple requests).  The following rules apply to the receiving agent:</t>
       <t>
         <list style="symbols">
           <t>It MUST verify that the timestamp received is within five minutes of the current time, except as described below for offline messages.<vspace blankLines="1"/></t>
@@ -470,7 +471,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
           <t>If any of the foregoing checks fails, the timestamp SHOULD be presented to the receiving entity (human or application) marked as "old timestamp", "future timestamp", or "decreasing timestamp", and the receiving entity MAY return a stanza error to the sender.</t>
         </list>
       </t>
-      <t>The foregoing timestamp checks assume that the recipient is online when the message is received.  However, if the recipient is offline then the server will probably store the message for delivery when the recipient is next online (offline storage does not apply to &lt;iq/&gt; or &lt;presence/&gt; stanzas, only &lt;message/&gt; stanzas).  As described in <xref target="OFFLINE"/>, when sending an offline message to the recipient, the server SHOULD include delayed delivery data as specified in <xref target="DELAY"/> so that the recipient knows that this is an offline message and also knows the original time of receipt at the server.  In this case, the recipient SHOULD verify that the timestamp received in the encrypted message is within five minutes of the time stamped by the recipient's server in the &lt;delay/&gt; element.</t>
+      <t>The foregoing timestamp checks assume that the recipient is online when the message is received.  However, if the recipient is offline then the server will probably store the message for delivery when the recipient is next online (offline storage does not apply to &lt;iq/&gt; or &lt;presence/&gt; stanzas, only &lt;message/&gt; stanzas).  As described in <xref target="XEP-0160"/>, when sending an offline message to the recipient, the server SHOULD include delayed delivery data as specified in <xref target="XEP-0203"/> so that the recipient knows that this is an offline message and also knows the original time of receipt at the server.  In this case, the recipient SHOULD verify that the timestamp received in the encrypted message is within five minutes of the time stamped by the recipient's server in the &lt;delay/&gt; element.</t>
     </section>
     <section title="Interaction with Stanza Semantics" anchor="interact">
       <t>The following limitations and caveats apply:</t>
@@ -514,7 +515,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
   </middle>
   <back>
     <references title="Normative References">
-      <reference anchor="BASE64">
+      <reference anchor="RFC4684">
         <front>
           <title>The Base16, Base32, and Base64 Data Encodings</title>
           <author initials="S." surname="Josefsson" fullname="S. Josefsson">
@@ -541,7 +542,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <format type="TXT" octets="26773" target="ftp://ftp.isi.edu/in-notes/rfc3565.txt"/>
       </reference>
       -->
-      <reference anchor="DATETIME">
+      <reference anchor="XEP-0082">
         <front>
           <title>XMPP Date and Time Profiles</title>
           <author initials="P." surname="Saint-Andre" fullname="Peter Saint-Andre">
@@ -555,7 +556,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <seriesInfo name="XSF XEP" value="0082"/>
         <format type="HTML" target="http://xmpp.org/extensions/xep-0082.html"/>
       </reference>
-      <reference anchor="DELAY">
+      <reference anchor="XEP-0203">
         <front>
           <title>Delayed Delivery</title>
           <author initials="P." surname="Saint-Andre" fullname="Peter Saint-Andre">
@@ -583,7 +584,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <seriesInfo name="Internet-Draft" value="draft-saintandre-xmpp-e2e-requirements-01"/>
         <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-saintandre-xmpp-e2e-requirements-01.txt"/>
       </reference>
-      <reference anchor="MSG-FWD">
+      <reference anchor="XEP-0297">
         <front>
           <title>Message Forwarding</title>
           <author initials="M." surname="Wild" fullname="Matthew Wild">
@@ -603,7 +604,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <seriesInfo name="XSF XEP" value="0297"/>
         <format type="HTML" target="http://xmpp.org/extensions/xep-0297.html"/>
       </reference>
-      <reference anchor="KEYWORDS">
+      <reference anchor="RFC2119">
         <front>
           <title abbrev="RFC Key Words">Key words for use in RFCs to Indicate Requirement Levels</title>
           <author initials="S." surname="Bradner" fullname="Scott Bradner">
@@ -687,10 +688,10 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
               <email>jhildebr@cisco.com</email>
             </address>
           </author>
-          <date year="2012" month="January"/>
+          <date year="2012" month="May"/>
         </front>
-        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-encryption-00"/>
-        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-encryption-00.txt"/>
+        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-encryption-02"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-encryption-02.txt"/>
       </reference>
       <reference anchor="JOSE-JWK">
         <front>
@@ -701,10 +702,10 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
               <email>mjb@microsoft.com</email>
             </address>
           </author>
-          <date year="2012" month="January"/>
+          <date year="2012" month="May"/>
         </front>
-        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-key-00"/>
-        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-key-00.txt"/>
+        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-key-02"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-key-02.txt"/>
       </reference>
       <!--
       <reference anchor="PKIX">
@@ -737,7 +738,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <format type="TXT" octets="352580" target="ftp://ftp.isi.edu/in-notes/rfc5280.txt"/>
       </reference>
       -->
-      <reference anchor="SECTERMS">
+      <reference anchor="RFC4949">
         <front>
           <title>Internet Security Glossary, Version 2</title>
           <author initials="R." surname="Shirey" fullname="R. Shirey">
@@ -772,7 +773,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
       -->
     </references>
     <references title="Informative References">
-      <reference anchor="OFFLINE">
+      <reference anchor="XEP-0160">
         <front>
           <title>Best Practices for Handling Offline Messages</title>
           <author initials="P." surname="Saint-Andre" fullname="Peter Saint-Andre">
@@ -870,6 +871,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
       <xs:sequence>
         <xs:element ref='header' minOccurs='1' maxOccurs='1'/>
         <xs:element ref='data' minOccurs='1' maxOccurs='1'/>
+        <xs:element ref='mac' minOccurs='1' maxOccurs='1'/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -904,6 +906,15 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
   </xs:element>
 
   <xs:element name='header'>
+    <xs:complexType>
+      <xs:simpleType>
+        <xs:extension base='xs:string'>
+        </xs:extension>
+      </xs:simpleType>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='mac'>
     <xs:complexType>
       <xs:simpleType>
         <xs:extension base='xs:string'>
