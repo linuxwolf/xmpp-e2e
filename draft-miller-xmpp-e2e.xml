@@ -57,11 +57,11 @@
       <section title="Process" anchor="encrypt-process">
         <t>For a given plaintext stanza (S), the sending agent performs the following:<vspace blankLines="1"/>
         <list style="numbers">
-          <t>Notes the current UTC date and time N when this stanza is constructed, formatted as described under <xref target="timestamps"/>.</t>
+          <t>Notes the current UTC date and time N when this stanza is constructed, formatted as described under <xref target="timestamps"/>.<vspace blankLines="1"/></t>
           <t>Constructs a forwarding envelope M using a &lt;forwarded/&gt; element qualified by the "urn:xmpp:forward:0" namespace (as defined in <xref target="XEP-0297"/>) as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The child element &lt;delay/&gt; qualified by the "urn:xmpp:delay" namespace (as defined in <xref target="XEP-0203"/>) with the attribute 'stamp' set to the UTC date and time value N<vspace blankLines="1"/></t>
-            <t>The plaintext stanza S</t>
+            <t>The plaintext stanza S<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Convert the forwarding envelope M to a UTF-8 encoded string (M'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. P' = UTF8-encode(P).  We call P' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
@@ -204,7 +204,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
         <t>Before a CMK can be requested, the receiving agent MUST have at least one public key for which it also has the private key.</t>
         <t>To request a CMK, the receiving agent performs the following:<vspace blankLines="1"/>
         <list style="numbers">
-          <t>Constructs a <xref target="JOSE-JWK"/> container object (KS), containing information about each public key the requesting agent wishes to use.  Each key SHOULD include a value for the property 'kid' which uniquely identifies it within the context of all provided keys.  Each key MUST include a value for the property 'kid' if any two keys use the same algorithm.<vspace blankLines="1"/></t>
+          <t>Constructs a <xref target="JOSE-JWK"/> JWK Set (KS), containing information about each public key the requesting agent wishes to use.  Each key SHOULD include a value for the property 'kid' which uniquely identifies it within the context of all provided keys.  Each key MUST include a value for the property 'kid' if any two keys use the same algorithm.<vspace blankLines="1"/></t>
           <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the CMK identifier value CID.<vspace blankLines="1"/></t>
@@ -218,13 +218,13 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
       <section title="Accept Process" anchor="keyreq-process-accept">
         <t>If the sending agent approves the request, it performs the following:<vspace blankLines="1"/>
         <list style="numbers">
-          <t>Chooses a key (PK) from the list provided via KS, and notes its identifier value 'kid'.</t>
+          <t>Chooses a key (PK) from the keys provided via KS, and notes its identifier value 'kid'.<vspace blankLines="1"/></t>
           <t>Constructs a parial <xref target="JOSE-JWE"/> header (H) as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The property 'alg' set to the cryptographic algorithm for PK, which is used to secure the content encryption key CMK.<vspace blankLines="1"/></t>
             <t>The property 'kid' set to the identifier matching PK.<vspace blankLines="1"/></t>
           </list>
-          NOTE: this header is intentionally lacking required attributes. The receiving agent is responsible for assembling a final, valid JWE header.</t>
+          NOTE: this header is intentionally lacking required attributes. The receiving agent is responsible for assembling a final, valid JWE header.<vspace blankLines="1"/></t>
           <t>Encrypts the content encryption key CMK using the key PK, i.e. CMK' = pki-encrypt(PK, CMK).<vspace blankLines="1"/></t>
           <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
@@ -251,17 +251,19 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
         <t>To begin a key request, the receiving agent performs step 1 from <xref target="keyreq-process-request">request process</xref> to generate the <xref target="JOSE-JWK"/>:</t>
         <figure>
           <artwork><![CDATA[
-[{
-  "alg":"RSA",
-  "mod":"AL7ano5DBdNYfKChGh3xxGDtAtozO3iEm20rzbNEjSLWFjuhm46SXzeJXV8Nr6V
-         UXcrJ8FN85OqNv0g9GAh9VoHriNECtZJzEw3TUl8edntXOAU8IZQPIh7rrU1pqQ
-         anrJ9RjWZqgd42LCTpFQWMAibZAfQD2gb5NIrZUbYs4wn9Rx52ru5xkrcrIYLvP
-         rK8Yv3fKwuU0y0gf809Yunz_H8A5aHplzrQtFOuW8uT_tWR8Wn_2w_H6Y6bOoME
-         oHZGSjCQCNGzlmVrjKadp7amtMCwezXcW9iI63qIP7ObLAKEolw1XaLMEm6d-mT
-         _tZZwpNo_r2eKm4WhYOW2bYLfoME=",
-  "exp":"AQAB",
-  "kid":"romeo@montegue.lit/garden"
-}]
+{
+  "keys": [{
+    "alg":"RSA-OAEP",
+    "mod":"AL7ano5DBdNYfKChGh3xxGDtAtozO3iEm20rzbNEjSLWFjuhm46SXzeJXV8Nr6V
+           UXcrJ8FN85OqNv0g9GAh9VoHriNECtZJzEw3TUl8edntXOAU8IZQPIh7rrU1pqQ
+           anrJ9RjWZqgd42LCTpFQWMAibZAfQD2gb5NIrZUbYs4wn9Rx52ru5xkrcrIYLvP
+           rK8Yv3fKwuU0y0gf809Yunz_H8A5aHplzrQtFOuW8uT_tWR8Wn_2w_H6Y6bOoME
+           oHZGSjCQCNGzlmVrjKadp7amtMCwezXcW9iI63qIP7ObLAKEolw1XaLMEm6d-mT
+           _tZZwpNo_r2eKm4WhYOW2bYLfoME=",
+    "exp":"AQAB",
+    "kid":"romeo@montegue.lit/garden"
+  }]
+}
           ]]></artwork>
         </figure>
         <t>Then the receiving agent performs step 2 to generate the &lt;keyreq/&gt;:</t>
@@ -308,11 +310,11 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
 </iq>
           ]]></artwork>
         </figure>
-        <t>If the sending agent accepts this key request, it performs steps 1 and 2 from <xref target="keyreq-process-accept">accept process</xref> to generate the partial <xref target="JOSE-JWE"/> header:</t>
+        <t>If the sending agent accepts this key request, it performs steps 1 and 2 from <xref target="keyreq-process-accept"/> to generate the partial <xref target="JOSE-JWE"/> header:</t>
         <figure>
           <artwork><![CDATA[
 {
-  "alg":"RSA-OEAP",
+  "alg":"RSA-OAEP",
   "kid":"romeo@montegue.lit/garden"
 }
           ]]></artwork>
@@ -462,7 +464,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
       </section>
       <section title="Successful Decryption" anchor="inbound-success">
         <t>In the case where the protocol is understood and the receiving agent successfully decrypted the payload, it MUST NOT return a stanza error.</t>
-        <t>If the payload is an &lt;iq/&gt; of type "get" or "set", and the response is an error, the receiving agent MUST send the encrypted response in an &lt;iq/&gt; of type "result", to prevent exposing information about the payload.</t> 
+        <t>If the payload is an &lt;iq/&gt; of type "get" or "set", and the response to this &lt;iq/&gt; is of type "error", the receiving agent MUST send the encrypted response wrapped in an &lt;iq/&gt; of type "result", to prevent exposing information about the payload.</t> 
       </section>
     </section>
     <section title="Inclusion and Checking of Timestamps" anchor="timestamps">
