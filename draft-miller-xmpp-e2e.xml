@@ -42,6 +42,23 @@
       <t>Security-related terms are to be understood in the sense defined in <xref target="RFC4949"/>.</t>
       <t>The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
     </section>
+    <section title="Determining Support" anchor="disco">
+      <t>If an agent supports end-to-end object encryption, it MUST advertiset that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:2:encrypt".
+        <figure>
+          <artwork><![CDATA[
+<iq xmlns='jabber:client'
+    id='disco1'
+    to='romeo@montegue.lit/garden'
+    type='result'>
+  <query xmlns='http://jabber.org/protocol/disco#info'>
+    <feature xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2:encrypt'/>
+  </query>
+</iq>
+          ]]></artwork>
+        </figure>
+      </t>
+      <t>To help facilitate discovery, an agent SHOULD also include <xref target='XEP-0115'/> information in any directed or broadcast presence updates.</t>
+    </section>
     <section title="Encrypting XMPP Stanzas" anchor="encrypt">
       <t>The process that a sending agent follows for securing stanzas is the same regardless of the form of stanza (i.e., &lt;iq/&gt;, &lt;message/&gt;, or &lt;presence/&gt;).</t>
       <section title="Prerequisites" anchor="encrypt-prereq">
@@ -86,7 +103,7 @@
         </list>
       </t>
       </section>
-      <section title="Example Securing a Message" anchor="encrypt-example-msg">
+      <section title="Example - Securing a Message" anchor="encrypt-example-msg">
         <t>NOTE: unless otherwise indicated, all line breaks are included for readability.</t>
         <t>The sending agent begins with the plaintext version of the &lt;message/&gt; stanza 'S':</t>
         <figure>
@@ -201,8 +218,13 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
         </figure>
       </section>
     </section>
+    <section title="Decrypting XMPP Stanzas" anchor="decrypt">
+      <section title="Prerequisites">
+      </section>
+      <section title="Process">
+      </section>
+    </section>
     <section title="Requesting Content Keys" anchor="keyreq">
-      <t>A receiving agent might not have the conetnt encryption key to decrypt the stanza.</t>
       <section title="Request Process" anchor="keyreq-process-request">
         <t>Before a CMK can be requested, the receiving agent MUST have at least one public key for which it also has the private key.</t>
         <t>To request a CMK, the receiving agent performs the following:<vspace blankLines="1"/>
@@ -667,6 +689,36 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <seriesInfo name="RFC" value="6121"/>
         <format type="TXT"  target="http://tools.ietf.org/rfc/rfc6121.txt"/>
       </reference>
+      <reference anchor="XEP-0030">
+        <front>
+          <title>Service Discovery</title>
+          <author initials="R." surname="Eatmon" fullname="Ryan Eatmon">
+            <organization/>
+            <address>
+              <email>reatmon@jabber.org</email>
+            </address>
+          </author>
+          <author initials="J." surname="Hildebrand" fullname="Joe Hildebrand">
+            <organization>Cisco</organization>
+            <address>
+              <email>jhildebr@cisco.com</email>
+            </address>
+          </author>
+          <author initials="P." surname="Millard" fullname="Peter Millard">
+            <organization/>
+            <address/>
+          </author>
+          <author initials="P." surname="Saint-Andre" fullname="Peter Saint-Andre">
+            <organization/>
+            <address>
+              <email>stpeter@jabber.org</email>
+            </address>
+          </author>
+          <date month="June" year="2006"/>
+        </front>
+        <seriesInfo name="XSF XEP" value="0030"/>
+        <format type="HTML" target="http://xmpp.org/extensions/xep-0030.html"/>
+      </reference>
       <reference anchor="XEP-0082">
         <front>
           <title>XMPP Date and Time Profiles</title>
@@ -680,6 +732,32 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         </front>
         <seriesInfo name="XSF XEP" value="0082"/>
         <format type="HTML" target="http://xmpp.org/extensions/xep-0082.html"/>
+      </reference>
+      <reference anchor="XEP-0115">
+        <front>
+          <title>Entity Capabilities</title>
+          <author initials="J." surname="Hildebrand" fullname="Joe Hildebrand">
+            <organization>Cisco</organization>
+            <address>
+              <email>jhildebr@cisco.com</email>
+            </address>
+          </author>
+          <author initials="R." surname="Troncon" fullname="Remko Troncon">
+            <organization/>
+            <address>
+              <uri>http://el-tramo.be/</uri>
+            </address>
+          </author>
+          <author initials="P." surname="Saint-Andre" fullname="Peter Saint-Andre">
+            <organization/>
+            <address>
+              <email>stpeter@jabber.org</email>
+            </address>
+          </author>
+          <date month="February" year="2008"/>
+        </front>
+        <seriesInfo name="XSF XEP" value="0115"/>
+        <format type="HTML" target="http://xmpp.org/extensions/xep-0115.html"/>
       </reference>
       <reference anchor="XEP-0203">
         <front>
