@@ -3,8 +3,8 @@
 
 Network Working Group                                          M. Miller
 Internet-Draft                                       Cisco Systems, Inc.
-Intended status: Standards Track                       February 29, 2012
-Expires: September 1, 2012
+Intended status: Standards Track                           June 21, 2012
+Expires: December 23, 2012
 
 
  End-to-End Object Encryption for the Extensible Messaging and Presence
@@ -31,7 +31,7 @@ Status of this Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on September 1, 2012.
+   This Internet-Draft will expire on December 23, 2012.
 
 Copyright Notice
 
@@ -52,9 +52,9 @@ Copyright Notice
 
 
 
-Miller                  Expires September 1, 2012               [Page 1]
+Miller                  Expires December 23, 2012               [Page 1]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
 Table of Contents
@@ -108,9 +108,9 @@ Table of Contents
 
 
 
-Miller                  Expires September 1, 2012               [Page 2]
+Miller                  Expires December 23, 2012               [Page 2]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
 1.  Introduction
@@ -164,9 +164,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012               [Page 3]
+Miller                  Expires December 23, 2012               [Page 3]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
    information in any directed or broadcast presence updates.
@@ -220,9 +220,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012               [Page 4]
+Miller                  Expires December 23, 2012               [Page 4]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
        *  The child element <delay/> qualified by the "urn:xmpp:delay"
@@ -276,9 +276,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012               [Page 5]
+Miller                  Expires December 23, 2012               [Page 5]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
        *  The child element <mac/> qualified by the "urn"ietf:params:
@@ -332,9 +332,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012               [Page 6]
+Miller                  Expires December 23, 2012               [Page 6]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
    <forwarded xmlns='urn:xmpp:forward:0'>
@@ -388,9 +388,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012               [Page 7]
+Miller                  Expires December 23, 2012               [Page 7]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
    following:
@@ -444,9 +444,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012               [Page 8]
+Miller                  Expires December 23, 2012               [Page 8]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
 5.2.  Process
@@ -500,9 +500,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012               [Page 9]
+Miller                  Expires December 23, 2012               [Page 9]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
    <message xmlns='jabber:client'
@@ -556,9 +556,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012              [Page 10]
+Miller                  Expires December 23, 2012              [Page 10]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
    In addition to returning an error, the receiving agent SHOULD NOT
@@ -612,9 +612,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012              [Page 11]
+Miller                  Expires December 23, 2012              [Page 11]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
 6.1.  Request Process
@@ -668,9 +668,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012              [Page 12]
+Miller                  Expires December 23, 2012              [Page 12]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
    3.  Encrypts the content master key CMK using the key PK, i.e.  CMK'
@@ -724,9 +724,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012              [Page 13]
+Miller                  Expires December 23, 2012              [Page 13]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
    {
@@ -780,9 +780,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012              [Page 14]
+Miller                  Expires December 23, 2012              [Page 14]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
    <iq xmlns='jabber:client'
@@ -836,9 +836,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012              [Page 15]
+Miller                  Expires December 23, 2012              [Page 15]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
    <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
@@ -892,9 +892,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012              [Page 16]
+Miller                  Expires December 23, 2012              [Page 16]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
    perceived time or the underlying clock time, the sending agent MUST
@@ -948,9 +948,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012              [Page 17]
+Miller                  Expires December 23, 2012              [Page 17]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
 9.  Mandatory-to-Implement Cryptographic Algorithms
@@ -1004,9 +1004,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012              [Page 18]
+Miller                  Expires December 23, 2012              [Page 18]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
 12.1.  Normative References
@@ -1060,9 +1060,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012              [Page 19]
+Miller                  Expires December 23, 2012              [Page 19]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
    [XEP-0297]
@@ -1116,9 +1116,9 @@ Appendix A.  Schema for urn:ietf:params:xml:ns:xmpp-e2e:2
 
 
 
-Miller                  Expires September 1, 2012              [Page 20]
+Miller                  Expires December 23, 2012              [Page 20]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
          <xs:attribute name='id' type='xs:string' use='required'/>
@@ -1172,9 +1172,9 @@ Internet-Draft                  XMPP E2E                   February 2012
 
 
 
-Miller                  Expires September 1, 2012              [Page 21]
+Miller                  Expires December 23, 2012              [Page 21]
 
-Internet-Draft                  XMPP E2E                   February 2012
+Internet-Draft                  XMPP E2E                       June 2012
 
 
            <xs:extension base='xs:string'>
@@ -1228,5 +1228,5 @@ Author's Address
 
 
 
-Miller                  Expires September 1, 2012              [Page 22]
+Miller                  Expires December 23, 2012              [Page 22]
 
