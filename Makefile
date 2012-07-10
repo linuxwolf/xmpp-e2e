@@ -1,7 +1,14 @@
 RFC2TXT=xml2txt
 RFC2HTML=xml2html
+DOCNAME=draft-miller-xmpp-e2e
+INPUT=$(DOCNAME).xml
+OUTPUT=$(DOCNAME).txt \
+		$(DOCNAME).html
 
-all :	draft-miller-xmpp-e2e.txt draft-miller-xmpp-e2e.html
+all :	$(OUTPUT)
+
+clean :
+	rm -rf $(OUTPUT)
 
 %.html : %.xml
 	$(RFC2HTML) $<
