@@ -5,7 +5,7 @@
 <?rfc symrefs="yes"?>
 <?rfc toc="yes"?>
 <?rfc tocdepth="4"?>
-<rfc category="std" docName="draft-miller-xmpp-e2e-01" ipr="trust200902">
+<rfc category="std" docName="draft-miller-xmpp-e2e-02" ipr="trust200902">
   <front>
     <title abbrev="XMPP E2E">End-to-End Object Encryption for the Extensible Messaging and Presence Protocol (XMPP)</title>
     <author initials="M." surname="Miller" fullname="Matthew Miller">
@@ -22,7 +22,7 @@
         <email>mamille2@cisco.com</email>
       </address>
     </author>
-    <date month="June" day="21" year="2012"/>
+    <date month="July" day="11" year="2012"/>
     <area>RAI</area>
     <keyword>Internet-Draft</keyword>
     <keyword>XMPP</keyword>
@@ -38,12 +38,11 @@
       <t>Most proposals have not been able to support multiple end-points for a given recipient. As more devices support XMPP, it becomes more desirable to allow an entity to communicate with another in a more secure manner, regardless of the number of agents th entity is employing. This document specifies an approach for encrypting communications between two entities which each might have multiple end-points.</t>
     </section>
     <section title="Terminology" anchor="terms">
-      <t>This document inherits terminology defined in <xref target="RFC6120"/>.</t>
-      <t>Security-related terms are to be understood in the sense defined in <xref target="RFC4949"/>.</t>
+      <t>This document inherits XMPP-related terminology from <xref target="RFC6120"/>, JSON Web Algorithms (JWA)-related terminology from <xref target="JOSE-JWA"/>, JSON Web Encryption (JWE)-related terminology from <xref target="JOSE-JWE"/>, and JSON Web Key (JWK)-related terminology from <xref target="JOSE-JWK"/>.  Security-related terms are to be understood in the sense defined in <xref target="RFC4949"/>.</t>
       <t>The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
     </section>
     <section title="Determining Support" anchor="disco">
-      <t>If an agent supports end-to-end object encryption, it MUST advertiset that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:2:encrypt".
+      <t>If an agent supports end-to-end object encryption, it MUST advertiset that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:3:encrypt".
         <figure>
           <artwork><![CDATA[
 <iq xmlns='jabber:client'
@@ -51,7 +50,9 @@
     to='romeo@montegue.lit/garden'
     type='result'>
   <query xmlns='http://jabber.org/protocol/disco#info'>
-    <feature xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2:encrypt'/>
+    ...
+    <feature xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3:encrypt'/>
+    ...
   </query>
 </iq>
           ]]></artwork>
@@ -66,15 +67,15 @@
         <list style="symbols">
           <t>The JID of the sender (i.e. its own JID).  This SHOULD be the bare JID (localpart@domainpart).<vspace blankLines="1"/></t>
           <t>The JID of the recipient.  This SHOULD be the bare JID (localpart@domainpart).<vspace blankLines="1"/></t>
-          <t>A Content Master Key (CMK).  The CMK MUST have a length at least equal to that of the required encryption keys and MUST be generated randomly. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
-          <t>A CMK identifier (CID). The CID MUST be unique for a given (sender, recipient, CMK) tuple, and MUST NOT be derived from CMK itself.<vspace blankLines="1"/></t>
-          <t>Ensures the plaintext stanza is fully qualified, including the proper namespace declarations (e.g. contains the attribute 'xmlns' set to the value "jabber:client" for 'jabber:client' stanzas defined in <xref target="RFC6120"/>).<vspace blankLines="1"/></t>
+          <t>A Session Master Key (SMK).  The SMK MUST have a length at least equal to that required by the key wrapping algorithm in use and MUST be generated randomly. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
+          <t>A SMK identifier (SID). The SID MUST be unique for a given (sender, recipient, SMK) tuple, and MUST NOT be derived from SMK itself.<vspace blankLines="1"/></t>
         </list>
-      </t>
+        </t>
       </section>
       <section title="Process" anchor="encrypt-process">
         <t>For a given plaintext stanza (S), the sending agent performs the following:<vspace blankLines="1"/>
         <list style="numbers">
+          <t>Ensures the plaintext stanza is fully qualified, including the proper namespace declarations (e.g. contains the attribute 'xmlns' set to the value "jabber:client" for 'jabber:client' stanzas defined in <xref target="RFC6120"/>).<vspace blankLines="1"/></t>
           <t>Notes the current UTC date and time N when this stanza is constructed, formatted as described under <xref target="timestamps"/>.<vspace blankLines="1"/></t>
           <t>Constructs a forwarding envelope M using a &lt;forwarded/&gt; element qualified by the "urn:xmpp:forward:0" namespace (as defined in <xref target="XEP-0297"/>) as follows:<vspace blankLines="1"/>
           <list style="symbols">
@@ -82,21 +83,24 @@
             <t>The plaintext stanza S<vspace blankLines="1"/></t>
           </list>
           </t>
-          <t>Convert the forwarding envelope M to a UTF-8 encoded string (M'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. P' = UTF8-encode(P).  We call P' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
+          <t>Convert the forwarding envelope M to a UTF-8 encoded string (M'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. M' = UTF8-encode(M).  We call M' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
+          <t>Generates a Content Master Key (CMK). The CMK MUST have a length at least equal to that required by the content encryption algorithm in use and MUST be generated randomly. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
           <t>Generates any additional unprotected block cipher factors (IV); e.g. initialization vector/nonce.  A sending agent MUST ensure that no two sets of factors are used with the same CMK, and SHOULD NOT reuse such factors for other stanzas.<vspace blankLines="1"/></t>
-          <t>Performs the message encryption steps from <xref target='JOSE-JWE'/> to generate the JWE Header H, JWE Ciphertext C, and JWE Integrity Value I; using the following inputs:<vspace blankLines="1"/>
+          <t>Performs the message encryption steps from <xref target='JOSE-JWE'/> to generate the JWE Header H, JWE Encrypted Key E, JWE Ciphertext C, and JWE Integrity Value I; using the following inputs:<vspace blankLines="1"/>
             <list style="symbols">
-              <t>The 'alg' property is set to "none"; recipients use 'keyreq' in <xref target='keyreq'/> to obtain the CMK.<vspace blankLines="1"/></t>
+              <t>The 'alg' property is set to an appropriate key wrapping algorithm (e.g. "A256KW" or "A128KW"); recipients use 'keyreq' in <xref target='keyreq'/> to obtain the SMK.<vspace blankLines="1"/></t>
               <t>The 'enc' property is set to the intended content encryption algorithm.<vspace blankLines="1"/></t>
+              <t>SMK as the key for CMK Encryption.<vspace blankLines="1"/></t>
               <t>CMK as the Content Master Key.<vspace blankLines="1"/></t>
               <t>M' as the plaintext content to encrypt.<vspace blankLines="1"/></t>  
             </list>
           </t>
-          <t>Constructs an &lt;e2e/&gt; element qualified by the  "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace as follows:<vspace blankLines="1"/>
+          <t>Constructs an &lt;e2e/&gt; element qualified by the  "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
-            <t>The attribute 'id' set to the identifier value CID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as C, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The attribute 'id' set to the identifier value SID.<vspace blankLines="1"/></t>
+            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character as E, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character data as C, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
             <t>The child element &lt;mac/&gt; qualified by the "urn"ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as I, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
@@ -128,11 +132,11 @@
           <list style="symbols">
             <t>Sender JID as "juliet@capulet.lit"<vspace blankLines="1"/></t>
             <t>Recipient JID as "romeo@montegue.lit"<vspace blankLines="1"/></t>
-            <t>Content master key 'CMK' as (base64 encoded) "-ElMo6FndEkMxWP3TIkp1dDfVKqmqAAgrlcvVnUVpOc="<vspace blankLines="1"/></t>
-            <t>CMK identifier CID as "835c92a8-94cd-4e96-b3f3-b2e75a438f92"<vspace blankLines="1"/></t>
+            <t>Session Master Key 'SMK' as (base64 encoded) "xWtdjhYsH4Va_9SfYSefsJfZu03m5RrbXo_UavxxeU8=" <vspace blankLines="1"/></t>
+            <t>CMK identifier SID as "835c92a8-94cd-4e96-b3f3-b2e75a438f92"<vspace blankLines="1"/></t>
           </list>
         </t>
-        <t>The sending agent performs steps 1 and 2 to generate the envelope:</t>
+        <t>The sending agent performs steps 1, 2, and 3 to generate the envelope:</t>
         <figure>
           <artwork><![CDATA[
 <forwarded xmlns='urn:xmpp:forward:0'>
@@ -154,15 +158,21 @@
 </forwarded>
           ]]></artwork>
         </figure>
-        <t>Then the sending agent performs steps 3, 4, and 5 to generate the <xref target="JOSE-JWE"/> outputs:</t>
+        <t>Then the sending agent performs steps 4 through 7 (with Content Master Key as "-ElMo6FndEkMxWP3TIkp1dDfVKqmqAAgrlcvVnUVpOc=", base64 encoded) to generate the <xref target="JOSE-JWE"/> outputs:</t>
         <figure>
           <preamble>JWE Header</preamble>
           <artwork><![CDATA[
 {
-  "alg":"none",
+  "alg":"A256KW",
   "enc":"A256CCM",
   "iv":"B7waCj2vF_sLaJfe-1GHrA=="
 }
+          ]]></artwork>
+        </figure>
+        <figure>
+          <preamble>JWE Content Encryption Key</preamble>
+          <artwork><![CDATA[
+XvySjpkqv6m-hUrG2VSEwIM9wZqVcdP037trOMpqFbK_i2AvHLqiNA==
           ]]></artwork>
         </figure>
         <figure>
@@ -181,8 +191,8 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
 93Fr1nfFLNhXLCZYhZ7By6T9NN8omp4ZYE92HMpPzgo-eCGP
           ]]></artwork>
         </figure>
-        <t>NOTE: For CCM, the integrity value is encoded as part of the ciphertext, therefore the resulting Integrity Value is an octet string of length 0.</t>
-        <t>Then the sending agent performs steps 6 and 7, and sends the following:</t>
+        <t>NOTE: For CCM <xref target="RFC3610"/>, the integrity value is encoded as part of the ciphertext, therefore the resulting Integrity Value is an octet string of length 0.</t>
+        <t>Then the sending agent performs steps 8 and 9, and sends the following:</t>
         <figure>
           <artwork><![CDATA[
 <message xmlns='jabber:client'
@@ -190,13 +200,14 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>
       eyJlbmMiOiJBMjU2Q0NNIiwiaXYiOiJCN3dhQ2oydkZfc0xhSmZlLTFHS
       HJBPT0iLCJhZGF0YSI6IjQ5Mi0wNS0xMlQyMDowNzozNy4wMTJaIiwibX
       NpemUiOiIxNiJ9
     </header>
+    <cmk></cmk>
     <data>
       7LlMXd-qqPAQ_LZm6u9AR2csyDgT09z5DWdn8K5GLr_qbWRDKw2ufZrmO
       9YZ-jHl1IDeXeQ9azbNNViv8gpa-prDYkXOo3QoqYOJiA0RAkPU-UjN41
@@ -224,13 +235,14 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
         <t>If the receiving agent does not understand the protocol, it MUST do one and only one of the following: (1) ignore the &lt;e2e/&gt; extension, (2) ignore the entire stanza, or (3) return a &lt;service-unavailable/&gt; error to the sender, as described in <xref target="RFC6120"/>.</t>
         <t>NOTE: If the inbound stanza is an &lt;iq/&gt;, the receiving agent MUST return an error to the sending agent, to comply with the exchanging of IQ stanzas in <xref target="RFC6121"/>.</t>
       </section>
-      <section title="Process">
+      <section title="Process" anchor="decrypt-process">
         <t>Upon receipt of an encrypted stanza, the receiving agent performs the following:
           <list style="numbers">
-            <t>Determines if a valid CMK is available, associated with the CID specified by the 'id' attribute value of the &lt;e2e/&gtl; element and the sending agent JID specified by the 'from' attribute of the wrapping stanza. If the receiving agent does not already have the CMK, it requests it according to <xref target="keyreq"/>.<vspace blankLines="1"/></t>
+            <t>Determines if a valid SMK is available, associated with the SID specified by the 'id' attribute value of the &lt;e2e/&gtl; element and the sending agent JID specified by the 'from' attribute of the wrapping stanza. If the receiving agent does not already have the CMK, it requests it according to <xref target="keyreq"/>.<vspace blankLines="1"/></t>
             <t>Performs the message decryption steps from <xref target="JOSE-JWE"/> to generate the plaintext forwarding envelope string M', using the following inputs:<vspace blankLines="1"/>
               <list style="symbols">
                 <t>The JWE Header H from the &lt;header/&gt; element's character data content.<vspace blankLines="1"/></t>
+                <t>The JWE Content Encryption Key from the &lt;cmk/&gt; element's character data content.<vspace blankLines="1"/></t>
                 <t>The JWE Ciphertext C from the &lt;data/&gt; element's character data content.<vspace blankLines="1"/></t>
                 <t>The JWE Integrity Value I from the &lt;mac/&gt; element's character data content.<vspace blankLines="1"/></t>
               </list>
@@ -250,7 +262,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
     <data>[XML character data]</header>
@@ -275,7 +287,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
     <data>[XML character data]</header>
@@ -298,7 +310,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
     <data>[XML character data]</header>
@@ -316,17 +328,17 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
         <t>If the payload is an &lt;iq/&gt; of type "get" or "set", and the response to this &lt;iq/&gt; is of type "error", the receiving agent MUST send the encrypted response wrapped in an &lt;iq/&gt; of type "result", to prevent exposing information about the payload.</t>
       </section>
     </section>
-    <section title="Requesting Content Keys" anchor="keyreq">
-      <t>Because of the dynamic nature of XMPP stanza routing, the protocol does not exchange content keys as part of the encrypted stanza. Instead, a separate content key protocol is used by receiving agents to request a particular content key from the sending agent.</t>
+    <section title="Requesting Session Keys" anchor="keyreq">
+      <t>Because of the dynamic nature of XMPP stanza routing, the protocol does not exchange session keys as part of the encrypted stanza. Instead, a separate protocol is used by receiving agents to request a particular session key from the sending agent.</t>
       <section title="Request Process" anchor="keyreq-process-request">
-        <t>Before a CMK can be requested, the receiving agent MUST have at least one public key for which it also has the private key.</t>
-        <t>To request a CMK, the receiving agent performs the following:<vspace blankLines="1"/>
+        <t>Before a SMK can be requested, the receiving agent MUST have at least one public key for which it also has the private key.</t>
+        <t>To request a SMK, the receiving agent performs the following:<vspace blankLines="1"/>
         <list style="numbers">
           <t>Constructs a <xref target="JOSE-JWK"/> JWK Set (KS), containing information about each public key the requesting agent wishes to use.  Each key SHOULD include a value for the property 'kid' which uniquely identifies it within the context of all provided keys.  Each key MUST include a value for the property 'kid' if any two keys use the same algorithm.<vspace blankLines="1"/></t>
-          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace as follows:<vspace blankLines="1"/>
+          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
-            <t>The attribute 'id' set to the CMK identifier value CID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;pkey/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as KS, encoded base64url as pre <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The attribute 'id' set to the SMK identifier value SID.<vspace blankLines="1"/></t>
+            <t>The child element &lt;pkey/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character data as KS, encoded base64url as pre <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;keyreq/&gt; element as the payload of an &lt;iq/&gt; stanza with the attribute 'type' set to "get", the attribute 'to' set to the full JID of the original encrypted stanza's sender, and the attribute 'id' set to an opaque string value the receiving agent uses to track the &lt;iq/&gt; response.<vspace blankLines="1"/></t>
@@ -339,16 +351,16 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
           <t>Chooses a key (PK) from the keys provided via KS, and notes its identifier value 'kid'.<vspace blankLines="1"/></t>
           <t>Constructs a parial <xref target="JOSE-JWE"/> header (H) as follows:<vspace blankLines="1"/>
           <list style="symbols">
-            <t>The property 'alg' set to the cryptographic algorithm for PK, which is used to secure the content master key CMK.<vspace blankLines="1"/></t>
+            <t>The property 'alg' set to the cryptographic algorithm for PK, which is used to secure the content master key SMK.<vspace blankLines="1"/></t>
             <t>The property 'kid' set to the identifier matching PK.<vspace blankLines="1"/></t>
           </list>
           NOTE: this header is intentionally lacking required attributes. The receiving agent is responsible for assembling a final, valid JWE header.<vspace blankLines="1"/></t>
-          <t>Encrypts the content master key CMK using the key PK, i.e. CMK' = pki-encrypt(PK, CMK).<vspace blankLines="1"/></t>
-          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace as follows:<vspace blankLines="1"/>
+          <t>Encrypts the content master key SMK using the key PK, i.e. SMK' = pki-encrypt(PK, SMK).<vspace blankLines="1"/></t>
+          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
-            <t>The attribute 'id' set to the CMK identifier CID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as CMK', encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The attribute 'id' set to the SMK identifier SID.<vspace blankLines="1"/></t>
+            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character data as SMK', encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;keyreq/&gt; element as the payload of an &lt;iq/&gt; stanza with the attribute 'type' set to "result", the attribute 'to' set to the full JID from the request &lt;iq/&gt;'s 'from' attribute, and the attribute 'id' set to the value of the request &lt;iq/&gt;'s 'id' attribute.<vspace blankLines="1"/></t>
@@ -356,17 +368,17 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
         </t>
       </section>
       <section title="Error Conditions" anchor="keyreq-errors">
-        <t>If the sending agent does not approve of the request, it sends an &lt;iq/&gt; stanza of type "error" and containing the reason for denying the request:<vspace blankLines="1"/>
+        <t>If the sending agent does not approve the request, it sends an &lt;iq/&gt; stanza of type "error" and containing the reason for denying the request:<vspace blankLines="1"/>
           <list style="symbols">
-            <t>&lt;forbidden/&gt;: the key request is made by an entity that is not authorized to decrypt stanzas from the sending agent and/or for the indicated CID.<vspace blankLines="1"/></t>
-            <t>&lt;item-not-found/&gt;: the requested CID is no longer valid.<vspace blankLines="1"/></t>
+            <t>&lt;forbidden/&gt;: the key request is made by an entity that is not authorized to decrypt stanzas from the sending agent and/or for the indicated SID.<vspace blankLines="1"/></t>
+            <t>&lt;item-not-found/&gt;: the requested SID is no longer valid.<vspace blankLines="1"/></t>
             <t>&lt;not-acceptable/&gt;: the key request did not contain any keys the sending agent understands.<vspace blankLines="1"/></t>
           </list>
         </t>
       </section>
       <section title="Example of Successful Key Request" anchor="keyreq-example-success">
         <t>NOTE: unless otherwise indicated, all line breaks are included for readability.</t>
-        <t>To begin a key request, the receiving agent performs step 1 from <xref target="keyreq-process-request">request process</xref> to generate the <xref target="JOSE-JWK"/>:</t>
+        <t>To begin a key request, the receiving agent performs step 1 from <xref target="keyreq-process-request"/> to generate the <xref target="JOSE-JWK"/>:</t>
         <figure>
           <artwork><![CDATA[
 {
@@ -388,7 +400,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
         <t>Then the receiving agent performs step 2 to generate the &lt;keyreq/&gt;:</t>
         <figure>
           <artwork><![CDATA[
-<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
+<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
         id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
   <pkey>
     W3siYWxnIjoiUlNBIiwibW9kIjoiQUw3YW5vNURCZE5ZZktDaEdoM3h4R0R
@@ -413,7 +425,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
     id='xdJbWMA+'
     to='juliet@capulet.lit/balcony'
     type='get'>
-  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
+  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
           id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <pkey>
       W3siYWxnIjoiUlNBIiwibW9kIjoiQUw3YW5vNURCZE5ZZktDaEdoM3h4R
@@ -440,34 +452,34 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
 }
           ]]></artwork>
         </figure>
-        <t>Then the sending agent performs step 3 to generate the encrypted CMK:</t>
+        <t>Then the sending agent performs step 3 to generate the encrypted SMK:</t>
         <figure>
           <artwork><![CDATA[
-DCKrJpLd8XYze7joNKsyvpzGD4MffVQF7apQMkPK8_vKx4J3xEqWB3tXxp6oxJF
-4YHla4SFiMp44LccMEd6JchPp_23OXrBo8i7Fwo8jVH6QoQa71T_1rQj6CWQ1eF
-vXiU4Qmp52F-gjuUhlKfe3qccdlFp3kLy8Mpq5mDdq6deOq0_qusqr8QTqrT5LN
-IgsXYzrdiDdKx8KSKpI4FBB_H1x-A1C97DfJk9s5H7GzKVm2BRWVXWjJfO4lckE
-Z45ZJkA3CKq86Yth3YBetoScPVLhoRoO2qqBg4gR9dDO5mXnOgPslVfXWvegexH
-AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
+DsLfaD3ZPtE4k1wnhsHNsYyFi3spey8NNNMeYQ6L-sdLJrcWIwfOYNPK-Sb
+oLvsSiXB7yw1MLtKhhrAiRovEmMnTgoLvcuzX8PIBcDbSP3ie0aMynXqStb
+Rk-LwijdSY7NqD_WB1tP4dhqo3OwlXf4bSWlBnUDEzGh8giF6KYeRzw181m
+vMIJ6BCjwnvqTKBNlMDUX3cTfXSAFi9j8MkkS3wLbc2MM4RzP4ESyiZZQJn
+z_zkg1enjAbJ_fpwJ-E4a14EyWhwYpCNW3Tb5IhyhhgBsiLB6kulm9RMYwc
+TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
           ]]></artwork>
         </figure>
         <t>Then the sending agent performs step 4 to generate the &lt;keyreq/&gt; response:</t>
         <figure>
           <artwork><![CDATA[
-<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
+<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
         id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
   <header>
     eyJhbGciOiJSU0EtT0VBUCIsImtpZCI6InJvbWVvQG1vbnRlZ3VlLmxpc3Q
     vZ2FyZGVuIn0=
   </header>
-  <cmk>
-    DCKrJpLd8XYze7joNKsyvpzGD4MffVQF7apQMkPK8_vKx4J3xEqWB3tXxp6
-    oxJF4YHla4SFiMp44LccMEd6JchPp_23OXrBo8i7Fwo8jVH6QoQa71T_1rQ
-    j6CWQ1eFvXiU4Qmp52F-gjuUhlKfe3qccdlFp3kLy8Mpq5mDdq6deOq0_qu
-    sqr8QTqrT5LNIgsXYzrdiDdKx8KSKpI4FBB_H1x-A1C97DfJk9s5H7GzKVm
-    2BRWVXWjJfO4lckEZ45ZJkA3CKq86Yth3YBetoScPVLhoRoO2qqBg4gR9dD
-    O5mXnOgPslVfXWvegexHAyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
-  </cmk>
+  <smk>
+    DsLfaD3ZPtE4k1wnhsHNsYyFi3spey8NNNMeYQ6L-sdLJrcWIwfOYNPK-Sb
+    oLvsSiXB7yw1MLtKhhrAiRovEmMnTgoLvcuzX8PIBcDbSP3ie0aMynXqStb
+    Rk-LwijdSY7NqD_WB1tP4dhqo3OwlXf4bSWlBnUDEzGh8giF6KYeRzw181m
+    vMIJ6BCjwnvqTKBNlMDUX3cTfXSAFi9j8MkkS3wLbc2MM4RzP4ESyiZZQJn
+    z_zkg1enjAbJ_fpwJ-E4a14EyWhwYpCNW3Tb5IhyhhgBsiLB6kulm9RMYwc
+    TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
+  </smk>
 </keyreq>
           ]]></artwork>
         </figure>
@@ -479,21 +491,21 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
     id='xdJbWMA+'
     to='romeo@montegue.lit/garden'
     type='result'>
-  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
+  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
           id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>
       eyJhbGciOiJSU0EtT0VBUCIsImtpZCI6InJvbWVvQG1vbnRlZ3VlLmxpc
       3QvZ2FyZGVuIn0=
     </header>
-    <cmk>
-      DCKrJpLd8XYze7joNKsyvpzGD4MffVQF7apQMkPK8_vKx4J3xEqWB3tXx
-      p6oxJF4YHla4SFiMp44LccMEd6JchPp_23OXrBo8i7Fwo8jVH6QoQa71T
-      _1rQj6CWQ1eFvXiU4Qmp52F-gjuUhlKfe3qccdlFp3kLy8Mpq5mDdq6de
-      Oq0_qusqr8QTqrT5LNIgsXYzrdiDdKx8KSKpI4FBB_H1x-A1C97DfJk9s
-      5H7GzKVm2BRWVXWjJfO4lckEZ45ZJkA3CKq86Yth3YBetoScPVLhoRoO2
-      qqBg4gR9dDO5mXnOgPslVfXWvegexHAyhHmJZsj3yV_pW1Rlb5jn5J4Rw
+    <smk>
+      DsLfaD3ZPtE4k1wnhsHNsYyFi3spey8NNNMeYQ6L-sdLJrcWIwfOYNPK-
+      SboLvsSiXB7yw1MLtKhhrAiRovEmMnTgoLvcuzX8PIBcDbSP3ie0aMynX
+      qStbRk-LwijdSY7NqD_WB1tP4dhqo3OwlXf4bSWlBnUDEzGh8giF6KYeR
+      zw181mvMIJ6BCjwnvqTKBNlMDUX3cTfXSAFi9j8MkkS3wLbc2MM4RzP4E
+      SyiZZQJnz_zkg1enjAbJ_fpwJ-E4a14EyWhwYpCNW3Tb5IhyhhgBsiLB6
+      kulm9RMYwcTCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg
       ==
-    </cmk>
+    </smk>
   </keyreq>
 </iq>
           ]]></artwork>
@@ -532,10 +544,10 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
       <section title="Storage of Encrypted Stanzas" anchor="security-storage">
         <t>The recipient's server might store any &lt;message/&gt; stanzas received until the recipient is next available; this duration could be anywhere from a few minutes to several months.</t>
       </section>
-      <section title="Re-use of Content Master Keys" anchor="security-cmk">
-        <t>A sender SHOULD NOT use the same CMK for stanzas intended for different recipients, as determined by the localpart and domainpart of the recipient's JID.</t>
-        <t>A sender MAY re-use a CMK for several stanzas to the same recpient.  In this case, the CID remains the same, but the sending agent MUST generate a new IV for each encrypted stanza.  The sender SHOULD periodically generate a new CMK; however, this specification does not mandate any specific algorithms or processes.</t>
-        <t>In the case of &lt;message/&gt; stanzas, a sending agent might generate a new CMK each time it generates a new ThreadID, as outlined in <xref target="XEP-0201"/>.</t>
+      <section title="Re-use of Session Master Keys" anchor="security-smk">
+        <t>A sender SHOULD NOT use the same SMK for stanzas intended for different recipients, as determined by the localpart and domainpart of the recipient's JID.</t>
+        <t>A sender MAY re-use a SMK for several stanzas to the same recpient.  In this case, the SID remains the same, but the sending agent MUST generate a new CMK and IV for each encrypted stanza.  The sender SHOULD periodically generate a new SMK; however, this specification does not mandate any specific algorithms or processes.</t>
+        <t>In the case of &lt;message/&gt; stanzas, a sending agent might generate a new SMK each time it generates a new ThreadID, as outlined in <xref target="XEP-0201"/>.</t>
       </section>
     </section>
     <section title="IANA Considerations" anchor="iana">
@@ -543,7 +555,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <t>A URN sub-namespace of encrypted content for the Extensible Messaging and Presence Protocol (XMPP) is defined as follows.</t>
         <t>
           <list style="hanging">
-            <t hangText="URI:">urn:ietf:params:xml:ns:xmpp-e2e:2</t>
+            <t hangText="URI:">urn:ietf:params:xml:ns:xmpp-e2e:3</t>
             <t hangText="Specification:">RFC XXXX</t>
             <t hangText="Description:">This is an XML namespace name of encrypted content for the Extensible Messaging and Presence Protocol as defined by RFC XXXX.</t>
             <t hangText="Registrant Contact:">IESG, &lt;iesg@ietf.org&gt;</t>
@@ -568,6 +580,20 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
         <seriesInfo name="Internet-Draft" value="draft-saintandre-xmpp-e2e-requirements-01"/>
         <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-saintandre-xmpp-e2e-requirements-01.txt"/>
       </reference>
+      <reference anchor="JOSE-JWA">
+        <front>
+          <title>JSON Web Algorithms (JWA)</title>
+          <author initials="M." surname="Jones" fullname="Michael B. Jones">
+            <organization>Microsoft</organization>
+            <address>
+              <email>mjb@microsoft.com</email>
+            </address>
+          </author>
+          <date year="2012" month="July"/>
+        </front>
+        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-algorithms-03"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-algorithms-03.txt"/>
+      </reference>
       <reference anchor="JOSE-JWE">
         <front>
           <title>JSON Web Encryption (JWE)</title>
@@ -589,10 +615,10 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
               <email>jhildebr@cisco.com</email>
             </address>
           </author>
-          <date year="2012" month="May"/>
+          <date year="2012" month="July"/>
         </front>
-        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-encryption-02"/>
-        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-encryption-02.txt"/>
+        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-encryption-03"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-encryption-03.txt"/>
       </reference>
       <reference anchor="JOSE-JWK">
         <front>
@@ -603,10 +629,10 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
               <email>mjb@microsoft.com</email>
             </address>
           </author>
-          <date year="2012" month="May"/>
+          <date year="2012" month="July"/>
         </front>
-        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-key-02"/>
-        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-key-02.txt"/>
+        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-key-03"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-key-03.txt"/>
       </reference>
       <reference anchor="RFC2119">
         <front>
@@ -778,7 +804,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
       </reference>
       <reference anchor="XEP-0297">
         <front>
-          <title>Message Forwarding</title>
+          <title>Stanza Forwarding</title>
           <author initials="M." surname="Wild" fullname="Matthew Wild">
             <organization/>
             <address>
@@ -791,13 +817,30 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
               <email>kevin@kismith.co.uk</email>
             </address>
           </author>
-          <date day="11" month="July" year="2011"/>
+          <date day="11" month="July" year="2012"/>
         </front>
         <seriesInfo name="XSF XEP" value="0297"/>
         <format type="HTML" target="http://xmpp.org/extensions/xep-0297.html"/>
       </reference>
     </references>
     <references title="Informative References">
+      <reference anchor="RFC3610">
+        <front>
+          <title>Counter with CBC-MAC (CCM)</title>
+          <author initials="D." surname="Whiting" fullname="Doug Whiting">
+            <organization>Hifn</organization>
+          </author>
+          <author initials="R." surname="Housley" fullname="Russell Housley">
+            <organization>Vigil Security, LLC</organization>
+          </author>
+          <author initials="N." surname="Ferguson" fullname="Niels Ferguson">
+            <organization>MacFergus BV</organization>
+          </author>
+          <date year="2003" month="September"/>
+        </front>
+        <seriesInfo name="RFC" value="3923"/>
+        <format type="TXT" octets="51828" target="ftp://ftp.isi.edu/in-notes/rfc3923.txt"/>
+      </reference>
       <reference anchor="RFC3923">
         <front>
           <title>End-to-End Signing and Object Encryption for the Extensible Messaging and Presence Protocol (XMPP)</title>
@@ -974,7 +1017,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
       </reference>
       -->
     </references>
-    <section title="Schema for urn:ietf:params:xml:ns:xmpp-e2e:2" anchor="schemas-e2e">
+    <section title="Schema for urn:ietf:params:xml:ns:xmpp-e2e:3" anchor="schemas-e2e">
       <t>The following XML schema is descriptive, not normative.</t>
       <figure>
         <artwork><![CDATA[
@@ -982,8 +1025,8 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
 
 <xs:schema
     xmlns:xs='http://www.w3.org/2001/XMLSchema'
-    targetNamespace='urn:ietf:params:xml:ns:xmpp-e2e:2'
-    xmlns='urn:ietf:params:xml:ns:xmpp-e2e:2'
+    targetNamespace='urn:ietf:params:xml:ns:xmpp-e2e:3'
+    xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
     elementFormDefault='qualified'>
 
   <xs:element name='e2e'>
@@ -991,6 +1034,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
       <xs:attribute name='id' type='xs:string' use='required'/>
       <xs:sequence>
         <xs:element ref='header' minOccurs='1' maxOccurs='1'/>
+        <xs:element ref='cmk' minOccurs='1' maxOccurs='1'/>
         <xs:element ref='data' minOccurs='1' maxOccurs='1'/>
         <xs:element ref='mac' minOccurs='1' maxOccurs='1'/>
       </xs:sequence>
@@ -1003,7 +1047,7 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
       <xs:sequence>
         <xs:element ref='header' minOccurs='0' maxOccurs='1'/>
         <xs:element ref='pkey' minOccurs='0' maxOccurs='1'/>
-        <xs:element ref='cmk' minOccurs='0' maxOccurs='1'/>
+        <xs:element ref='smk' minOccurs='0' maxOccurs='1'/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -1045,6 +1089,15 @@ AyhHmJZsj3yV_pW1Rlb5jn5J4Rw==
   </xs:element>
 
   <xs:element name='pkey'>
+    <xs:complexType>
+      <xs:simpleType>
+        <xs:extension base='xs:string'>
+        </xs:extension>
+      </xs:simpleType>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='smk'>
     <xs:complexType>
       <xs:simpleType>
         <xs:extension base='xs:string'>
