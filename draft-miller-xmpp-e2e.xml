@@ -22,7 +22,7 @@
         <email>mamille2@cisco.com</email>
       </address>
     </author>
-    <date month="July" day="11" year="2012"/>
+    <date month="July" day="12" year="2012"/>
     <area>RAI</area>
     <keyword>Internet-Draft</keyword>
     <keyword>XMPP</keyword>
@@ -35,7 +35,7 @@
   <middle>
     <section title="Introduction" anchor="intro">
       <t>End-to-end encryption of traffic sent over the Extensible Messaging and Presence Protocol <xref target="RFC6120"/> is a desirable goal.  Requirements and a threat analysis for XMPP encryption are provided in <xref target="E2E-REQ"/>.  Many possible approaches to meet those (or similar) requirements have been proposed over the years, including methods based on PGP, S/MIME, SIGMA, and TLS.</t>
-      <t>Most proposals have not been able to support multiple end-points for a given recipient. As more devices support XMPP, it becomes more desirable to allow an entity to communicate with another in a more secure manner, regardless of the number of agents th entity is employing. This document specifies an approach for encrypting communications between two entities which each might have multiple end-points.</t>
+      <t>Most proposals have not been able to support multiple end-points for a given recipient. As more devices support XMPP, it becomes more desirable to allow an entity to communicate with another in a more secure manner, regardless of the number of agents the entity is employing. This document specifies an approach for encrypting communications between two entities which each might have multiple end-points.</t>
     </section>
     <section title="Terminology" anchor="terms">
       <t>This document inherits XMPP-related terminology from <xref target="RFC6120"/>, JSON Web Algorithms (JWA)-related terminology from <xref target="JOSE-JWA"/>, JSON Web Encryption (JWE)-related terminology from <xref target="JOSE-JWE"/>, and JSON Web Key (JWK)-related terminology from <xref target="JOSE-JWK"/>.  Security-related terms are to be understood in the sense defined in <xref target="RFC4949"/>.</t>
@@ -384,13 +384,12 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
 {
   "keys": [{
     "alg":"RSA-OAEP",
-    "mod":"AL7ano5DBdNYfKChGh3xxGDtAtozO3iEm20rzbNEjSLWFjuhm46S
-           XzeJXV8Nr6VUXcrJ8FN85OqNv0g9GAh9VoHriNECtZJzEw3TUl8e
-           dntXOAU8IZQPIh7rrU1pqQanrJ9RjWZqgd42LCTpFQWMAibZAfQD
-           2gb5NIrZUbYs4wn9Rx52ru5xkrcrIYLvPrK8Yv3fKwuU0y0gf809
-           Yunz_H8A5aHplzrQtFOuW8uT_tWR8Wn_2w_H6Y6bOoMEoHZGSjCQ
-           CNGzlmVrjKadp7amtMCwezXcW9iI63qIP7ObLAKEolw1XaLMEm6d
-           -mT_tZZwpNo_r2eKm4WhYOW2bYLfoME=",
+    "mod":"vtqejkMF01h8oKEaHfHEYO0C2jM7eISbbSvNs0SNItYWO6GbjpJf
+    N4ldXw2vpVRdysnwU3zk6o2_SD0YCH1WgeuI0QK1knMTDdNSXx52e1c4BTw
+    hlA8iHuutTWmpBqesn1GNZmqB3jYsJOkVBYwCJtkB9APaBvk0itlRtizjCf
+    1HHnau7nGStyshgu8-srxi_d8rC5TTLSB_zT1i6fP8fwDloemXOtC0U65by
+    5P-1ZHxaf_bD8fpjps6gwSgdkZKMJAI0bOWZWuMpp2ntqa0wLB7Ndxb2Ijr
+    eog_s5ssAoSiXDVdoswSbp36ZP-1lnCk2j-vZ4qbhaFg5bZtgt-gwQ==",
     "exp":"AQAB",
     "kid":"romeo@montegue.lit/garden"
   }]
