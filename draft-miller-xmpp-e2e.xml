@@ -22,7 +22,7 @@
         <email>mamille2@cisco.com</email>
       </address>
     </author>
-    <date month="July" day="16" year="2012"/>
+    <date month="July" day="13" year="2012"/>
     <area>RAI</area>
     <keyword>Internet-Draft</keyword>
     <keyword>XMPP</keyword>
@@ -101,7 +101,7 @@
             <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
             <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character as E, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
             <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character data as C, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;mac/&gt; qualified by the "urn"ietf:params:xml:ns:xmpp-e2e:2" namespace and with XML character data as I, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;mac/&gt; qualified by the "urn"ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character data as I, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;e2e/&gt; element as the payload of a stanza that SHOULD match the stanza from step 1 in kind (e.g., &lt;message/&gt;), type (e.g., "chat"), and addressing (e.g. to="romeo@montague.net" from="juliet@capulet.net/balcony"). If the original stanza (S) has a value for the "id" attribute, this stanza MUST NOT use the same value for its "id" attribute.<vspace blankLines="1"/></t>
@@ -115,7 +115,7 @@
           <artwork><![CDATA[
 <message xmlns='jabber:client'
          from='juliet@capulet.lit/balcony'
-         to='romeo@montegue.lit/garden'
+         to='romeo@montegue.lit'
          type='chat'>
   <thread>35740be5-b5a4-4c4e-962a-a03b14ed92f4</thread>
   <body>
@@ -130,7 +130,7 @@
         </figure>
         <t>and the following prerequisites:
           <list style="symbols">
-            <t>Sender JID as "juliet@capulet.lit"<vspace blankLines="1"/></t>
+            <t>Sender JID as "juliet@capulet.lit/balcony"<vspace blankLines="1"/></t>
             <t>Recipient JID as "romeo@montegue.lit"<vspace blankLines="1"/></t>
             <t>Session Master Key 'SMK' as (base64 encoded) "xWtdjhYsH4Va_9SfYSefsJfZu03m5RrbXo_UavxxeU8=" <vspace blankLines="1"/></t>
             <t>CMK identifier SID as "835c92a8-94cd-4e96-b3f3-b2e75a438f92"<vspace blankLines="1"/></t>
@@ -144,7 +144,7 @@
          stamp='1492-05-12T20:07:37.012Z'/>
   <message xmlns='jabber:client'
            from='juliet@capulet.lit/balcony'
-           to='romeo@montegue.lit/garden'
+           to='romeo@montegue.lit'
            type='chat'>
     <thread>35740be5-b5a4-4c4e-962a-a03b14ed92f4</thread>
     <body>
@@ -198,7 +198,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
 <message xmlns='jabber:client'
          from='juliet@capulet.lit/balcony'
          id='fJZd9WFIIwNjFctT'
-         to='romeo@montegue.lit/garden'
+         to='romeo@montegue.lit'
          type='chat'>
   <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
@@ -271,7 +271,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
     <bad-request
         xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
     <insufficient-information
-        xmlns='urn:ietf:params:xml:ns:xmpp-e2e'/>
+        xmlns='urn:ietf:params:xml:ns:xmp-e2e:3'/>
   </error>
 </message>
           ]]></artwork>
@@ -294,7 +294,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
   </e2e>
   <error type='modify'>
     <bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
-    <decryption-failed xmlns='urn:ietf:params:xml:ns:xmpp-e2e'/>
+    <decryption-failed xmlns='urn:ietf:params:xml:ns:xmp-e2e:3'/>
   </error>
 </message>
           ]]></artwork>
@@ -317,7 +317,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
   </e2e>
   <error type='modify'>
     <bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
-    <bad-timestamp xmlns='urn:ietf:params:xml:ns:xmpp-e2e'/>
+    <bad-timestamp xmlns='urn:ietf:params:xml:ns:xmp-e2e:3'/>
   </error>
 </message>
           ]]></artwork>
@@ -354,7 +354,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
             <t>The property 'alg' set to the cryptographic algorithm for PK, which is used to secure the content master key SMK.<vspace blankLines="1"/></t>
             <t>The property 'kid' set to the identifier matching PK.<vspace blankLines="1"/></t>
           </list>
-          NOTE: this header is intentionally lacking required attributes. The receiving agent is responsible for assembling a final, valid JWE header.<vspace blankLines="1"/></t>
+          <vspace blankLines="1"/></t>
           <t>Encrypts the content master key SMK using the key PK, i.e. SMK' = pki-encrypt(PK, SMK).<vspace blankLines="1"/></t>
           <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
@@ -545,7 +545,7 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
       </section>
       <section title="Re-use of Session Master Keys" anchor="security-smk">
         <t>A sender SHOULD NOT use the same SMK for stanzas intended for different recipients, as determined by the localpart and domainpart of the recipient's JID.</t>
-        <t>A sender MAY re-use a SMK for several stanzas to the same recpient.  In this case, the SID remains the same, but the sending agent MUST generate a new CMK and IV for each encrypted stanza.  The sender SHOULD periodically generate a new SMK; however, this specification does not mandate any specific algorithms or processes.</t>
+        <t>A sender MAY re-use a SMK for several stanzas to the same recipient.  In this case, the SID remains the same, but the sending agent MUST generate a new CMK and IV for each encrypted stanza.  The sender SHOULD periodically generate a new SMK; however, this specification does not mandate any specific algorithms or processes.</t>
         <t>In the case of &lt;message/&gt; stanzas, a sending agent might generate a new SMK each time it generates a new ThreadID, as outlined in <xref target="XEP-0201"/>.</t>
       </section>
     </section>
