@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc compact="yes"?>
+<?rfc strict="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc toc="yes"?>
+<?rfc tocdepth="4"?>
+<rfc category="std" docName="draft-miller-xmpp-e2e-03" ipr="trust200902">
+  <front>
+    <title abbrev="JWE Protected JWK">Using JSON Web Encryption (JWE) for Protecting JSON Web Key (JWK) Objects</title>
+    <author initials="M." surname="Miller" fullname="Matthew Miller">
+      <organization>Cisco Systems, Inc.</organization>
+      <address>
+        <postal>
+          <street>1899 Wynkoop Street, Suite 600</street>
+          <city>Denver</city>
+          <region>CO</region>
+          <code>80202</code>
+          <country>USA</country>
+        </postal>
+        <phone>+1-303-308-3204</phone>
+        <email>mamille2@cisco.com</email>
+      </address>
+    </author>
+    <date month="January" day="14" year="2013"/>
+    <area>Security</area>
+    <keyword>Internet-Draft</keyword>
+    <keyword>JOSE</keyword>
+    <abstract>
+      <t></t>
+    </abstract>
+  </front>
+  <middle>
+    <section title="Introduction" anchor="intro">
+      <t></t>
+    </section>
+    <section title="Terminology" anchor="terms">
+      <t>This document inherits JSON Web Algorithms (JWA)-related terminology from <xref target="JOSE-JWA"/>, JSON Web Encryption (JWE)-related terminology from <xref target="JOSE-JWE"/>, and JSON Web Key (JWK)-related terminology from <xref target="JOSE-JWK"/>.  Security-related terms are to be understood in the sense defined in <xref target="RFC4949"/>.</t>
+      <t>The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
+    </section>
+    <section title="Security Considerations" anchor="security">
+    </section>
+  </middle>
+  <back>
+    <references title="Normative References">
+      <reference anchor="JOSE-JWA">
+        <front>
+          <title>JSON Web Algorithms (JWA)</title>
+          <author initials="M." surname="Jones" fullname="Michael B. Jones">
+            <organization>Microsoft</organization>
+            <address>
+              <email>mjb@microsoft.com</email>
+            </address>
+          </author>
+          <date year="2012" month="December"/>
+        </front>
+        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-algorithms-08"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-algorithms-08.txt"/>
+      </reference>
+      <reference anchor="JOSE-JWE">
+        <front>
+          <title>JSON Web Encryption (JWE)</title>
+          <author initials="M." surname="Jones" fullname="Michael B. Jones">
+            <organization>Microsoft</organization>
+            <address>
+              <email>mjb@microsoft.com</email>
+            </address>
+          </author>
+          <author initials="E." surname="Rescola" fullname="Eric Rescola">
+            <organization>RTFM, Inc.</organization>
+            <address>
+              <email>ekr@rtfm.com</email>
+            </address>
+          </author>
+          <author initials="J." surname="Hildebrand" fullname="Joe Hildebrand">
+            <organization>Cisco Systems, Inc.</organization>
+            <address>
+              <email>jhildebr@cisco.com</email>
+            </address>
+          </author>
+          <date year="2012" month="December"/>
+        </front>
+        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-encryption-08"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-encryption-08.txt"/>
+      </reference>
+      <reference anchor="JOSE-JWK">
+        <front>
+          <title>JSON Web Key (JWK)</title>
+          <author initials="M." surname="Jones" fullname="Michael B. Jones">
+            <organization>Microsoft</organization>
+            <address>
+              <email>mjb@microsoft.com</email>
+            </address>
+          </author>
+          <date year="2012" month="December"/>
+        </front>
+        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-key-08"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-key-08.txt"/>
+      </reference>
+      <reference anchor="RFC2119">
+        <front>
+          <title abbrev="RFC Key Words">Key words for use in RFCs to Indicate Requirement Levels</title>
+          <author initials="S." surname="Bradner" fullname="Scott Bradner">
+            <organization>Harvard University</organization>
+            <address>
+              <postal>
+                <street>1350 Mass.  Ave.</street>
+                <street>Cambridge</street>
+                <street>MA 02138</street>
+              </postal>
+              <phone>- +1 617 495 3864</phone>
+              <email>-</email>
+            </address>
+          </author>
+          <date month="March" year="1997"/>
+          <area>General</area>
+          <keyword>keyword</keyword>
+          <abstract>
+            <t>In many standards track documents several words are used to signify the requirements in the specification.  These words are often capitalized.  This document defines these words as they should be interpreted in IETF documents.  Authors who follow these guidelines should incorporate this phrase near the beginning of their document: 
+              <list><t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.</t></list>
+            </t>
+            <t>Note that the force of these words is modified by the requirement level of the document in which they are used.</t>
+          </abstract>
+        </front>
+        <seriesInfo name="BCP" value="14"/>
+        <seriesInfo name="RFC" value="2119"/>
+      </reference>
+      <reference anchor="RFC4684">
+        <front>
+          <title>The Base16, Base32, and Base64 Data Encodings</title>
+          <author initials="S." surname="Josefsson" fullname="S. Josefsson">
+            <organization/>
+          </author>
+          <date year="2006" month="October"/>
+          <abstract>
+            <t>This document describes the commonly used base 64, base 32, and base 16 encoding schemes. It also discusses the use of line-feeds in encoded data, use of padding in encoded data, use of non-alphabet characters in encoded data, use of different encoding alphabets, and canonical encodings. [STANDARDS TRACK]</t>
+          </abstract>
+        </front>
+        <seriesInfo name="RFC" value="4648"/>
+        <format type="TXT" octets="35491" target="ftp://ftp.isi.edu/in-notes/rfc4648.txt"/>
+      </reference>
+      <reference anchor="RFC4949">
+        <front>
+          <title>Internet Security Glossary, Version 2</title>
+          <author initials="R." surname="Shirey" fullname="R. Shirey">
+            <organization/>
+          </author>
+          <date year="2007" month="August"/>
+          <abstract>
+            <t>This Glossary provides definitions, abbreviations, and explanations of terminology for information system security.  The 334 pages of entries offer recommendations to improve the comprehensibility of written material that is generated in the Internet Standards Process (RFC 2026).  The recommendations follow the principles that such writing should (a) use the same term or definition whenever the same concept is mentioned; (b) use terms in their plainest, dictionary sense; (c) use terms that are already well-established in open publications; and (d) avoid terms that either favor a particular vendor or favor a particular technology or mechanism over other, competing techniques that already exist or could be developed.  This memo provides information for the Internet community.</t>
+          </abstract>
+        </front>
+        <seriesInfo name="RFC" value="4949"/>
+        <format type="TXT" octets="867626" target="ftp://ftp.isi.edu/in-notes/rfc4949.txt"/>
+      </reference>
+    </references>
+  </back>
+</rfc>
