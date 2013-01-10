@@ -5,7 +5,7 @@
 <?rfc symrefs="yes"?>
 <?rfc toc="yes"?>
 <?rfc tocdepth="4"?>
-<rfc category="std" docName="draft-miller-xmpp-e2e-02" ipr="trust200902">
+<rfc category="std" docName="draft-miller-xmpp-e2e-03" ipr="trust200902">
   <front>
     <title abbrev="XMPP E2E">End-to-End Object Encryption for the Extensible Messaging and Presence Protocol (XMPP)</title>
     <author initials="M." surname="Miller" fullname="Matthew Miller">
@@ -22,7 +22,7 @@
         <email>mamille2@cisco.com</email>
       </address>
     </author>
-    <date month="July" day="13" year="2012"/>
+    <date month="January" day="10" year="2013"/>
     <area>RAI</area>
     <keyword>Internet-Draft</keyword>
     <keyword>XMPP</keyword>
@@ -42,7 +42,7 @@
       <t>The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
     </section>
     <section title="Determining Support" anchor="disco">
-      <t>If an agent supports end-to-end object encryption, it MUST advertiset that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:3:encrypt".
+      <t>If an agent supports end-to-end object encryption, it MUST advertiset that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:4".
         <figure>
           <artwork><![CDATA[
 <iq xmlns='jabber:client'
@@ -51,7 +51,7 @@
     type='result'>
   <query xmlns='http://jabber.org/protocol/disco#info'>
     ...
-    <feature xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3:encrypt'/>
+    <feature xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'/>
     ...
   </query>
 </iq>
@@ -91,17 +91,19 @@
               <t>The 'alg' property is set to an appropriate key wrapping algorithm (e.g. "A256KW" or "A128KW"); recipients use 'keyreq' in <xref target='keyreq'/> to obtain the SMK.<vspace blankLines="1"/></t>
               <t>The 'enc' property is set to the intended content encryption algorithm.<vspace blankLines="1"/></t>
               <t>SMK as the key for CMK Encryption.<vspace blankLines="1"/></t>
-              <t>CMK as the Content Master Key.<vspace blankLines="1"/></t>
+              <t>CMK as the JWE Content Master Key.<vspace blankLines="1"/></t>
+              <t>IV as the JWE Initialization Vector.<vspace blankLines="1"/></t>
               <t>M' as the plaintext content to encrypt.<vspace blankLines="1"/></t>  
             </list>
           </t>
-          <t>Constructs an &lt;e2e/&gt; element qualified by the  "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace as follows:<vspace blankLines="1"/>
+          <t>Constructs an &lt;e2e/&gt; element qualified by the  "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the identifier value SID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character as E, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character data as C, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;mac/&gt; qualified by the "urn"ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character data as I, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character as E, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;iv/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character as IV, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as C, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;mac/&gt; qualified by the "urn"ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as I, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;e2e/&gt; element as the payload of a stanza that SHOULD match the stanza from step 1 in kind (e.g., &lt;message/&gt;), type (e.g., "chat"), and addressing (e.g. to="romeo@montague.net" from="juliet@capulet.net/balcony"). If the original stanza (S) has a value for the "id" attribute, this stanza MUST NOT use the same value for its "id" attribute.<vspace blankLines="1"/></t>
@@ -133,7 +135,7 @@
             <t>Sender JID as "juliet@capulet.lit/balcony"<vspace blankLines="1"/></t>
             <t>Recipient JID as "romeo@montegue.lit"<vspace blankLines="1"/></t>
             <t>Session Master Key 'SMK' as (base64 encoded) "xWtdjhYsH4Va_9SfYSefsJfZu03m5RrbXo_UavxxeU8=" <vspace blankLines="1"/></t>
-            <t>CMK identifier SID as "835c92a8-94cd-4e96-b3f3-b2e75a438f92"<vspace blankLines="1"/></t>
+            <t>SMK identifier SID as "835c92a8-94cd-4e96-b3f3-b2e75a438f92"<vspace blankLines="1"/></t>
           </list>
         </t>
         <t>The sending agent performs steps 1, 2, and 3 to generate the envelope:</t>
@@ -165,15 +167,21 @@
 {
   "alg":"A256KW",
   "enc":"A256CCM",
-  "iv":"B7waCj2vF_sLaJfe-1GHrA=="
+  "kid":"835c92a8-94cd-4e96-b3f3-b2e75a438f92"
 }
           ]]></artwork>
         </figure>
         <figure>
           <preamble>JWE Content Encryption Key</preamble>
           <artwork><![CDATA[
-XvySjpkqv6m-hUrG2VSEwIM9wZqVcdP037trOMpqFbK_i2AvHLqiNA==
+XvySjpkqv6m-hUrG2VSEwIM9wZqVcdP037trOMpqFbK_i2AvHLqiNA
           ]]></artwork>
+        </figure>
+        <figure>
+          <preamble>JWE Initialization Vector</preamble>
+          <artwork><![CDATA[
+B7waCj2vF_sLaJfe-1GHrA
+            ]]></artwork>
         </figure>
         <figure>
           <preamble>JWE Ciphertext</preamble>
@@ -200,14 +208,19 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>
       eyJlbmMiOiJBMjU2Q0NNIiwiaXYiOiJCN3dhQ2oydkZfc0xhSmZlLTFHS
       HJBPT0iLCJhZGF0YSI6IjQ5Mi0wNS0xMlQyMDowNzozNy4wMTJaIiwibX
       NpemUiOiIxNiJ9
     </header>
-    <cmk></cmk>
+    <cmk>
+      XvySjpkqv6m-hUrG2VSEwIM9wZqVcdP037trOMpqFbK_i2AvHLqiNA
+    </cmk>
+    <iv>
+      B7waCj2vF_sLaJfe-1GHrA
+    </iv>
     <data>
       7LlMXd-qqPAQ_LZm6u9AR2csyDgT09z5DWdn8K5GLr_qbWRDKw2ufZrmO
       9YZ-jHl1IDeXeQ9azbNNViv8gpa-prDYkXOo3QoqYOJiA0RAkPU-UjN41
@@ -243,6 +256,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
               <list style="symbols">
                 <t>The JWE Header H from the &lt;header/&gt; element's character data content.<vspace blankLines="1"/></t>
                 <t>The JWE Content Encryption Key from the &lt;cmk/&gt; element's character data content.<vspace blankLines="1"/></t>
+                <t>The JWE Initialization Vector/Nonce from the &lt;iv/&gt; element's character data content.<vspace blankLines="1"/></t>
                 <t>The JWE Ciphertext C from the &lt;data/&gt; element's character data content.<vspace blankLines="1"/></t>
                 <t>The JWE Integrity Value I from the &lt;mac/&gt; element's character data content.<vspace blankLines="1"/></t>
               </list>
@@ -262,7 +276,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
     <data>[XML character data]</header>
@@ -271,7 +285,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
     <bad-request
         xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
     <insufficient-information
-        xmlns='urn:ietf:params:xml:ns:xmp-e2e:3'/>
+        xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'/>
   </error>
 </message>
           ]]></artwork>
@@ -287,14 +301,14 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
     <data>[XML character data]</header>
   </e2e>
   <error type='modify'>
     <bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
-    <decryption-failed xmlns='urn:ietf:params:xml:ns:xmp-e2e:3'/>
+    <decryption-failed xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'/>
   </error>
 </message>
           ]]></artwork>
@@ -310,14 +324,14 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
     <data>[XML character data]</header>
   </e2e>
   <error type='modify'>
     <bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
-    <bad-timestamp xmlns='urn:ietf:params:xml:ns:xmp-e2e:3'/>
+    <bad-timestamp xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'/>
   </error>
 </message>
           ]]></artwork>
@@ -335,10 +349,10 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
         <t>To request a SMK, the receiving agent performs the following:<vspace blankLines="1"/>
         <list style="numbers">
           <t>Constructs a <xref target="JOSE-JWK"/> JWK Set (KS), containing information about each public key the requesting agent wishes to use.  Each key SHOULD include a value for the property 'kid' which uniquely identifies it within the context of all provided keys.  Each key MUST include a value for the property 'kid' if any two keys use the same algorithm.<vspace blankLines="1"/></t>
-          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace as follows:<vspace blankLines="1"/>
+          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the SMK identifier value SID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;pkey/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character data as KS, encoded base64url as pre <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;pkey/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as KS, encoded base64url as pre <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;keyreq/&gt; element as the payload of an &lt;iq/&gt; stanza with the attribute 'type' set to "get", the attribute 'to' set to the full JID of the original encrypted stanza's sender, and the attribute 'id' set to an opaque string value the receiving agent uses to track the &lt;iq/&gt; response.<vspace blankLines="1"/></t>
@@ -356,11 +370,11 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
           </list>
           <vspace blankLines="1"/></t>
           <t>Encrypts the content master key SMK using the key PK, i.e. SMK' = pki-encrypt(PK, SMK).<vspace blankLines="1"/></t>
-          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace as follows:<vspace blankLines="1"/>
+          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the SMK identifier SID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:3" namespace and with XML character data as SMK', encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as SMK', encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;keyreq/&gt; element as the payload of an &lt;iq/&gt; stanza with the attribute 'type' set to "result", the attribute 'to' set to the full JID from the request &lt;iq/&gt;'s 'from' attribute, and the attribute 'id' set to the value of the request &lt;iq/&gt;'s 'id' attribute.<vspace blankLines="1"/></t>
@@ -399,7 +413,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
         <t>Then the receiving agent performs step 2 to generate the &lt;keyreq/&gt;:</t>
         <figure>
           <artwork><![CDATA[
-<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
+<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
         id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
   <pkey>
     W3siYWxnIjoiUlNBIiwibW9kIjoiQUw3YW5vNURCZE5ZZktDaEdoM3h4R0R
@@ -424,7 +438,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
     id='xdJbWMA+'
     to='juliet@capulet.lit/balcony'
     type='get'>
-  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
+  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
           id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <pkey>
       W3siYWxnIjoiUlNBIiwibW9kIjoiQUw3YW5vNURCZE5ZZktDaEdoM3h4R
@@ -465,7 +479,7 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
         <t>Then the sending agent performs step 4 to generate the &lt;keyreq/&gt; response:</t>
         <figure>
           <artwork><![CDATA[
-<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
+<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
         id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
   <header>
     eyJhbGciOiJSU0EtT0VBUCIsImtpZCI6InJvbWVvQG1vbnRlZ3VlLmxpc3Q
@@ -490,7 +504,7 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
     id='xdJbWMA+'
     to='romeo@montegue.lit/garden'
     type='result'>
-  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
+  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
           id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>
       eyJhbGciOiJSU0EtT0VBUCIsImtpZCI6InJvbWVvQG1vbnRlZ3VlLmxpc
@@ -554,7 +568,7 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
         <t>A URN sub-namespace of encrypted content for the Extensible Messaging and Presence Protocol (XMPP) is defined as follows.</t>
         <t>
           <list style="hanging">
-            <t hangText="URI:">urn:ietf:params:xml:ns:xmpp-e2e:3</t>
+            <t hangText="URI:">urn:ietf:params:xml:ns:xmpp-e2e:4</t>
             <t hangText="Specification:">RFC XXXX</t>
             <t hangText="Description:">This is an XML namespace name of encrypted content for the Extensible Messaging and Presence Protocol as defined by RFC XXXX.</t>
             <t hangText="Registrant Contact:">IESG, &lt;iesg@ietf.org&gt;</t>
@@ -588,10 +602,10 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
               <email>mjb@microsoft.com</email>
             </address>
           </author>
-          <date year="2012" month="July"/>
+          <date year="2012" month="December"/>
         </front>
-        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-algorithms-03"/>
-        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-algorithms-03.txt"/>
+        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-algorithms-08"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-algorithms-08.txt"/>
       </reference>
       <reference anchor="JOSE-JWE">
         <front>
@@ -614,10 +628,10 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
               <email>jhildebr@cisco.com</email>
             </address>
           </author>
-          <date year="2012" month="July"/>
+          <date year="2012" month="December"/>
         </front>
-        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-encryption-03"/>
-        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-encryption-03.txt"/>
+        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-encryption-08"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-encryption-08.txt"/>
       </reference>
       <reference anchor="JOSE-JWK">
         <front>
@@ -628,10 +642,10 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
               <email>mjb@microsoft.com</email>
             </address>
           </author>
-          <date year="2012" month="July"/>
+          <date year="2012" month="December"/>
         </front>
-        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-key-03"/>
-        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-key-03.txt"/>
+        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-key-08"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-key-08.txt"/>
       </reference>
       <reference anchor="RFC2119">
         <front>
@@ -917,106 +931,8 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
         <seriesInfo name="XSF XEP" value="0203"/>
         <format type="HTML" target="http://xmpp.org/extensions/xep-0203.html"/>
       </reference>
-      <!--
-      <reference anchor="CMS-AES">
-        <front>
-          <title>Use of the Advanced Encryption Standard (AES) Encryption Algorithm in Cryptographic Message Syntax (CMS)</title>
-          <author initials="J." surname="Schaad" fullname="J. Schaad">
-            <organization/>
-          </author>
-          <date year="2003" month="July"/>
-        </front>
-        <seriesInfo name="RFC" value="3565"/>
-        <format type="TXT" octets="26773" target="ftp://ftp.isi.edu/in-notes/rfc3565.txt"/>
-      </reference>
-      -->
-      <!--
-      <reference anchor="HMAC">
-        <front>
-          <title>US Secure Hash Algorithms (SHA and HMAC-SHA)</title>
-          <author initials="D." surname="Eastlake" fullname="D. Eastlake">
-            <organization/>
-          </author>
-          <author initials="T." surname="Hansen" fullname="T. Hansen">
-            <organization/>
-          </author>
-          <date year="2006" month="July"/>
-          <abstract>
-            <t>The United States of America has adopted a suite of Secure Hash Algorithms (SHAs), including four beyond SHA-1, as part of a Federal Information Processing Standard (FIPS), specifically SHA-224 (RFC 3874), SHA-256, SHA-384, and SHA-512. The purpose of this document is to make source code performing these hash functions conveniently available to the Internet community. The sample code supports input strings of arbitrary bit length. SHA-1's sample code from RFC 3174 has also been updated to handle input strings of arbitrary bit length. Most of the text herein was adapted by the authors from FIPS 180-2.&lt;/t&gt;&lt;t&gt; Code to perform SHA-based HMACs, with arbitrary bit length text, is also included. This memo provides information for the Internet community.</t>
-          </abstract>
-        </front>
-        <seriesInfo name="RFC" value="4634"/>
-        <format type="TXT" octets="197147" target="ftp://ftp.isi.edu/in-notes/rfc4634.txt"/>
-      </reference>
-      -->
-      <!--
-      <reference anchor="JOSE-JWA">
-        <front>
-          <title>JSON Web Algorithms (JWA)</title>
-          <author initials="M." surname="Jones" fullname="Michael B. Jones">
-            <organization>Microsoft</organization>
-            <address>
-              <email>mjb@microsoft.com</email>
-            </address>
-          </author>
-          <date year="2012" month="January"/>
-        </front>
-        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-algorithms-00"/>
-        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-algorithms-00.txt"/>
-      </reference>
-      -->
-      <!--
-      <reference anchor="PKIX">
-        <front>
-          <title>Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile</title>
-          <author initials="D." surname="Cooper" fullname="D. Cooper">
-            <organization/>
-          </author>
-          <author initials="S." surname="Santesson" fullname="S. Santesson">
-            <organization/>
-          </author>
-          <author initials="S." surname="Farrell" fullname="S. Farrell">
-            <organization/>
-          </author>
-          <author initials="S." surname="Boeyen" fullname="S. Boeyen">
-            <organization/>
-          </author>
-          <author initials="R." surname="Housley" fullname="R. Housley">
-            <organization/>
-          </author>
-          <author initials="W." surname="Polk" fullname="W. Polk">
-            <organization/>
-          </author>
-          <date year="2008" month="May"/>
-          <abstract>
-            <t>This memo profiles the X.509 v3 certificate and X.509 v2 certificate revocation list (CRL) for use in the Internet.  An overview of this approach and model is provided as an introduction.  The X.509 v3 certificate format is described in detail, with additional information regarding the format and semantics of Internet name forms.  Standard certificate extensions are described and two Internet-specific extensions are defined.  A set of required certificate extensions is specified.  The X.509 v2 CRL format is described in detail along with standard and Internet-specific extensions.  An algorithm for X.509 certification path validation is described.  An ASN.1 module and examples are provided in the appendices. [STANDARDS TRACK]</t>
-          </abstract>
-        </front>
-        <seriesInfo name="RFC" value="5280"/>
-        <format type="TXT" octets="352580" target="ftp://ftp.isi.edu/in-notes/rfc5280.txt"/>
-      </reference>
-      -->
-      <!--
-      <reference anchor="X509-ALGO">
-        <front>
-          <title>Public-Key Cryptography Standards (PKCS) #1: RSA Cryptography Specifications Version 2.1</title>
-          <author initials="J." surname="Jonsson" fullname="J. Jonsson">
-            <organization/>
-          </author>
-          <author initials="B." surname="Kaliski" fullname="B. Kaliski">
-            <organization/>
-          </author>
-          <date year="2003" month="February"/>
-          <abstract>
-            <t>This memo represents a republication of PKCS #1 v2.1 from RSA Laboratories' Public-Key Cryptography Standards (PKCS) series, and change control is retained within the PKCS process.  The body of this document is taken directly from the PKCS #1 v2.1 document, with certain corrections made during the publication process.  This memo provides information for the Internet community.</t>
-          </abstract>
-        </front>
-        <seriesInfo name="RFC" value="3447"/>
-        <format type="TXT" octets="143173" target="ftp://ftp.isi.edu/in-notes/rfc3447.txt"/>
-      </reference>
-      -->
     </references>
-    <section title="Schema for urn:ietf:params:xml:ns:xmpp-e2e:3" anchor="schemas-e2e">
+    <section title="Schema for urn:ietf:params:xml:ns:xmpp-e2e:4" anchor="schemas-e2e">
       <t>The following XML schema is descriptive, not normative.</t>
       <figure>
         <artwork><![CDATA[
@@ -1024,8 +940,8 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
 
 <xs:schema
     xmlns:xs='http://www.w3.org/2001/XMLSchema'
-    targetNamespace='urn:ietf:params:xml:ns:xmpp-e2e:3'
-    xmlns='urn:ietf:params:xml:ns:xmpp-e2e:3'
+    targetNamespace='urn:ietf:params:xml:ns:xmpp-e2e:4'
+    xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
     elementFormDefault='qualified'>
 
   <xs:element name='e2e'>
@@ -1034,6 +950,7 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
       <xs:sequence>
         <xs:element ref='header' minOccurs='1' maxOccurs='1'/>
         <xs:element ref='cmk' minOccurs='1' maxOccurs='1'/>
+        <xs:element ref='iv' minOccurs=1' maxOccurs='1'/>
         <xs:element ref='data' minOccurs='1' maxOccurs='1'/>
         <xs:element ref='mac' minOccurs='1' maxOccurs='1'/>
       </xs:sequence>
@@ -1052,6 +969,15 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
   </xs:element>
   
   <xs:element name='cmk'>
+    <xs:complexType>
+      <xs:simpleType>
+        <xs:extension base='xs:string'>
+        </xs:extension>
+      </xs:simpleType>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='iv'>
     <xs:complexType>
       <xs:simpleType>
         <xs:extension base='xs:string'>
