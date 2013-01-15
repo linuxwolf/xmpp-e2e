@@ -32,14 +32,34 @@
   </front>
   <middle>
     <section title="Introduction" anchor="intro">
-      <t></t>
+      <t>Say something about why wrapping keys is worthwhile.</t>
+      <t>Say something about why re-using JWE semantics is worthwhile.</t>
     </section>
     <section title="Terminology" anchor="terms">
-      <t>This document inherits JSON Web Algorithms (JWA)-related terminology from <xref target="JOSE-JWA"/>, JSON Web Encryption (JWE)-related terminology from <xref target="JOSE-JWE"/>, and JSON Web Key (JWK)-related terminology from <xref target="JOSE-JWK"/>.  Security-related terms are to be understood in the sense defined in <xref target="RFC4949"/>.</t>
+      <t>This document inherits JSON Web Algorithms (JWA)-related terminology from <xref target="JOSE-JWA"/>, JSON Web Encryption (JWE)-related terminology from <xref target="JOSE-JWE"/>, JSON Web Key (JWK)-related terminology from <xref target="JOSE-JWK"/>, and password-based cryptography-related terminology from <xref target="RFC2898"/>.  Security-related terms are to be understood in the sense defined in <xref target="RFC4949"/>.</t>
       <t>The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
     </section>
-    <section title="Security Considerations" anchor="security">
+    <section title="Protecting Keys" anchor="protect">
+      <section title="Process" anchor="protect-process">
+        <t>The process for protecting private keys and symmetric keys is idential. To protect a key, the key holder performs the following steps:<vspace blankLines="1"/>
+          <list style="numbers">
+            <t>Converts the JWK object to a UTF-8 encoded string (K').<vspace blankLines="1"/></t>
+            <t>Performs the message encryption steps from <xref target="JOSE-JWE"/> to generate the JWE header H, JWE Encrypted Key E, JWE Initialization Vector IV, JWE Ciphertext C, and JWE Integrity Value I, using the following inputs:<vspace blankLines="1"/>
+              <list style="symbols">
+                <t>The 'alg' property set to the intented key encryption algorithm (e.g. "RSA-OAEP", or "PBES2-H512+A256KW" from below).<vspace blankLines="1"/></t>
+                <t>The 'enc' property set to the intended content encryption algorithm (e.g. "A256GCM" or "A256CBC+HS512").<vspace blankLines="1"/></t>
+                <t>K' as the plaintext content to encrypt.</t>
+              </list>
+            </t>
+          </list>
+        </t>
+      </section>
+      <section title="Private Key Example" anchor="protect-example-priv"></section>
+      <section title="Symmetric key Example" anchor="protect-example-symm"></section>
     </section>
+    <section title="Using Passwords" anchor="pbcrypto"></section>
+    <section title="IANA Considerations" anchor="iana"></section>
+    <section title="Security Considerations" anchor="security"></section>
   </middle>
   <back>
     <references title="Normative References">
@@ -125,7 +145,21 @@
         <seriesInfo name="BCP" value="14"/>
         <seriesInfo name="RFC" value="2119"/>
       </reference>
-      <reference anchor="RFC4684">
+      <reference anchor="RFC2898">
+        <front>
+          <title>Password-Based Cryptography Specification</title>
+          <author initials="B." surname="Kaliski" fullname="Burt Kaliski">
+            <organization>RSA Labratories</organization>
+          </author>
+          <date year="2000" month="September"/>
+          <abstract>
+            <t>This memo represents a republication of PKCS #5 v2.0 from RSA Laboratories' Public-Key Cryptography Standards (PKCS) series, and change control is retained within the PKCS process.  The body of this document, except for the security considerations section, is taken directly from that specification.</t>
+          </abstract>
+        </front>
+        <seriesInfo name="RFC" value="2898"/>
+        <format type="TXT" target="http://www.ietf.org/rfc/rfc2898.txt"/>
+      </reference>
+      <reference anchor="RFC4686">
         <front>
           <title>The Base16, Base32, and Base64 Data Encodings</title>
           <author initials="S." surname="Josefsson" fullname="S. Josefsson">
@@ -137,7 +171,7 @@
           </abstract>
         </front>
         <seriesInfo name="RFC" value="4648"/>
-        <format type="TXT" octets="35491" target="ftp://ftp.isi.edu/in-notes/rfc4648.txt"/>
+        <format type="TXT" octets="35491" target="http://www.ietf.org/rfc/rfc4648.txt"/>
       </reference>
       <reference anchor="RFC4949">
         <front>
@@ -151,7 +185,7 @@
           </abstract>
         </front>
         <seriesInfo name="RFC" value="4949"/>
-        <format type="TXT" octets="867626" target="ftp://ftp.isi.edu/in-notes/rfc4949.txt"/>
+        <format type="TXT" octets="867626" target="http://www.ietf.org/rfc/rfc4949.txt"/>
       </reference>
     </references>
   </back>

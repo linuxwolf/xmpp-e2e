@@ -61,15 +61,15 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . . . 3
    2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . . . 3
-   3.  Security Considerations . . . . . . . . . . . . . . . . . . . . 3
-   4.  Normative References  . . . . . . . . . . . . . . . . . . . . . 3
+   3.  Protecting Keys . . . . . . . . . . . . . . . . . . . . . . . . 3
+     3.1.  Process . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+     3.2.  Private Key Example . . . . . . . . . . . . . . . . . . . . 3
+     3.3.  Symmetric key Example . . . . . . . . . . . . . . . . . . . 4
+   4.  Using Passwords . . . . . . . . . . . . . . . . . . . . . . . . 4
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . . . 4
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . . . 4
+   7.  Normative References  . . . . . . . . . . . . . . . . . . . . . 4
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 4
-
-
-
-
-
-
 
 
 
@@ -115,14 +115,19 @@ Internet-Draft              JWE Protected JWK               January 2013
 
 1.  Introduction
 
+   Say something about why wrapping keys is worthwhile.
+
+   Say something about why re-using JWE semantics is worthwhile.
+
 
 2.  Terminology
 
    This document inherits JSON Web Algorithms (JWA)-related terminology
    from [JOSE-JWA], JSON Web Encryption (JWE)-related terminology from
-   [JOSE-JWE], and JSON Web Key (JWK)-related terminology from
-   [JOSE-JWK].  Security-related terms are to be understood in the sense
-   defined in [RFC4949].
+   [JOSE-JWE], JSON Web Key (JWK)-related terminology from [JOSE-JWK],
+   and password-based cryptography-related terminology from [RFC2898].
+   Security-related terms are to be understood in the sense defined in
+   [RFC4949].
 
    The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
    "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
@@ -130,10 +135,53 @@ Internet-Draft              JWE Protected JWK               January 2013
    [RFC2119].
 
 
-3.  Security Considerations
+3.  Protecting Keys
+
+3.1.  Process
+
+   The process for protecting private keys and symmetric keys is
+   idential.  To protect a key, the key holder performs the following
+   steps:
+
+   1.  Converts the JWK object to a UTF-8 encoded string (K').
+
+   2.  Performs the message encryption steps from [JOSE-JWE] to generate
+       the JWE header H, JWE Encrypted Key E, JWE Initialization Vector
+       IV, JWE Ciphertext C, and JWE Integrity Value I, using the
+       following inputs:
+
+       *  The 'alg' property set to the intented key encryption
+          algorithm (e.g.  "RSA-OAEP", or "PBES2-H512+A256KW" from
+          below).
+
+       *  The 'enc' property set to the intended content encryption
+          algorithm (e.g.  "A256GCM" or "A256CBC+HS512").
+
+       *  K' as the plaintext content to encrypt.
+
+3.2.  Private Key Example
 
 
-4.  Normative References
+
+
+Miller                    Expires July 18, 2013                 [Page 3]
+
+Internet-Draft              JWE Protected JWK               January 2013
+
+
+3.3.  Symmetric key Example
+
+
+4.  Using Passwords
+
+
+5.  IANA Considerations
+
+
+6.  Security Considerations
+
+
+7.  Normative References
 
    [JOSE-JWA]
               Jones, M., "JSON Web Algorithms (JWA)",
@@ -153,7 +201,10 @@ Internet-Draft              JWE Protected JWK               January 2013
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, March 1997.
 
-   [RFC4684]  Josefsson, S., "The Base16, Base32, and Base64 Data
+   [RFC2898]  Kaliski, B., "Password-Based Cryptography Specification",
+              RFC 2898, September 2000.
+
+   [RFC4686]  Josefsson, S., "The Base16, Base32, and Base64 Data
               Encodings", RFC 4648, October 2006.
 
    [RFC4949]  Shirey, R., "Internet Security Glossary, Version 2",
@@ -164,7 +215,12 @@ Internet-Draft              JWE Protected JWK               January 2013
 
 
 
-Miller                    Expires July 18, 2013                 [Page 3]
+
+
+
+
+
+Miller                    Expires July 18, 2013                 [Page 4]
 
 Internet-Draft              JWE Protected JWK               January 2013
 
@@ -220,5 +276,5 @@ Author's Address
 
 
 
-Miller                    Expires July 18, 2013                 [Page 4]
+Miller                    Expires July 18, 2013                 [Page 5]
 
