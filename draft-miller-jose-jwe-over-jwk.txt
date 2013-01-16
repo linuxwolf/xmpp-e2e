@@ -3,13 +3,13 @@
 
 Network Working Group                                          M. Miller
 Internet-Draft                                       Cisco Systems, Inc.
-Intended status: Standards Track                        January 14, 2013
-Expires: July 18, 2013
+Intended status: Standards Track                        January 22, 2013
+Expires: July 26, 2013
 
 
    Using JSON Web Encryption (JWE) for Protecting JSON Web Key (JWK)
                                 Objects
-                        draft-miller-xmpp-e2e-03
+                   draft-miller-jose-jwe-over-jwk-00
 
 Abstract
 
@@ -29,7 +29,7 @@ Status of this Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on July 18, 2013.
+   This Internet-Draft will expire on July 26, 2013.
 
 Copyright Notice
 
@@ -52,24 +52,34 @@ Copyright Notice
 
 
 
-Miller                    Expires July 18, 2013                 [Page 1]
+Miller                    Expires July 26, 2013                 [Page 1]
 
 Internet-Draft              JWE Protected JWK               January 2013
 
 
 Table of Contents
 
-   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . . . 3
-   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . . . 3
-   3.  Protecting Keys . . . . . . . . . . . . . . . . . . . . . . . . 3
-     3.1.  Process . . . . . . . . . . . . . . . . . . . . . . . . . . 3
-     3.2.  Private Key Example . . . . . . . . . . . . . . . . . . . . 3
-     3.3.  Symmetric key Example . . . . . . . . . . . . . . . . . . . 4
-   4.  Using Passwords . . . . . . . . . . . . . . . . . . . . . . . . 4
-   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . . . 4
-   6.  Security Considerations . . . . . . . . . . . . . . . . . . . . 4
-   7.  Normative References  . . . . . . . . . . . . . . . . . . . . . 4
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 4
+   1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  3
+   2.  Terminology  . . . . . . . . . . . . . . . . . . . . . . . . .  3
+   3.  Protecting Keys  . . . . . . . . . . . . . . . . . . . . . . .  3
+   4.  Private Key Example  . . . . . . . . . . . . . . . . . . . . .  4
+   5.  Symmetric key Example  . . . . . . . . . . . . . . . . . . . .  7
+   6.  Using Password-Based Cryptography  . . . . . . . . . . . . . .  8
+     6.1.  PBKDF2 Key Type  . . . . . . . . . . . . . . . . . . . . .  8
+       6.1.1.  'slt' Parameter  . . . . . . . . . . . . . . . . . . .  8
+       6.1.2.  'its' Parameter  . . . . . . . . . . . . . . . . . . .  8
+       6.1.3.  'dkl' Parameter  . . . . . . . . . . . . . . . . . . .  8
+     6.2.  PBKDF2 Key Agreement Algorithms  . . . . . . . . . . . . .  8
+     6.3.  PBES2 Key Encryption Algorithms  . . . . . . . . . . . . .  9
+   7.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . .  9
+     7.1.  JSON Web Key Types Registration  . . . . . . . . . . . . .  9
+     7.2.  JSON Web Key Parameters Registration . . . . . . . . . . .  9
+     7.3.  JSON Web Encryption Algorithms . . . . . . . . . . . . . .  9
+   8.  Security Considerations  . . . . . . . . . . . . . . . . . . .  9
+   9.  References . . . . . . . . . . . . . . . . . . . . . . . . . .  9
+     9.1.  Normative References . . . . . . . . . . . . . . . . . . .  9
+     9.2.  Informative References . . . . . . . . . . . . . . . . . . 10
+   Author's Address . . . . . . . . . . . . . . . . . . . . . . . . . 10
 
 
 
@@ -98,17 +108,7 @@ Table of Contents
 
 
 
-
-
-
-
-
-
-
-
-
-
-Miller                    Expires July 18, 2013                 [Page 2]
+Miller                    Expires July 26, 2013                 [Page 2]
 
 Internet-Draft              JWE Protected JWK               January 2013
 
@@ -137,11 +137,7 @@ Internet-Draft              JWE Protected JWK               January 2013
 
 3.  Protecting Keys
 
-3.1.  Process
-
-   The process for protecting private keys and symmetric keys is
-   idential.  To protect a key, the key holder performs the following
-   steps:
+   To protect a key, the key holder performs the following steps:
 
    1.  Converts the JWK object to a UTF-8 encoded string (K').
 
@@ -151,37 +147,337 @@ Internet-Draft              JWE Protected JWK               January 2013
        following inputs:
 
        *  The 'alg' property set to the intented key encryption
-          algorithm (e.g.  "RSA-OAEP", or "PBES2-H512+A256KW" from
+          algorithm (e.g.  "RSA-OAEP", or "PBES2-HS512+A256KW" from
           below).
+
+       *  Keying material appropriate for the selected key encryption
+          algorithm (e.g. private key for "RSA-OAEP", or shared
+          password, salt, and iteration count for "PBES2-HS512+A256KW").
 
        *  The 'enc' property set to the intended content encryption
           algorithm (e.g.  "A256GCM" or "A256CBC+HS512").
 
-       *  K' as the plaintext content to encrypt.
-
-3.2.  Private Key Example
-
-
+       *  Keying material appropriate for the selected content
+          encryption algorithm (e.g.  Content Encryption Key and
+          Initialization Vector).
 
 
-Miller                    Expires July 18, 2013                 [Page 3]
+
+
+Miller                    Expires July 26, 2013                 [Page 3]
 
 Internet-Draft              JWE Protected JWK               January 2013
 
 
-3.3.  Symmetric key Example
+       *  K' as the plaintext content to encrypt.
+   3.  Serializes to the appriopriate format for exchange, such as the
+       Compact Serialization documented in [JOSE-JWE].
 
 
-4.  Using Passwords
+
+4.  Private Key Example
+
+   NOTE: unless otherwise indiciated, all line breaks are included for
+   readability.
+
+   The key holder begins with the [JOSE-JWK] representation of the
+   private key (here using a [JOSE-PRIVKEY] formatted RSA [RFC3447]
+   private key):
 
 
-5.  IANA Considerations
 
 
-6.  Security Considerations
 
 
-7.  Normative References
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Miller                    Expires July 26, 2013                 [Page 4]
+
+Internet-Draft              JWE Protected JWK               January 2013
+
+
+   {
+       "kty":"RSA",
+       "kid":"juliet@capulet.lit",
+       "n":"ALekPD1kotXZCY_YUz_ITWBZb2nTOw35VvZlnqTiYSeusO58qCtYDz
+            ahTEkEcjtduRqfkxJKHYVq9Iro4x1cewXFdJZUuMOQAhoD63AHemXE
+            kdPiKqJvkBXDT_Eo4NPOjMKKkFPy2MsJQBmdtVknUvzxEchhYjZ490
+            EJTvGJ7OYwrSwkcCxy9D29XxL-OQLkSLlH1XD8kgVmJw8hsb42Bg0j
+            PgKlkvcyENmYpYE_hqlJoqYNFzgtAnNtK4C3tspix46R3IgilQG2Of
+            i99vpUnmTvjrOlNef2l65PRsPHD1Gl9fyPLCxrkolXbdwvxZ9j2d2f
+            Iu-OBTxRhnBtarNls_k",
+       "e":"AQAB",
+       "d":"GRtbIQmhOZtyszfgKdg4u_N-R_mZGU_9k7JQ_jn1DnfTuMdSNprTea
+            STyWfSNkuaAwnOEbIQVy1IQbWVV25NY3ybc_IhUJtfri7bAXYEReWa
+            Cl3hdlPKXy9UvqPYGR0kIXTQRqns-dVJ7jahlI7LyckrpTmrM8dWBo
+            4_PMaenNnPiQgO0xnuToxutRZJfJvG4Ox4ka3GORQd9CsCZ2vsUDms
+            XOfUENOyMqADC6p1M3h33tsurY15k9qMSpG9OX_IJAXmxzAh_tWiZO
+            wk2K4yxH9tS3Lq1yX8C1EWmeRDkK2ahecG85-oLKQt5VEpWHKmjOi_
+            gJSdSgqcN96X52esAQ",
+       "p":"ANq50jleISkjfLEuAoHEBxW7NPF26BQ6irpt7HOIdxkca05kHZdWSv
+            bsPjyB30D9BZMV1a8flhPmRG66orx_9ogi1Eu8AJel7wEbdSpCGlMT
+            z0mAfcpN9bNEPFCvehN_zqwAwGLQCbPjNycQi3zYKoeehw5xE00IR9
+            6wk-U98icL",
+       "q":"2a43135aa05479f570676fc36e3d693d0ab21d21e38fdd0be71fcc
+            3b3a9800931c2cc66d6d4b702aabd50eaded6c4a3764872885b0ed
+            b7a49b7e65b382069ba50c4dc6e069a0e39ffdafc780c5cafe586a
+            8a0238cbf92a4b5c18e762308d49f9ae046b27ec98a35878d4a47e
+            bf3da9621100798ae1b6d5adc55a8b0915620fa7",
+       "dp":"KkMTWqBUefVwZ2_Dbj1pPQqyHSHjj90L5x_MOzqYAJMcLMZtbUtwK
+             qvVDq3tbEo3ZIcohbDtt6SbfmWzggabpQxNxuBpoOOf_a_HgMXK_l
+             hqigI4y_kqS1wY52IwjUn5rgRrJ-yYo1h41KR-vz2pYhEAeYrhttW
+             txVqLCRViD6c",
+       "dq":"AvfS0-gRxvn0bwJoMSnFxYcK1WnuEjQFluMGfwGitQBWtfZ1Er7t1
+             xDkbN9GQTB9yqpDoYaN06H7CFtrkxhJIBQaj6nkF5KKS3TQtQ5qCz
+             kOkmxIe3KRbBymXxkb5qwUpX5ELD5xFc6FeiafWYY63TmmEAu_lRF
+             COJ3xDea-ots",
+       "qi":"AJUkIvsPQqclEXjBKz9UbAS5O8DbTr7OREKT6prjL6luezQVHM0nB
+             KD8JlKqmm7vVdPj8uHUOe_22qaCkbtUfdG77hZ1Ot0h1hBYJWULyQ
+             zHgL5o-LJvhadKGLv53qLYENIc2yOYK8u2o3WMvftpTcf--mgWaDl
+             LvRwiflLH0jiP"
+   }
+
+   The key holder uses the following [JOSE-JWE] inputs:
+
+   o  JWE Header
+
+
+
+
+
+
+
+Miller                    Expires July 26, 2013                 [Page 5]
+
+Internet-Draft              JWE Protected JWK               January 2013
+
+
+   {
+     "alg":"PBES2-HS256+A128KW",
+     "enc":"A128CBC+HS256",
+     "jwk":{
+       "kty":"PBKDF2",
+       "salt":"2WCTcJZ1Rvd_CJuJripQ1w",
+       "itrs":4096
+     }
+   }
+
+
+   o  Password:
+
+   Thus from my lips, by yours, my sin is purged.
+
+
+   o  Content Master Key (encoded as [RFC4686])
+
+   1ICvnpc3zPRNS7JoJ9bnJ929eX7EnRwmc0CHNOF1zKc
+
+
+   o  Initialization Vector (encoded as [RFC4686]):
+
+   B9BVK3hIsEu9zUOWjKeOSg
+
+
+   The key holder performs steps 1 and 2 to generate the [JOSE-JWE]
+   outputs (represented using the Compact Serialization):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Miller                    Expires July 26, 2013                 [Page 6]
+
+Internet-Draft              JWE Protected JWK               January 2013
+
+
+   eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDK0hTMjU
+   2IiwiandrIjp7Imt0eSI6IlBCS0RGMiIsInNhbHQiOiIyV0NUY0paMVJ2ZF9DSn
+   VKcmlwUTF3IiwiaXRycyI6NDA5Nn19.
+   dO4VTHV1JJnnPxbc9xswMA6ezNLCQ1Nq0Bnt4l2hjzxyXfbgM3w-cQ.
+   B9BVK3hIsEu9zUOWjKeOSg.
+   mUt0YpU0Gsfis7tK70aggz5Qb5J6oppjl7aSn_S4DIHJkSF-Gd9KEu4XF0vbMc1
+   kvovNOmnahDLoJIq7hoB666zt1yp4umZKuzhOQ5O3jwOwC4rUf1W3hDM5p2nYZq
+   LFqDBme-Z8KVwosfBj2TkZSnFWC6cqMy6d7K6egWz7uct39ZH6_FAUrr0JiMMnj
+   0jxTEBP6apiLD-GJutxITnWISmGmX0jOWyTKRh-F-I3lJ3pXE0_4vWR8-gXaFGW
+   CgItofAOsdKKoxiSJvXPVxK-oqPFPlS0H5OLHw9tkjmPVZ0Ot-RLgoMPQJ0Yi47
+   U0DBh_2-IQBcpPvwBnUzl8KcrLFh-NpTSoC_zIn6xos5r4JVXf5v1V79MKGvk3-
+   evdQoEKtS9LnimKTP8YmeqAnU1Y3VoUkgeRTZikKhQ_kwpAxakaRuBzfaIOKjqY
+   X5J_jSJuuBQU_4fgHPkvrq1zJ3TnUAWZIqFcw27dKGMxXLMlz_sbW2YerZ0BULc
+   xbe8bJpbHkE64r7Nc86iZyL6e-8htkUvpGmdQGqno-q723Ry-u2Iz1-exjgjbNu
+   z4tbSrf49Y0_VSFEuHLnCRChVQE8cgupCy8GioEpuC7v1hMNE7JZTVbG3Ud3QzZ
+   Webr0sAYjWwqa2ySoJ7AaRfIiVgMdTAS2_gBdbYRSYI2pkQTHpyZ8D_lp5RvYFR
+   FNsHWoEToXeL1P_csuKaGsikKbzgXdevrjmCJTOpByGYO5cb2O8xFyYy1VX_pM6
+   bxqj5ai8-jyiCoDKvF_40wT_9F6H79UIZtuc3L7r7OxKrmY32LLvfofVRsfdIcK
+   AhMvnvOCpzRN3sHiR7iAx1bvaIaz40Mshf8z-__70GEqr5oWxRwyv2uhCiPHtV6
+   lBIhCqki6th317-n_lR58LHw894ja0xbOOxUJfZziaG14O9tqjetTSB0JGKXC4S
+   ry6zzeyqDwsSpY439Uqn7va_V5ELLfJf9S7fh0AtZS3ogpw4oT-6LbywFPf0jH9
+   LgNmatORG_J2wgu8R8QpKogo_WTQK7izHVtEMe1vQQElAy8P2SUjOJiOU6wAW4o
+   neU7HUUwD3cvFSn-ykze48FurI5f6DXyPNTVtzaEjBnVVP517bGb_3V_-1SCBdZ
+   1f_sYWJ0S8r2u5ccy28CP_7MhZOY8r4oJJn2NmT_jDOllCNtJLKVdKon0QslEER
+   GXa8r6Jtp3UbfLVjZQbnFl2mBygH4PoWbyGVxUNDE66mZVKM4Y-6ng5L84PrDt5
+   aAQ0HREqjvX4bsQgWyXKq-HRe5DXO2qdoPAIoPGhqOlZz70iYHO5lkX_Oso3eBv
+   DCDVbkD7Gr-LZJusrVtA6Hf82YpUUldjyPsD985T2hdcSQMoxol8aWNDL52T4Eo
+   FTTLFNG0Xy3qvS79ScgMOSIOE8k_DgzyBrcGJibeeaVKGdbqUQRADaeWO2QM3Rq
+   9TOyizLNyyjkJBgecWtIfLAWSTPx7n39zuBhGb5oChAFlR1HqrV76KO22rj08ra
+   J_zi8YQpp4qTTXmYwY5sjftE8IDDcLxk6ovvDM7262onZ5CP3GKp09s9dTJZi2L
+   tmZ8NAHlJ5Q9v9XMHi0tvLKKlahdcvgnG3sC_gL46osnNE3gBipLe_IQNl0X0zU
+   cakwzYtC02JeBbNFQSduY4OBiAAhD2VhyhLMNvGyt9QjntCru1z_gkr1qZR4y5W
+   Uec9WtxPqqC-dny-MZOINZd13LdStVY_g0KaAJET0etT4vYZJ6IfqdEXRSKKQKN
+   CJpencNhJH99NEumPwY0J8hYGC-KkGb6ZQ0yeQDIpcH2reMS9_DU0JaFtd5BpKm
+   pNDAvmekzWv65o6MCzLVN4Wlf4tZ6a7FnLxDg0jQBsPGh3ZKEeGmvxJKSvGK_Or
+   5-gXJdMyj1n0bWyex-ZTmtbR3OHKgAlFQUdLuB-47UFS0HtF0Lo1ENPZUoxwFcg
+   Uu2Yr30O8vhHLhkRAyAvrFPBHhSqcGr954FeMhMo18dKu3zdykyueIQpLIpU7qN
+   btXXSOu1c1rPqBMm3h77iLmNzSByFER32-W7hQwx9-Ikbwy52DaZACpXdyzZOQ2
+   PSYEJeuy8CyHap8_Dwucb3CQiqBi-iz25Mmwx8qBjWq3K31W4WeF0heC_rCe6LS
+   vOCuHJXpu8Wqa1LeyTbuHyQawH8Aev-MzVLXp0E-WtggfNi-mqcThs25993uveI
+   TpmK6lyQu6SX31t6MlQKI_29e46cYRMFhsEZSGM--acnZiryvi39IKsVNtOf33E
+   9zlKntRdmMoROenR-q5--9nObKaF81k3Xb-yWNTlQh1ot59rWAeqpPv0uA.
+   big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
+
+
+5.  Symmetric key Example
+
+
+
+
+
+Miller                    Expires July 26, 2013                 [Page 7]
+
+Internet-Draft              JWE Protected JWK               January 2013
+
+
+6.  Using Password-Based Cryptography
+
+   There are often times when a key is exchanged through immediate human
+   interaction.  To help facilitate such exchanges, a number of
+   password-based cryptography schemes utilizing [RFC2898] are defined
+   to supplement the key format, agreement, and encryption algorithms
+   from [JOSE-JWA].
+
+6.1.  PBKDF2 Key Type
+
+   The "PBKDF2" [JOSE-JWK] type is used to contain the parameters
+   necessary to derive a cipher key from a password.  The following
+   parameters are defined:
+
+6.1.1.  'slt' Parameter
+
+   The REQUIRED "slt" parameter contains the PBKDF2 salt value (S), as a
+   base64url encoded string.  This value SHOULD NOT be the empty string
+   "".
+
+6.1.2.  'its' Parameter
+
+   The REQUIRED "its" parameter contains the PBKDF2 iteration count (c),
+   as an integer.  This value MUST NOT be less than 1, as per [RFC2898].
+
+6.1.3.  'dkl' Parameter
+
+   The RECOMMENDED "dkl" parameter contains the PBKDF2 derived-key octet
+   length (dkLen), as an integer.  This parameter MAY be omitted (and
+   MUST be ignored) when the key encryption algorithm requires a
+   specific key length.
+
+6.2.  PBKDF2 Key Agreement Algorithms
+
+   The "PBKDF2-HS256" and "PBKDF2-HS512" [JOSE-JWE] key agreement
+   algorithms are used to produce a JWE Content Master Key from a user-
+   supplied password, as per the PBKDF2 key derivation function from
+   section 5.1 of [RFC2898].  The "PBKDF2-HS256" algorithm uses "HMAC-
+   SHA256" for the psuedo-random function (PRF), while the "PBKDF2-
+   HS512" algorithm uses "HMAC-SHA512" for the PRF.
+
+   The derived key length (dkLen) SHOULD be specified in the applicable
+   "PBKDF2" JWK object, and if specified MUST be equal to the size in
+   octets for the content encryption algorithm.  However,
+   implementations MAY assume a value necessary for generating a JWE
+   Content Master Key appropriate for desired the content encryption
+   algorithm, ignoring the value of the "dkl" parameter.
+
+
+
+
+Miller                    Expires July 26, 2013                 [Page 8]
+
+Internet-Draft              JWE Protected JWK               January 2013
+
+
+6.3.  PBES2 Key Encryption Algorithms
+
+   The "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" [JOSE-JWE] key
+   encryption algorithms are used to encrypt a JWE Content Master Key
+   using a user-supplied password to derive the key encryption key.
+   These algorithms combine PBKDF2 with a key wrapping algorithm to
+   encrypt the JWE Content Master Key according to PBES2 from section
+   6.2 of [RFC2898].
+
+   The "PBES2-HS256+A128KW" algorithm uses a dervied key length of 16
+   octets, while "PBES2-HS512+A256KW" uses a derived key length of 32
+   octets.
+
+
+7.  IANA Considerations
+
+7.1.  JSON Web Key Types Registration
+
+7.2.  JSON Web Key Parameters Registration
+
+7.3.  JSON Web Encryption Algorithms
+
+
+8.  Security Considerations
+
+
+9.  References
+
+9.1.  Normative References
 
    [JOSE-JWA]
               Jones, M., "JSON Web Algorithms (JWA)",
@@ -198,6 +494,19 @@ Internet-Draft              JWE Protected JWK               January 2013
               draft-ietf-jose-json-web-key-08 (work in progress),
               December 2012.
 
+   [JOSE-PRIVKEY]
+              Jones, M., "JSON Private and Symmetric Key",
+              draft-jones-jose-json-private-and-symmetric-key-00 (work
+
+
+
+Miller                    Expires July 26, 2013                 [Page 9]
+
+Internet-Draft              JWE Protected JWK               January 2013
+
+
+              in progress), December 2012.
+
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, March 1997.
 
@@ -210,19 +519,11 @@ Internet-Draft              JWE Protected JWK               January 2013
    [RFC4949]  Shirey, R., "Internet Security Glossary, Version 2",
               RFC 4949, August 2007.
 
+9.2.  Informative References
 
-
-
-
-
-
-
-
-
-
-Miller                    Expires July 18, 2013                 [Page 4]
-
-Internet-Draft              JWE Protected JWK               January 2013
+   [RFC3447]  Jonsson, J. and B. Kaliski, "Public-Key Cryptography
+              Standards (PKCS) #1: RSA Cryptography Specifications
+              Version 2.1", RFC 2898, February 2003.
 
 
 Author's Address
@@ -255,26 +556,5 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Miller                    Expires July 18, 2013                 [Page 5]
+Miller                    Expires July 26, 2013                [Page 10]
 
