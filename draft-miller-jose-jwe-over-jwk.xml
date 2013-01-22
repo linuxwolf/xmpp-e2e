@@ -128,14 +128,14 @@ Thus from my lips, by yours, my sin is purged.
               ]]></artwork>
             </figure>
           <vspace blankLines="1"/></t>
-          <t>Content Master Key (encoded as <xref target="RFC4686"/>)
+          <t>Content Master Key (encoded as base64url per <xref target="RFC4686"/>)
             <figure>
               <artwork><![CDATA[
 1ICvnpc3zPRNS7JoJ9bnJ929eX7EnRwmc0CHNOF1zKc
               ]]></artwork>
             </figure>
           <vspace blankLines="1"/></t>
-          <t>Initialization Vector (encoded as <xref target="RFC4686"/>):
+          <t>Initialization Vector (encoded as base64url per <xref target="RFC4686"/>):
             <figure>
               <artwork><![CDATA[
 B9BVK3hIsEu9zUOWjKeOSg
@@ -220,13 +220,67 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
     </section>
     <section title="IANA Considerations" anchor="iana">
       <section title="JSON Web Key Types Registration" anchor="iana-jwk-types">
+        <t>
+          <list style="symbols">
+            <t>"kty" Paramater value: "PBKDF2"<vspace blankLines="1"/></t>
+            <t>Implementation Requirements: RECOMMENDED-<vspace blankLines="1"/></t>
+            <t>Change Controller: IETF<vspace blankLines="1"/></t>
+            <t>Specification Document(s): <xref target="pbcrypto-pbkdf2-jwk"/> of [[ this document ]]<vspace blankLines="1"/></t>
+          </list>
+        </t>
       </section>
       <section title="JSON Web Key Parameters Registration" anchor="iana-jwk-params">
       </section>
       <section title="JSON Web Encryption Algorithms" anchor="iana-jwe-algs">
+        <t>
+          <list style="symbols">
+            <t>Algorithm Name: "PBKDF2-HS256"<vspace blankLines="1"/></t>
+            <t>Algorithm Usage Location(s): "alg"</t>
+            <t>Implementation Requirements: RECOMMENDED-<vspace blankLines="1"/></t>
+            <t>Change Controller: IETF<vspace blankLines="1"/></t>
+            <t>Specification Document(s): <xref target="pbcrypto-pbkdf2-jwe"/> of [[ this document ]]<vspace blankLines="1"/></t>
+          </list>
+        </t>
+        <t>
+          <list style="symbols">
+            <t>Algorithm Name: "PBKDF2-HS512"<vspace blankLines="1"/></t>
+            <t>Algorithm Usage Location(s): "alg"</t>
+            <t>Implementation Requirements: RECOMMENDED-<vspace blankLines="1"/></t>
+            <t>Change Controller: IETF<vspace blankLines="1"/></t>
+            <t>Specification Document(s): <xref target="pbcrypto-pbkdf2-jwe"/> of [[ this document ]]<vspace blankLines="1"/></t>
+          </list>
+        </t>
+        <t>
+          <list style="symbols">
+            <t>Algorithm Name: "PBES2-HS256+A128KW"<vspace blankLines="1"/></t>
+            <t>Algorithm Usage Location(s): "alg"</t>
+            <t>Implementation Requirements: RECOMMENDED-<vspace blankLines="1"/></t>
+            <t>Change Controller: IETF<vspace blankLines="1"/></t>
+            <t>Specification Document(s): <xref target="pbcrypto-pbes2-jwe"/> of [[ this document ]]<vspace blankLines="1"/></t>
+          </list>
+        </t>
+        <t>
+          <list style="symbols">
+            <t>Algorithm Name: "PBES2-HS512+A256KW"<vspace blankLines="1"/></t>
+            <t>Algorithm Usage Location(s): "alg"</t>
+            <t>Implementation Requirements: RECOMMENDED-<vspace blankLines="1"/></t>
+            <t>Change Controller: IETF<vspace blankLines="1"/></t>
+            <t>Specification Document(s): <xref target="pbcrypto-pbes2-jwe"/> of [[ this document ]]<vspace blankLines="1"/></t>
+          </list>
+        </t>
       </section>
     </section>
-    <section title="Security Considerations" anchor="security"></section>
+    <section title="Security Considerations" anchor="security">
+      <section title="Re-using Keying Material" anchor="security-reuse">
+        <t>It is NOT RECOMMENDED to re-use all of the same keying material (Key Encryption Key, Content Master Key, Initialization Vector, etc) to protect multiple JWK objects.</t>
+      </section>
+      <section title="Storing Protected Keys" anchor="security-store">
+        <t>Depending on the application, a protected JWK could be stored for an extended duration.</t>
+      </section>
+      <section title="Using Passwords" anchor="security-pwd">
+        <t>While convenient for end users, passwords have many drawbacks, such as the limited range of values usable on typical input devices (e.g. keyboards). To help mitigate these limitations, this document applies principals from <xref target="RFC2898"/> to derive cryptographic keys from user-supplied passwords.</t>
+      </section>
+    </section>
   </middle>
   <back>
     <references title="Normative References">

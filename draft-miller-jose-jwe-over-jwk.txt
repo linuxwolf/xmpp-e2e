@@ -75,14 +75,14 @@ Table of Contents
      7.1.  JSON Web Key Types Registration  . . . . . . . . . . . . .  9
      7.2.  JSON Web Key Parameters Registration . . . . . . . . . . .  9
      7.3.  JSON Web Encryption Algorithms . . . . . . . . . . . . . .  9
-   8.  Security Considerations  . . . . . . . . . . . . . . . . . . .  9
-   9.  References . . . . . . . . . . . . . . . . . . . . . . . . . .  9
-     9.1.  Normative References . . . . . . . . . . . . . . . . . . .  9
-     9.2.  Informative References . . . . . . . . . . . . . . . . . . 10
-   Author's Address . . . . . . . . . . . . . . . . . . . . . . . . . 10
-
-
-
+   8.  Security Considerations  . . . . . . . . . . . . . . . . . . . 10
+     8.1.  Re-using Keying Material . . . . . . . . . . . . . . . . . 10
+     8.2.  Storing Protected Keys . . . . . . . . . . . . . . . . . . 10
+     8.3.  Using Passwords  . . . . . . . . . . . . . . . . . . . . . 10
+   9.  References . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+     9.1.  Normative References . . . . . . . . . . . . . . . . . . . 11
+     9.2.  Informative References . . . . . . . . . . . . . . . . . . 11
+   Author's Address . . . . . . . . . . . . . . . . . . . . . . . . . 11
 
 
 
@@ -297,12 +297,12 @@ Internet-Draft              JWE Protected JWK               January 2013
    Thus from my lips, by yours, my sin is purged.
 
 
-   o  Content Master Key (encoded as [RFC4686])
+   o  Content Master Key (encoded as base64url per [RFC4686])
 
    1ICvnpc3zPRNS7JoJ9bnJ929eX7EnRwmc0CHNOF1zKc
 
 
-   o  Initialization Vector (encoded as [RFC4686]):
+   o  Initialization Vector (encoded as base64url per [RFC4686]):
 
    B9BVK3hIsEu9zUOWjKeOSg
 
@@ -467,12 +467,98 @@ Internet-Draft              JWE Protected JWK               January 2013
 
 7.1.  JSON Web Key Types Registration
 
+   o  "kty" Paramater value: "PBKDF2"
+
+   o  Implementation Requirements: RECOMMENDED-
+
+   o  Change Controller: IETF
+
+   o  Specification Document(s): Section 6.1 of [[ this document ]]
+
+
 7.2.  JSON Web Key Parameters Registration
 
 7.3.  JSON Web Encryption Algorithms
 
+   o  Algorithm Name: "PBKDF2-HS256"
+
+   o  Algorithm Usage Location(s): "alg"
+   o  Implementation Requirements: RECOMMENDED-
+
+   o  Change Controller: IETF
+
+   o  Specification Document(s): Section 6.2 of [[ this document ]]
+
+
+   o  Algorithm Name: "PBKDF2-HS512"
+
+   o  Algorithm Usage Location(s): "alg"
+   o  Implementation Requirements: RECOMMENDED-
+
+
+
+
+
+
+Miller                    Expires July 26, 2013                 [Page 9]
+
+Internet-Draft              JWE Protected JWK               January 2013
+
+
+   o  Change Controller: IETF
+
+   o  Specification Document(s): Section 6.2 of [[ this document ]]
+
+
+   o  Algorithm Name: "PBES2-HS256+A128KW"
+
+   o  Algorithm Usage Location(s): "alg"
+   o  Implementation Requirements: RECOMMENDED-
+
+   o  Change Controller: IETF
+
+   o  Specification Document(s): Section 6.3 of [[ this document ]]
+
+
+   o  Algorithm Name: "PBES2-HS512+A256KW"
+
+   o  Algorithm Usage Location(s): "alg"
+   o  Implementation Requirements: RECOMMENDED-
+
+   o  Change Controller: IETF
+
+   o  Specification Document(s): Section 6.3 of [[ this document ]]
+
+
 
 8.  Security Considerations
+
+8.1.  Re-using Keying Material
+
+   It is NOT RECOMMENDED to re-use all of the same keying material (Key
+   Encryption Key, Content Master Key, Initialization Vector, etc) to
+   protect multiple JWK objects.
+
+8.2.  Storing Protected Keys
+
+   Depending on the application, a protected JWK could be stored for an
+   extended duration.
+
+8.3.  Using Passwords
+
+   While convenient for end users, passwords have many drawbacks, such
+   as the limited range of values usable on typical input devices (e.g.
+   keyboards).  To help mitigate these limitations, this document
+   applies principals from [RFC2898] to derive cryptographic keys from
+   user-supplied passwords.
+
+
+
+
+
+Miller                    Expires July 26, 2013                [Page 10]
+
+Internet-Draft              JWE Protected JWK               January 2013
 
 
 9.  References
@@ -497,14 +583,6 @@ Internet-Draft              JWE Protected JWK               January 2013
    [JOSE-PRIVKEY]
               Jones, M., "JSON Private and Symmetric Key",
               draft-jones-jose-json-private-and-symmetric-key-00 (work
-
-
-
-Miller                    Expires July 26, 2013                 [Page 9]
-
-Internet-Draft              JWE Protected JWK               January 2013
-
-
               in progress), December 2012.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
@@ -524,6 +602,19 @@ Internet-Draft              JWE Protected JWK               January 2013
    [RFC3447]  Jonsson, J. and B. Kaliski, "Public-Key Cryptography
               Standards (PKCS) #1: RSA Cryptography Specifications
               Version 2.1", RFC 2898, February 2003.
+
+
+
+
+
+
+
+
+
+
+Miller                    Expires July 26, 2013                [Page 11]
+
+Internet-Draft              JWE Protected JWK               January 2013
 
 
 Author's Address
@@ -556,5 +647,26 @@ Author's Address
 
 
 
-Miller                    Expires July 26, 2013                [Page 10]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Miller                    Expires July 26, 2013                [Page 12]
 
