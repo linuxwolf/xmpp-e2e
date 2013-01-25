@@ -66,20 +66,19 @@ Internet-Draft             JWE Protected JWK                January 2013
        6.1.1.  'S' Parameter . . . . . . . . . . . . . . . . . . . .   7
        6.1.2.  'c' Parameter . . . . . . . . . . . . . . . . . . . .   7
        6.1.3.  'dkl' Parameter . . . . . . . . . . . . . . . . . . .   7
-     6.2.  PBKDF2 Key Agreement Algorithms . . . . . . . . . . . . .   7
-     6.3.  PBES2 Key Encryption Algorithms . . . . . . . . . . . . .   8
+     6.2.  PBES2 Key Encryption Algorithms . . . . . . . . . . . . .   7
    7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
      7.1.  JSON Web Key Types Registration . . . . . . . . . . . . .   8
      7.2.  JSON Web Key Parameters Registration  . . . . . . . . . .   8
-     7.3.  JSON Web Encryption Algorithms  . . . . . . . . . . . . .   9
-   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
-     8.1.  Re-using Keying Material  . . . . . . . . . . . . . . . .  10
-     8.2.  Storing Protected Keys  . . . . . . . . . . . . . . . . .  10
-     8.3.  Using Passwords . . . . . . . . . . . . . . . . . . . . .  10
-   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
-     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  10
-     9.2.  Informative References  . . . . . . . . . . . . . . . . .  11
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  11
+     7.3.  JSON Web Encryption Algorithms  . . . . . . . . . . . . .   8
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+     8.1.  Re-using Keying Material  . . . . . . . . . . . . . . . .   9
+     8.2.  Storing Protected Keys  . . . . . . . . . . . . . . . . .   9
+     8.3.  Using Passwords . . . . . . . . . . . . . . . . . . . . .   9
+   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
+     9.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
+     9.2.  Informative References  . . . . . . . . . . . . . . . . .  10
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  10
 
 1.  Introduction
 
@@ -106,6 +105,7 @@ Internet-Draft             JWE Protected JWK                January 2013
    To protect a key, the key holder performs the following steps:
 
 
+   1.  Converts the JWK object to a UTF-8 encoded string (K').
 
 
 
@@ -113,8 +113,6 @@ Miller                   Expires July 28, 2013                  [Page 2]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
-
-   1.  Converts the JWK object to a UTF-8 encoded string (K').
 
    2.  Performs the message encryption steps from [JOSE-JWE] to generate
        the JWE header H, JWE Encrypted Key E, JWE Initialization Vector
@@ -150,6 +148,8 @@ Internet-Draft             JWE Protected JWK                January 2013
    The key holder begins with the [JOSE-JWK] representation of the
    private key (here using a [JOSE-PRIVKEY] formatted RSA [RFC3447]
    private key):
+
+
 
 
 
@@ -368,36 +368,7 @@ Internet-Draft             JWE Protected JWK                January 2013
    MUST be ignored) when the key encryption algorithm requires a
    specific key length.
 
-6.2.  PBKDF2 Key Agreement Algorithms
-
-   The "PBKDF2-HS256" and "PBKDF2-HS512" [JOSE-JWE] algorithms are used
-   to produce a JWE Content Master Key from a user-supplied password, as
-   per the PBKDF2 key derivation function from section 5.1 of [RFC2898].
-   With these algorithms, the derived key is used directly to decrypt
-   the encoded JWE Ciphertext, and the encoded JWE Encrypted Key section
-   is expected to be empty.
-
-   The "PBKDF2-HS256" algorithm uses HMAC-SHA256 for the psuedo-random
-   function (PRF).  The "PBKDF2-HS512" algorithm uses HMAC-SHA512 for
-   the PRF.
-
-   The salt (S) and iteration count (c) MUST be specified by the "S" and
-   "c" parameters (respectively) in the applicable "PBKDF2" JWK object.
-   The dkLen SHOULD be specified in the applicable "PBKDF2" JWK object,
-   and if specified MUST be equal to the size in octets for the content
-   encryption algorithm.  If omitted, the dkLen is assumed to be the
-
-
-
-Miller                   Expires July 28, 2013                  [Page 7]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
-
-   length of the the JWE Content Master Key appropriate for desired the
-   content encryption algorithm.
-
-6.3.  PBES2 Key Encryption Algorithms
+6.2.  PBES2 Key Encryption Algorithms
 
    The "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" [JOSE-JWE]
    algorithms are used to encrypt a JWE Content Master Key using a user-
@@ -414,6 +385,14 @@ Internet-Draft             JWE Protected JWK                January 2013
    The "PBES2-HS512+A256KW" algorithm uses HMAC-SHA512 as the PRF and
    AES256-Wrap as defined in [RFC3394] for the encryption scheme.  The
    dkLen of 32 octets.
+
+
+
+
+Miller                   Expires July 28, 2013                  [Page 7]
+
+Internet-Draft             JWE Protected JWK                January 2013
+
 
    The salt (S) and iteration count (c) MUST be specified by the "S" and
    "c" parameters (respectively) in the applicable "PBKDF2" JWK object.
@@ -444,12 +423,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    o  Specification Document(s): Section 6.1.1 of [[ this document ]]
 
 
-
-Miller                   Expires July 28, 2013                  [Page 8]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
-
    o  Parameter Name: "c"
 
    o  Change Controller: IETF
@@ -466,52 +439,32 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 7.3.  JSON Web Encryption Algorithms
 
-   o  Algorithm Name: "PBKDF2-HS256"
-
-   o  Algorithm Usage Location(s): "alg"
-   o  Implementation Requirements: RECOMMENDED-
-
-   o  Change Controller: IETF
-
-   o  Specification Document(s): Section 6.2 of [[ this document ]]
-
-
-   o  Algorithm Name: "PBKDF2-HS512"
-
-   o  Algorithm Usage Location(s): "alg"
-   o  Implementation Requirements: RECOMMENDED-
-
-   o  Change Controller: IETF
-
-   o  Specification Document(s): Section 6.2 of [[ this document ]]
-
-
    o  Algorithm Name: "PBES2-HS256+A128KW"
 
    o  Algorithm Usage Location(s): "alg"
-   o  Implementation Requirements: RECOMMENDED-
-
-   o  Change Controller: IETF
-
-   o  Specification Document(s): Section 6.3 of [[ this document ]]
-
-
-   o  Algorithm Name: "PBES2-HS512+A256KW"
 
 
 
-
-Miller                   Expires July 28, 2013                  [Page 9]
+Miller                   Expires July 28, 2013                  [Page 8]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
 
+   o  Implementation Requirements: RECOMMENDED-
+
+   o  Change Controller: IETF
+
+   o  Specification Document(s): Section 6.2 of [[ this document ]]
+
+
+   o  Algorithm Name: "PBES2-HS512+A256KW"
+
    o  Algorithm Usage Location(s): "alg"
    o  Implementation Requirements: RECOMMENDED-
 
    o  Change Controller: IETF
 
-   o  Specification Document(s): Section 6.3 of [[ this document ]]
+   o  Specification Document(s): Section 6.2 of [[ this document ]]
 
 
 8.  Security Considerations
@@ -544,6 +497,15 @@ Internet-Draft             JWE Protected JWK                January 2013
               json-web-algorithms-08 (work in progress), December 2012.
 
    [JOSE-JWE]
+
+
+
+
+Miller                   Expires July 28, 2013                  [Page 9]
+
+Internet-Draft             JWE Protected JWK                January 2013
+
+
               Jones, M., Rescola, E., and J. Hildebrand, "JSON Web
               Encryption (JWE)", draft-ietf-jose-json-web-encryption-08
               (work in progress), December 2012.
@@ -553,15 +515,6 @@ Internet-Draft             JWE Protected JWK                January 2013
               key-08 (work in progress), December 2012.
 
    [JOSE-PRIVKEY]
-
-
-
-
-Miller                   Expires July 28, 2013                 [Page 10]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
-
               Jones, M., "JSON Private and Symmetric Key", draft-jones-
               jose-json-private-and-symmetric-key-00 (work in progress),
               December 2012.
@@ -603,13 +556,4 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-
-Miller                   Expires July 28, 2013                 [Page 11]
+Miller                   Expires July 28, 2013                 [Page 10]

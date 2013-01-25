@@ -209,11 +209,6 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
           <t>The OPTIONAL "dkl" parameter contains the PBKDF2 derived key octet length (dkLen), as an integer. This parameter SHOULD be omitted (and MUST be ignored) when the key encryption algorithm requires a specific key length.</t>
         </section>
       </section>
-      <section title="PBKDF2 Key Agreement Algorithms" anchor="pbcrypto-pbkdf2-jwe">
-        <t>The "PBKDF2-HS256" and "PBKDF2-HS512" <xref target="JOSE-JWE"/> algorithms are used to produce a JWE Content Master Key from a user-supplied password, as per the PBKDF2 key derivation function from section 5.1 of <xref target="RFC2898"/>. With these algorithms, the derived key is used directly to decrypt the encoded JWE Ciphertext, and the encoded JWE Encrypted Key section is expected to be empty.</t>
-        <t>The "PBKDF2-HS256" algorithm uses HMAC-SHA256 for the psuedo-random function (PRF). The "PBKDF2-HS512" algorithm uses HMAC-SHA512 for the PRF.</t>
-        <t>The salt (S) and iteration count (c) MUST be specified by the "S" and "c" parameters (respectively) in the applicable "PBKDF2" JWK object. The dkLen SHOULD be specified in the applicable "PBKDF2" JWK object, and if specified MUST be equal to the size in octets for the content encryption algorithm.  If omitted, the dkLen is assumed to be the length of the the JWE Content Master Key appropriate for desired the content encryption algorithm.</t>
-      </section>
       <section title="PBES2 Key Encryption Algorithms" anchor="pbcrypto-pbes2-jwe">
         <t>The "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" <xref target="JOSE-JWE"/> algorithms are used to encrypt a JWE Content Master Key using a user-supplied password to derive the key encryption key. With these algorithms, the derived key is used to encrypt the JWE Content Master Key. These algorithms combine PBKDF2 with a key wrapping algorithm to encrypt the JWE Content Master Key according to PBES2 from section 6.2 of <xref target="RFC2898"/>.</t>
         <t>The "PBES2-HS256+A128KW" algorithm uses HMAC-SHA256 as the PRF and AES128-Wrap as defined in <xref target="RFC3394"/> for the encryption scheme. The dervied key length is 16 octets.</t>
@@ -256,24 +251,6 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
         </t>
       </section>
       <section title="JSON Web Encryption Algorithms" anchor="iana-jwe-algs">
-        <t>
-          <list style="symbols">
-            <t>Algorithm Name: "PBKDF2-HS256"<vspace blankLines="1"/></t>
-            <t>Algorithm Usage Location(s): "alg"</t>
-            <t>Implementation Requirements: RECOMMENDED-<vspace blankLines="1"/></t>
-            <t>Change Controller: IETF<vspace blankLines="1"/></t>
-            <t>Specification Document(s): <xref target="pbcrypto-pbkdf2-jwe"/> of [[ this document ]]<vspace blankLines="1"/></t>
-          </list>
-        </t>
-        <t>
-          <list style="symbols">
-            <t>Algorithm Name: "PBKDF2-HS512"<vspace blankLines="1"/></t>
-            <t>Algorithm Usage Location(s): "alg"</t>
-            <t>Implementation Requirements: RECOMMENDED-<vspace blankLines="1"/></t>
-            <t>Change Controller: IETF<vspace blankLines="1"/></t>
-            <t>Specification Document(s): <xref target="pbcrypto-pbkdf2-jwe"/> of [[ this document ]]<vspace blankLines="1"/></t>
-          </list>
-        </t>
         <t>
           <list style="symbols">
             <t>Algorithm Name: "PBES2-HS256+A128KW"<vspace blankLines="1"/></t>
