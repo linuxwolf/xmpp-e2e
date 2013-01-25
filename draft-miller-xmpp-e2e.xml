@@ -251,7 +251,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
       <section title="Process" anchor="decrypt-process">
         <t>Upon receipt of an encrypted stanza, the receiving agent performs the following:
           <list style="numbers">
-            <t>Determines if a valid SMK is available, associated with the SID specified by the 'id' attribute value of the &lt;e2e/&gtl; element and the sending agent JID specified by the 'from' attribute of the wrapping stanza. If the receiving agent does not already have the CMK, it requests it according to <xref target="keyreq"/>.<vspace blankLines="1"/></t>
+            <t>Determines if a valid SMK is available, associated with the SID specified by the 'id' attribute value of the &lt;e2e/&gt; element and the sending agent JID specified by the 'from' attribute of the wrapping stanza. If the receiving agent does not already have the CMK, it requests it according to <xref target="keyreq"/>.<vspace blankLines="1"/></t>
             <t>Performs the message decryption steps from <xref target="JOSE-JWE"/> to generate the plaintext forwarding envelope string M', using the following inputs:<vspace blankLines="1"/>
               <list style="symbols">
                 <t>The JWE Header H from the &lt;header/&gt; element's character data content.<vspace blankLines="1"/></t>
