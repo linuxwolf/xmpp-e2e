@@ -194,7 +194,20 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
         </figure>
       </t>
     </section>
-    <section title="Symmetric key Example" anchor="protect-example-symm"></section>
+    <section title="Symmetric Key Example" anchor="protect-example-symm">
+      <t>NOTE: unless otherwise indiciated, all line breaks are included for readability.</t>
+      <t>The key holder begins with the <xref target="JOSE-JWK"/> representation of the symmetric key (formatted as per <xref target="JOSE-PRIVKEY"/>):
+        <figure>
+          <artwork><![CDATA[
+{
+    "kty":"oct",
+    "k": "fKrBr19_ne9Cp3akXGpqgA",
+    "kid": "b8acba65-8af2-4e93-a8e0-d4abd7f25e52"
+}
+          ]]></artwork>
+        </figure>
+      </t>
+    </section>
     <section title="Using Password-Based Cryptography" anchor="pbcrypto">
       <t>There are often times when a key is exchanged through immediate human interaction. To help facilitate such exchanges, a number of password-based cryptography schemes utilizing <xref target="RFC2898"/> are defined to supplement the key format, agreement, and encryption algorithms from <xref target='JOSE-JWA'/>.</t>
       <section title="PBKDF2 Key Type" anchor="pbcrypto-pbkdf2-jwk">
