@@ -63,18 +63,18 @@ Internet-Draft             JWE Protected JWK                January 2013
    5.  Symmetric key Example . . . . . . . . . . . . . . . . . . . .   6
    6.  Using Password-Based Cryptography . . . . . . . . . . . . . .   6
      6.1.  PBKDF2 Key Type . . . . . . . . . . . . . . . . . . . . .   7
-       6.1.1.  'slt' Parameter . . . . . . . . . . . . . . . . . . .   7
-       6.1.2.  'its' Parameter . . . . . . . . . . . . . . . . . . .   7
+       6.1.1.  'S' Parameter . . . . . . . . . . . . . . . . . . . .   7
+       6.1.2.  'c' Parameter . . . . . . . . . . . . . . . . . . . .   7
        6.1.3.  'dkl' Parameter . . . . . . . . . . . . . . . . . . .   7
      6.2.  PBKDF2 Key Agreement Algorithms . . . . . . . . . . . . .   7
      6.3.  PBES2 Key Encryption Algorithms . . . . . . . . . . . . .   8
    7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
      7.1.  JSON Web Key Types Registration . . . . . . . . . . . . .   8
      7.2.  JSON Web Key Parameters Registration  . . . . . . . . . .   8
-     7.3.  JSON Web Encryption Algorithms  . . . . . . . . . . . . .   8
-   8.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
-     8.1.  Re-using Keying Material  . . . . . . . . . . . . . . . .   9
-     8.2.  Storing Protected Keys  . . . . . . . . . . . . . . . . .   9
+     7.3.  JSON Web Encryption Algorithms  . . . . . . . . . . . . .   9
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
+     8.1.  Re-using Keying Material  . . . . . . . . . . . . . . . .  10
+     8.2.  Storing Protected Keys  . . . . . . . . . . . . . . . . .  10
      8.3.  Using Passwords . . . . . . . . . . . . . . . . . . . . .  10
    9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
      9.1.  Normative References  . . . . . . . . . . . . . . . . . .  10
@@ -231,8 +231,8 @@ Internet-Draft             JWE Protected JWK                January 2013
      "enc":"A128CBC+HS256",
      "jwk":{
        "kty":"PBKDF2",
-       "salt":"2WCTcJZ1Rvd_CJuJripQ1w",
-       "itrs":4096
+       "S":"2WCTcJZ1Rvd_CJuJripQ1w",
+       "c":4096
      }
    }
 
@@ -350,15 +350,15 @@ Internet-Draft             JWE Protected JWK                January 2013
    necessary to derive a cipher key from a password.  The following
    parameters are defined:
 
-6.1.1.  'slt' Parameter
+6.1.1.  'S' Parameter
 
-   The REQUIRED "slt" parameter contains the PBKDF2 salt value (S), as a
+   The REQUIRED "S" parameter contains the PBKDF2 salt value (S), as a
    base64url encoded string.  This value SHOULD NOT be the empty string
    "".
 
-6.1.2.  'its' Parameter
+6.1.2.  'c' Parameter
 
-   The REQUIRED "its" parameter contains the PBKDF2 iteration count (c),
+   The REQUIRED "c" parameter contains the PBKDF2 iteration count (c),
    as an integer.  This value MUST NOT be less than 1, as per [RFC2898].
 
 6.1.3.  'dkl' Parameter
@@ -381,10 +381,10 @@ Internet-Draft             JWE Protected JWK                January 2013
    function (PRF).  The "PBKDF2-HS512" algorithm uses HMAC-SHA512 for
    the PRF.
 
-   The salt (S) and iteration count (c) MUST be specified by the "slt"
-   and "its" parameters in the applicable "PBKDF2" JWK object.  The
-   dkLen SHOULD be specified in the applicable "PBKDF2" JWK object, and
-   if specified MUST be equal to the size in octets for the content
+   The salt (S) and iteration count (c) MUST be specified by the "S" and
+   "c" parameters (respectively) in the applicable "PBKDF2" JWK object.
+   The dkLen SHOULD be specified in the applicable "PBKDF2" JWK object,
+   and if specified MUST be equal to the size in octets for the content
    encryption algorithm.  If omitted, the dkLen is assumed to be the
 
 
@@ -415,12 +415,12 @@ Internet-Draft             JWE Protected JWK                January 2013
    AES256-Wrap as defined in [RFC3394] for the encryption scheme.  The
    dkLen of 32 octets.
 
-   The salt (S) and iteration count (c) MUST be specified by the "slt"
-   and "its" parameters in the applicable "PBKDF2" JWK object.  The
-   dkLen (dkLen) SHOULD NOT be specified in the applicable "PBKDF2" JWK
-   object, instead using the algorithm's value as above.  However, if
-   specified it MUST be equal to the size in octets for the algorithm's
-   keywrap function.
+   The salt (S) and iteration count (c) MUST be specified by the "S" and
+   "c" parameters (respectively) in the applicable "PBKDF2" JWK object.
+   The dkLen (dkLen) SHOULD NOT be specified in the applicable "PBKDF2"
+   JWK object, instead using the algorithm's value as above.  However,
+   if specified it MUST be equal to the size in octets for the
+   algorithm's keywrap function.
 
 7.  IANA Considerations
 
@@ -437,11 +437,11 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 7.2.  JSON Web Key Parameters Registration
 
-7.3.  JSON Web Encryption Algorithms
+   o  Parameter Name: "S"
 
-   o  Algorithm Name: "PBKDF2-HS256"
+   o  Change Controller: IETF
 
-   o  Algorithm Usage Location(s): "alg"
+   o  Specification Document(s): Section 6.1.1 of [[ this document ]]
 
 
 
@@ -450,6 +450,25 @@ Miller                   Expires July 28, 2013                  [Page 8]
 Internet-Draft             JWE Protected JWK                January 2013
 
 
+   o  Parameter Name: "c"
+
+   o  Change Controller: IETF
+
+   o  Specification Document(s): Section 6.1.2 of [[ this document ]]
+
+
+   o  Parameter Name: "dkl"
+
+   o  Change Controller: IETF
+
+   o  Specification Document(s): Section 6.1.3 of [[ this document ]]
+
+
+7.3.  JSON Web Encryption Algorithms
+
+   o  Algorithm Name: "PBKDF2-HS256"
+
+   o  Algorithm Usage Location(s): "alg"
    o  Implementation Requirements: RECOMMENDED-
 
    o  Change Controller: IETF
@@ -479,6 +498,14 @@ Internet-Draft             JWE Protected JWK                January 2013
 
    o  Algorithm Name: "PBES2-HS512+A256KW"
 
+
+
+
+Miller                   Expires July 28, 2013                  [Page 9]
+
+Internet-Draft             JWE Protected JWK                January 2013
+
+
    o  Algorithm Usage Location(s): "alg"
    o  Implementation Requirements: RECOMMENDED-
 
@@ -496,15 +523,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    protect multiple JWK objects.
 
 8.2.  Storing Protected Keys
-
-
-
-
-
-Miller                   Expires July 28, 2013                  [Page 9]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
 
    Depending on the application, a protected JWK could be stored for an
    extended duration.
@@ -535,6 +553,15 @@ Internet-Draft             JWE Protected JWK                January 2013
               key-08 (work in progress), December 2012.
 
    [JOSE-PRIVKEY]
+
+
+
+
+Miller                   Expires July 28, 2013                 [Page 10]
+
+Internet-Draft             JWE Protected JWK                January 2013
+
+
               Jones, M., "JSON Private and Symmetric Key", draft-jones-
               jose-json-private-and-symmetric-key-00 (work in progress),
               December 2012.
@@ -554,14 +581,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    [RFC4949]  Shirey, R., "Internet Security Glossary, Version 2", RFC
               4949, August 2007.
 
-
-
-
-Miller                   Expires July 28, 2013                 [Page 10]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
-
 9.2.  Informative References
 
    [RFC3447]  Jonsson, J. and B. Kaliski, "Public-Key Cryptography
@@ -578,25 +597,6 @@ Author's Address
 
    Phone: +1-303-308-3204
    Email: mamille2@cisco.com
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
