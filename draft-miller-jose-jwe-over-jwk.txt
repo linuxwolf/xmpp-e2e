@@ -60,25 +60,25 @@ Internet-Draft             JWE Protected JWK                January 2013
 
    3.  Protecting Keys . . . . . . . . . . . . . . . . . . . . . . .   2
    4.  Private Key Example . . . . . . . . . . . . . . . . . . . . .   3
-   5.  Symmetric key Example . . . . . . . . . . . . . . . . . . . .   6
-   6.  Using Password-Based Cryptography . . . . . . . . . . . . . .   6
-     6.1.  PBKDF2 Key Type . . . . . . . . . . . . . . . . . . . . .   7
-       6.1.1.  'S' Parameter . . . . . . . . . . . . . . . . . . . .   7
-       6.1.2.  'c' Parameter . . . . . . . . . . . . . . . . . . . .   7
-       6.1.3.  'dkl' Parameter . . . . . . . . . . . . . . . . . . .   7
-     6.2.  PBES2 Key Encryption Algorithms . . . . . . . . . . . . .   7
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
-     7.1.  JSON Web Key Types Registration . . . . . . . . . . . . .   8
-     7.2.  JSON Web Key Parameters Registration  . . . . . . . . . .   8
-     7.3.  JSON Web Encryption Algorithms  . . . . . . . . . . . . .   8
-   8.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
-     8.1.  Re-using Keying Material  . . . . . . . . . . . . . . . .   9
-     8.2.  Storing Protected Keys  . . . . . . . . . . . . . . . . .   9
-     8.3.  Using Passwords . . . . . . . . . . . . . . . . . . . . .   9
-   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
-     9.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
-     9.2.  Informative References  . . . . . . . . . . . . . . . . .  10
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  10
+   5.  Symmetric Key Example . . . . . . . . . . . . . . . . . . . .   6
+   6.  Using Password-Based Cryptography . . . . . . . . . . . . . .   8
+     6.1.  PBKDF2 Key Type . . . . . . . . . . . . . . . . . . . . .   8
+       6.1.1.  'S' Parameter . . . . . . . . . . . . . . . . . . . .   9
+       6.1.2.  'c' Parameter . . . . . . . . . . . . . . . . . . . .   9
+       6.1.3.  'dkl' Parameter . . . . . . . . . . . . . . . . . . .   9
+     6.2.  PBES2 Key Encryption Algorithms . . . . . . . . . . . . .   9
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+     7.1.  JSON Web Key Types Registration . . . . . . . . . . . . .  10
+     7.2.  JSON Web Key Parameters Registration  . . . . . . . . . .  10
+     7.3.  JSON Web Encryption Algorithms  . . . . . . . . . . . . .  10
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
+     8.1.  Re-using Keying Material  . . . . . . . . . . . . . . . .  11
+     8.2.  Storing Protected Keys  . . . . . . . . . . . . . . . . .  11
+     8.3.  Using Passwords . . . . . . . . . . . . . . . . . . . . .  11
+   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
+     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  11
+     9.2.  Informative References  . . . . . . . . . . . . . . . . .  12
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  12
 
 1.  Introduction
 
@@ -242,7 +242,7 @@ Internet-Draft             JWE Protected JWK                January 2013
    Thus from my lips, by yours, my sin is purged.
 
 
-   o  Content Master Key (encoded as base64url per [RFC4686])
+   o  Content Master Key (encoded as base64url per [RFC4686]):
 
    1ICvnpc3zPRNS7JoJ9bnJ929eX7EnRwmc0CHNOF1zKc
 
@@ -327,9 +327,9 @@ Internet-Draft             JWE Protected JWK                January 2013
    big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
 
 
-5.  Symmetric key Example
+5.  Symmetric Key Example
 
-6.  Using Password-Based Cryptography
+
 
 
 
@@ -338,6 +338,103 @@ Miller                   Expires July 28, 2013                  [Page 6]
 Internet-Draft             JWE Protected JWK                January 2013
 
 
+   NOTE: unless otherwise indiciated, all line breaks are included for
+   readability.
+
+   The key holder begins with the [JOSE-JWK] representation of the
+   symmetric key (formatted as per [JOSE-PRIVKEY]):
+
+   {
+       "kty":"oct",
+       "kid": "b8acba65-8af2-4e93-a8e0-d4abd7f25e52",
+       "k": "fKrBr19_ne9Cp3akXGpqgA"
+   }
+
+
+   The key holder uses the following [JOSE-JWE] inputs:
+
+
+   o  JWE Header
+
+   {
+     "alg":"RSA-OAEP",
+     "enc":"A128CBC+HS256",
+     "jwk":{
+       "kty":"RSA",
+       "n":"ALekPD1kotXZCY_YUz_ITWBZb2nTOw35VvZlnqTiYSeusO58qCtYDz
+            ahTEkEcjtduRqfkxJKHYVq9Iro4x1cewXFdJZUuMOQAhoD63AHemXE
+            kdPiKqJvkBXDT_Eo4NPOjMKKkFPy2MsJQBmdtVknUvzxEchhYjZ490
+            EJTvGJ7OYwrSwkcCxy9D29XxL-OQLkSLlH1XD8kgVmJw8hsb42Bg0j
+            PgKlkvcyENmYpYE_hqlJoqYNFzgtAnNtK4C3tspix46R3IgilQG2Of
+            i99vpUnmTvjrOlNef2l65PRsPHD1Gl9fyPLCxrkolXbdwvxZ9j2d2f
+            Iu-OBTxRhnBtarNls_k",
+       "e":"AQAB"
+     }
+   }
+
+
+   o  Content Master Key (encoded as base64url per [RFC4686]):
+
+   ci5IlLIHnFLn-1lhL5CWOS3DdbXGU-BPuFCrLspXAkA
+
+
+   o  Initialization Vector (encoded as base64url per [RFC4686]):
+
+   _dYbckd_xuJUBUNsxkT9yw
+
+
+
+   The key holder performs steps 1 and 2 to generate the [JOSE-JWE]
+   outputs (represented using the Compact Serialization):
+
+
+
+Miller                   Expires July 28, 2013                  [Page 7]
+
+Internet-Draft             JWE Protected JWK                January 2013
+
+
+   eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhDQkMrSFMyNTYiLCJqd2siOns
+   ia3R5IjoiUlNBIiwibiI6IkFMZWtQRDFrb3RYWkNZX1lVel9JVFdCWmIyblRPdz
+   M1VnZabG5xVGlZU2V1c081OHFDdFlEemFoVEVrRWNqdGR1UnFma3hKS0hZVnE5S
+   XJvNHgxY2V3WEZkSlpVdU1PUUFob0Q2M0FIZW1YRWtkUGlLcUp2a0JYRFRfRW80
+   TlBPak1LS2tGUHkyTXNKUUJtZHRWa25Vdnp4RWNoaFlqWjQ5MEVKVHZHSjdPWXd
+   yU3drY0N4eTlEMjlYeEwtT1FMa1NMbEgxWEQ4a2dWbUp3OGhzYjQyQmcwalBnS2
+   xrdmN5RU5tWXBZRV9ocWxKb3FZTkZ6Z3RBbk50SzRDM3RzcGl4NDZSM0lnaWxRR
+   zJPZmk5OXZwVW5tVHZqck9sTmVmMmw2NVBSc1BIRDFHbDlmeVBMQ3hya29sWGJk
+   d3Z4WjlqMmQyZkl1LU9CVHhSaG5CdGFyTmxzX2siLCJlIjoiQVFBQiJ9fQ.
+   UW26BTjbDGjgQ288JXJpGGpbZVV3WyZYJdm1Fvux8wM_t7bh6UbjbOdYXjL3rzD
+   phZteaD-DXiKrdGaVndTMLUmjg78H0R9K2WHxWNhTWiq8iMDGtw6BYnHW_r5DSf
+   vhojcDhCCBKWyO-QLXvTO1mfgo6UQwYY32Lvz-IrbxphrfBePsEXVYm75PLIIft
+   PnRwN3fWDMkKLCq2AesvWDuRWtKVjsh7uu_AX2ky6dvov2Lw_xMiDshsNz62RES
+   bNUW-ylMqNNn_VAYWKHK83k5CZppPlBb_8MDEUBPyGe_NDCa3118eo20tJGMn8v
+   XRg8k7D0nJ051hGlzAkMQ0S_x9g.
+   _dYbckd_xuJUBUNsxkT9yw.
+   QHkwptAlO0Gdo5BrbkaGPSek6wASr-twP8ZQ3YYHOkbRMedtsM0QwpvdnfUXoJL
+   7HZ0fbI-5YwO3PHvTOMXKx-K26cA-Hn9aseBvuICL2getFnrUcXs3vQI416PCw7
+   n39HtFLozCaBhJBaMv5x41CT6eaeRCMXE9Kbgz8lFicKNS9GYB7bUQfPXJl-qP7
+   05v-qkY4m2BAfofWtyGK-bnbs2ZKhKgaRTdRZlbnZTC19eSS8bPlalSNBrpr2eP
+   kDGDsYIKJvtbqD_xHeb7u5BT3ELmDl4CDjMruB3RiNwINcwNkCAhkg9tgV_vFCm
+   Qzsc9DH6dlnkYrbnyFrAD4Qe7xI1anDjLmRvU2cBB68-AtRd3PmpVzbr4t2eo33
+   GX9c_6fUILJS8WuExPs7KJkOuqDfKCPWDwRfX-yf8YUkrBZMj9aImyY2MyMJZFu
+   ITxseXbhkQFPJn-A4scSt1suWEXch5fKfl1KfxJlMio-Bm8kfUba4mgOKen7cJ0
+   whFSh7cupuSG0vVMLeBoBVGnndjARUxl5I57NZupH7xq3L8lDVHu_mQ_8Ae1j2h
+   QmPOA7_882j1ubpM9Kq-YmOPP4R8wk9SD0bl0k222mSMUMMEZoiSVk7OSHPHkXj
+   v-IkXkMmKT0lZiRohdKanb-Dfa1GWXeFTKFSKKJUQibLQ2zy6jlBptIEkxQNrJe
+   F-96Ie08r93r79ZRs3lNegzhI6ShMot1YBiG5C-WiOvPw6zysh_-AIGbuvZ9hBn
+   nuNfeGr2VPPcO5Z0FKGYGJ0DDnwlNHkdztEj_xLzSZjMxeO6o2hVJScLzzyG_Fy
+   T2v2kUHv_qeal18x-ICLR3yyF6JzoT0zKYPouBEIM5EZNAX9A3UjG0kNWW4Lou9
+   dlbLIZm-T7H6kj89RATMbDCwHa-nsF2kmnTRR6djt7lzDU1CHEEcM83ZWxi9qTR
+   cN_YrCokMkSjZYI87GqmnYHFsTktBBMNDX0u9SBdDZSwmz4EPsn7blYFt6Oiyd-
+   EBJlE_ocI4desERjIj0vKsgCoa9ea46S4m_gPa8xlCHK9wcsXU0ZhH8Lo_PyLm0
+   4CnjAbhKV0g8WvupjRQijkA6WoqYxQCP9EsDWH7kHJxDWV0uXXFoPZkcW5DBWrG
+   1NUC4TAjjI-9qhW7bpBZTLZHDJ99Awsh5lBqPYwUoPMS-lx-FPv9pAEih0rdHdH
+   __PelgmXKSwsoBSXzS_ErzePKwTfMAqedpe4WVykQ1rOTRn3uW01sv5gfRBRpo.
+   PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
+
+
+6.  Using Password-Based Cryptography
+
    There are often times when a key is exchanged through immediate human
    interaction.  To help facilitate such exchanges, a number of
    password-based cryptography schemes utilizing [RFC2898] are defined
@@ -345,6 +442,13 @@ Internet-Draft             JWE Protected JWK                January 2013
    from [JOSE-JWA].
 
 6.1.  PBKDF2 Key Type
+
+
+
+Miller                   Expires July 28, 2013                  [Page 8]
+
+Internet-Draft             JWE Protected JWK                January 2013
+
 
    The "PBKDF2" [JOSE-JWK] type is used to contain the parameters
    necessary to derive a cipher key from a password.  The following
@@ -386,14 +490,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    AES256-Wrap as defined in [RFC3394] for the encryption scheme.  The
    dkLen of 32 octets.
 
-
-
-
-Miller                   Expires July 28, 2013                  [Page 7]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
-
    The salt (S) and iteration count (c) MUST be specified by the "S" and
    "c" parameters (respectively) in the applicable "PBKDF2" JWK object.
    The dkLen (dkLen) SHOULD NOT be specified in the applicable "PBKDF2"
@@ -402,6 +498,13 @@ Internet-Draft             JWE Protected JWK                January 2013
    algorithm's keywrap function.
 
 7.  IANA Considerations
+
+
+
+Miller                   Expires July 28, 2013                  [Page 9]
+
+Internet-Draft             JWE Protected JWK                January 2013
+
 
 7.1.  JSON Web Key Types Registration
 
@@ -442,14 +545,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    o  Algorithm Name: "PBES2-HS256+A128KW"
 
    o  Algorithm Usage Location(s): "alg"
-
-
-
-Miller                   Expires July 28, 2013                  [Page 8]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
-
    o  Implementation Requirements: RECOMMENDED-
 
    o  Change Controller: IETF
@@ -458,6 +553,14 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
    o  Algorithm Name: "PBES2-HS512+A256KW"
+
+
+
+
+Miller                   Expires July 28, 2013                 [Page 10]
+
+Internet-Draft             JWE Protected JWK                January 2013
+
 
    o  Algorithm Usage Location(s): "alg"
    o  Implementation Requirements: RECOMMENDED-
@@ -497,15 +600,6 @@ Internet-Draft             JWE Protected JWK                January 2013
               json-web-algorithms-08 (work in progress), December 2012.
 
    [JOSE-JWE]
-
-
-
-
-Miller                   Expires July 28, 2013                  [Page 9]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
-
               Jones, M., Rescola, E., and J. Hildebrand, "JSON Web
               Encryption (JWE)", draft-ietf-jose-json-web-encryption-08
               (work in progress), December 2012.
@@ -515,6 +609,15 @@ Internet-Draft             JWE Protected JWK                January 2013
               key-08 (work in progress), December 2012.
 
    [JOSE-PRIVKEY]
+
+
+
+
+Miller                   Expires July 28, 2013                 [Page 11]
+
+Internet-Draft             JWE Protected JWK                January 2013
+
+
               Jones, M., "JSON Private and Symmetric Key", draft-jones-
               jose-json-private-and-symmetric-key-00 (work in progress),
               December 2012.
@@ -556,4 +659,13 @@ Author's Address
 
 
 
-Miller                   Expires July 28, 2013                 [Page 10]
+
+
+
+
+
+
+
+
+
+Miller                   Expires July 28, 2013                 [Page 12]

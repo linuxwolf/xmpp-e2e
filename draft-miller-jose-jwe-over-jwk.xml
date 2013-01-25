@@ -22,7 +22,7 @@
         <email>mamille2@cisco.com</email>
       </address>
     </author>
-    <date month="January" day="22" year="2013"/>
+    <date month="January" day="25" year="2013"/>
     <area>Security</area>
     <keyword>Internet-Draft</keyword>
     <keyword>JOSE</keyword>
@@ -128,7 +128,7 @@ Thus from my lips, by yours, my sin is purged.
               ]]></artwork>
             </figure>
           <vspace blankLines="1"/></t>
-          <t>Content Master Key (encoded as base64url per <xref target="RFC4686"/>)
+          <t>Content Master Key (encoded as base64url per <xref target="RFC4686"/>):
             <figure>
               <artwork><![CDATA[
 1ICvnpc3zPRNS7JoJ9bnJ929eX7EnRwmc0CHNOF1zKc
@@ -201,9 +201,92 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
           <artwork><![CDATA[
 {
     "kty":"oct",
-    "k": "fKrBr19_ne9Cp3akXGpqgA",
-    "kid": "b8acba65-8af2-4e93-a8e0-d4abd7f25e52"
+    "kid": "b8acba65-8af2-4e93-a8e0-d4abd7f25e52",
+    "k": "fKrBr19_ne9Cp3akXGpqgA"
 }
+          ]]></artwork>
+        </figure>
+      </t>
+      <t>The key holder uses the following <xref target="JOSE-JWE"/> inputs:<vspace blankLines="1"/>
+        <list style="symbols">
+          <t>JWE Header
+              <figure>
+                <artwork><![CDATA[
+{
+  "alg":"RSA-OAEP",
+  "enc":"A128CBC+HS256",
+  "jwk":{
+    "kty":"RSA",
+    "n":"ALekPD1kotXZCY_YUz_ITWBZb2nTOw35VvZlnqTiYSeusO58qCtYDz
+         ahTEkEcjtduRqfkxJKHYVq9Iro4x1cewXFdJZUuMOQAhoD63AHemXE
+         kdPiKqJvkBXDT_Eo4NPOjMKKkFPy2MsJQBmdtVknUvzxEchhYjZ490
+         EJTvGJ7OYwrSwkcCxy9D29XxL-OQLkSLlH1XD8kgVmJw8hsb42Bg0j
+         PgKlkvcyENmYpYE_hqlJoqYNFzgtAnNtK4C3tspix46R3IgilQG2Of
+         i99vpUnmTvjrOlNef2l65PRsPHD1Gl9fyPLCxrkolXbdwvxZ9j2d2f
+         Iu-OBTxRhnBtarNls_k",
+    "e":"AQAB"
+  }
+}
+                ]]></artwork>
+              </figure>
+          <vspace blankLines="1"/></t>
+
+          <t>Content Master Key (encoded as base64url per <xref target="RFC4686"/>):
+            <figure>
+              <artwork><![CDATA[
+ci5IlLIHnFLn-1lhL5CWOS3DdbXGU-BPuFCrLspXAkA
+              ]]></artwork>
+            </figure>
+          <vspace blankLines="1"/></t>
+          <t>Initialization Vector (encoded as base64url per <xref target="RFC4686"/>):
+            <figure>
+              <artwork><![CDATA[
+_dYbckd_xuJUBUNsxkT9yw
+              ]]></artwork>
+            </figure>
+          <vspace blankLines="1"/></t>
+        </list>
+      </t>
+      <t>The key holder performs steps 1 and 2 to generate the <xref target="JOSE-JWE"/> outputs (represented using the Compact Serialization):<vspace blankLines="1"/>
+        <figure>
+          <artwork><![CDATA[
+eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhDQkMrSFMyNTYiLCJqd2siOns
+ia3R5IjoiUlNBIiwibiI6IkFMZWtQRDFrb3RYWkNZX1lVel9JVFdCWmIyblRPdz
+M1VnZabG5xVGlZU2V1c081OHFDdFlEemFoVEVrRWNqdGR1UnFma3hKS0hZVnE5S
+XJvNHgxY2V3WEZkSlpVdU1PUUFob0Q2M0FIZW1YRWtkUGlLcUp2a0JYRFRfRW80
+TlBPak1LS2tGUHkyTXNKUUJtZHRWa25Vdnp4RWNoaFlqWjQ5MEVKVHZHSjdPWXd
+yU3drY0N4eTlEMjlYeEwtT1FMa1NMbEgxWEQ4a2dWbUp3OGhzYjQyQmcwalBnS2
+xrdmN5RU5tWXBZRV9ocWxKb3FZTkZ6Z3RBbk50SzRDM3RzcGl4NDZSM0lnaWxRR
+zJPZmk5OXZwVW5tVHZqck9sTmVmMmw2NVBSc1BIRDFHbDlmeVBMQ3hya29sWGJk
+d3Z4WjlqMmQyZkl1LU9CVHhSaG5CdGFyTmxzX2siLCJlIjoiQVFBQiJ9fQ.
+UW26BTjbDGjgQ288JXJpGGpbZVV3WyZYJdm1Fvux8wM_t7bh6UbjbOdYXjL3rzD
+phZteaD-DXiKrdGaVndTMLUmjg78H0R9K2WHxWNhTWiq8iMDGtw6BYnHW_r5DSf
+vhojcDhCCBKWyO-QLXvTO1mfgo6UQwYY32Lvz-IrbxphrfBePsEXVYm75PLIIft
+PnRwN3fWDMkKLCq2AesvWDuRWtKVjsh7uu_AX2ky6dvov2Lw_xMiDshsNz62RES
+bNUW-ylMqNNn_VAYWKHK83k5CZppPlBb_8MDEUBPyGe_NDCa3118eo20tJGMn8v
+XRg8k7D0nJ051hGlzAkMQ0S_x9g.
+_dYbckd_xuJUBUNsxkT9yw.
+QHkwptAlO0Gdo5BrbkaGPSek6wASr-twP8ZQ3YYHOkbRMedtsM0QwpvdnfUXoJL
+7HZ0fbI-5YwO3PHvTOMXKx-K26cA-Hn9aseBvuICL2getFnrUcXs3vQI416PCw7
+n39HtFLozCaBhJBaMv5x41CT6eaeRCMXE9Kbgz8lFicKNS9GYB7bUQfPXJl-qP7
+05v-qkY4m2BAfofWtyGK-bnbs2ZKhKgaRTdRZlbnZTC19eSS8bPlalSNBrpr2eP
+kDGDsYIKJvtbqD_xHeb7u5BT3ELmDl4CDjMruB3RiNwINcwNkCAhkg9tgV_vFCm
+Qzsc9DH6dlnkYrbnyFrAD4Qe7xI1anDjLmRvU2cBB68-AtRd3PmpVzbr4t2eo33
+GX9c_6fUILJS8WuExPs7KJkOuqDfKCPWDwRfX-yf8YUkrBZMj9aImyY2MyMJZFu
+ITxseXbhkQFPJn-A4scSt1suWEXch5fKfl1KfxJlMio-Bm8kfUba4mgOKen7cJ0
+whFSh7cupuSG0vVMLeBoBVGnndjARUxl5I57NZupH7xq3L8lDVHu_mQ_8Ae1j2h
+QmPOA7_882j1ubpM9Kq-YmOPP4R8wk9SD0bl0k222mSMUMMEZoiSVk7OSHPHkXj
+v-IkXkMmKT0lZiRohdKanb-Dfa1GWXeFTKFSKKJUQibLQ2zy6jlBptIEkxQNrJe
+F-96Ie08r93r79ZRs3lNegzhI6ShMot1YBiG5C-WiOvPw6zysh_-AIGbuvZ9hBn
+nuNfeGr2VPPcO5Z0FKGYGJ0DDnwlNHkdztEj_xLzSZjMxeO6o2hVJScLzzyG_Fy
+T2v2kUHv_qeal18x-ICLR3yyF6JzoT0zKYPouBEIM5EZNAX9A3UjG0kNWW4Lou9
+dlbLIZm-T7H6kj89RATMbDCwHa-nsF2kmnTRR6djt7lzDU1CHEEcM83ZWxi9qTR
+cN_YrCokMkSjZYI87GqmnYHFsTktBBMNDX0u9SBdDZSwmz4EPsn7blYFt6Oiyd-
+EBJlE_ocI4desERjIj0vKsgCoa9ea46S4m_gPa8xlCHK9wcsXU0ZhH8Lo_PyLm0
+4CnjAbhKV0g8WvupjRQijkA6WoqYxQCP9EsDWH7kHJxDWV0uXXFoPZkcW5DBWrG
+1NUC4TAjjI-9qhW7bpBZTLZHDJ99Awsh5lBqPYwUoPMS-lx-FPv9pAEih0rdHdH
+__PelgmXKSwsoBSXzS_ErzePKwTfMAqedpe4WVykQ1rOTRn3uW01sv5gfRBRpo.
+PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
           ]]></artwork>
         </figure>
       </t>
