@@ -206,16 +206,19 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
           <t>The REQUIRED "its" parameter contains the PBKDF2 iteration count (c), as an integer. This value MUST NOT be less than 1, as per <xref target="RFC2898"/>.</t>
         </section>
         <section title="'dkl' Parameter" anchor="pbcrypto-pbkdf2-jwk-dklen">
-          <t>The RECOMMENDED "dkl" parameter contains the PBKDF2 derived-key octet length (dkLen), as an integer. This parameter MAY be omitted (and MUST be ignored) when the key encryption algorithm requires a specific key length.</t>
+          <t>The OPTIONAL "dkl" parameter contains the PBKDF2 derived key octet length (dkLen), as an integer. This parameter SHOULD be omitted (and MUST be ignored) when the key encryption algorithm requires a specific key length.</t>
         </section>
       </section>
       <section title="PBKDF2 Key Agreement Algorithms" anchor="pbcrypto-pbkdf2-jwe">
-        <t>The "PBKDF2-HS256" and "PBKDF2-HS512" <xref target="JOSE-JWE"/> key agreement algorithms are used to produce a JWE Content Master Key from a user-supplied password, as per the PBKDF2 key derivation function from section 5.1 of <xref target="RFC2898"/>. The "PBKDF2-HS256" algorithm uses "HMAC-SHA256" for the psuedo-random function (PRF), while the "PBKDF2-HS512" algorithm uses "HMAC-SHA512" for the PRF.</t>
-        <t>The derived key length (dkLen) SHOULD be specified in the applicable "PBKDF2" JWK object, and if specified MUST be equal to the size in octets for the content encryption algorithm.  However, implementations MAY assume a value necessary for generating a JWE Content Master Key appropriate for desired the content encryption algorithm, ignoring the value of the "dkl" parameter.</t>
+        <t>The "PBKDF2-HS256" and "PBKDF2-HS512" <xref target="JOSE-JWE"/> algorithms are used to produce a JWE Content Master Key from a user-supplied password, as per the PBKDF2 key derivation function from section 5.1 of <xref target="RFC2898"/>. With these algorithms, the derived key is used directly to decrypt the encoded JWE Ciphertext, and the encoded JWE Encrypted Key section is expected to be empty.</t>
+        <t>The "PBKDF2-HS256" algorithm uses HMAC-SHA256 for the psuedo-random function (PRF). The "PBKDF2-HS512" algorithm uses HMAC-SHA512 for the PRF.</t>
+        <t>The salt (S) and iteration count (c) MUST be specified by the "slt" and "its" parameters in the applicable "PBKDF2" JWK object. The dkLen SHOULD be specified in the applicable "PBKDF2" JWK object, and if specified MUST be equal to the size in octets for the content encryption algorithm.  If omitted, the dkLen is assumed to be the length of the the JWE Content Master Key appropriate for desired the content encryption algorithm.</t>
       </section>
       <section title="PBES2 Key Encryption Algorithms" anchor="pbcrypto-pbes2-jwe">
-        <t>The "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" <xref target="JOSE-JWE"/> key encryption algorithms are used to encrypt a JWE Content Master Key using a user-supplied password to derive the key encryption key. These algorithms combine PBKDF2 with a key wrapping algorithm to encrypt the JWE Content Master Key according to PBES2 from section 6.2 of <xref target="RFC2898"/>.</t>
-        <t>The "PBES2-HS256+A128KW" algorithm uses a dervied key length of 16 octets, while "PBES2-HS512+A256KW" uses a derived key length of 32 octets.</t>
+        <t>The "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" <xref target="JOSE-JWE"/> algorithms are used to encrypt a JWE Content Master Key using a user-supplied password to derive the key encryption key. With these algorithms, the derived key is used to encrypt the JWE Content Master Key. These algorithms combine PBKDF2 with a key wrapping algorithm to encrypt the JWE Content Master Key according to PBES2 from section 6.2 of <xref target="RFC2898"/>.</t>
+        <t>The "PBES2-HS256+A128KW" algorithm uses HMAC-SHA256 as the PRF and AES128-Wrap as defined in <xref target="RFC3394"/> for the encryption scheme. The dervied key length is 16 octets.</t>
+        <t>The "PBES2-HS512+A256KW" algorithm uses HMAC-SHA512 as the PRF and AES256-Wrap as defined in <xref target="RFC3394"/> for the encryption scheme. The dkLen of 32 octets.</t>
+        <t>The salt (S) and iteration count (c) MUST be specified by the "slt" and "its" parameters in the applicable "PBKDF2" JWK object. The dkLen (dkLen) SHOULD NOT be specified in the applicable "PBKDF2" JWK object, instead using the algorithm's value as above. However, if specified it MUST be equal to the size in octets for the algorithm's keywrap function.</t>
       </section>
     </section>
     <section title="IANA Considerations" anchor="iana">
@@ -278,7 +281,7 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
         <t>Depending on the application, a protected JWK could be stored for an extended duration.</t>
       </section>
       <section title="Using Passwords" anchor="security-pwd">
-        <t>While convenient for end users, passwords have many drawbacks, such as the limited range of values usable on typical input devices (e.g. keyboards). To help mitigate these limitations, this document applies principals from <xref target="RFC2898"/> to derive cryptographic keys from user-supplied passwords.</t>
+        <t>While convenient for end users, passwords have many drawbacks, such as the limited range of values possible on typical input devices (e.g. keyboards). To help mitigate these limitations, this document applies principals from <xref target="RFC2898"/> to derive cryptographic keys from user-supplied passwords.</t>
       </section>
     </section>
   </middle>
@@ -393,6 +396,23 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
         </front>
         <seriesInfo name="RFC" value="2898"/>
         <format type="TXT" target="http://www.ietf.org/rfc/rfc2898.txt"/>
+      </reference>
+      <reference anchor="RFC3394">
+        <front>
+          <title>Advanced Encryption Standard (AES) Key Wrap Algorithm</title>
+          <author initials="J." surname="Schaad" fullname="Jim Schaad">
+            <organization>Soaring Hawk Consulting</organization>
+          </author>
+          <author initials="R." surname="Housley" fullname="Russ Housley">
+            <organization>RSA Laboratories</organization>
+          </author>
+          <date year="2002" month="September"/>
+          <abstract>
+            <t>The purpose of this document is to make the Advanced Encryption Standard (AES) Key Wrap algorithm conveniently available to the Internet community.  The United States of America has adopted AES as the new encryption standard.  The AES Key Wrap algorithm will probably be adopted by the USA for encryption of AES keys. The authors took most of the text in this document from the draft AES Key Wrap posted by NIST.</t>
+          </abstract>
+        </front>
+        <seriesInfo name="RFC" value="3394"/>
+        <format type="TXT" target="http://www.ietf.org/rfc/rfc3394.txt"/>
       </reference>
       <reference anchor="RFC4686">
         <front>
