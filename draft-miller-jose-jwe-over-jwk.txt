@@ -59,51 +59,51 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
    3.  Protecting Keys . . . . . . . . . . . . . . . . . . . . . . .   3
-   4.  Private Key Example . . . . . . . . . . . . . . . . . . . . .   3
-   5.  Symmetric Key Example . . . . . . . . . . . . . . . . . . . .   6
-   6.  Using Password-Based Cryptography . . . . . . . . . . . . . .   8
-     6.1.  PBKDF2 Key Type . . . . . . . . . . . . . . . . . . . . .   8
-       6.1.1.  'S' Parameter . . . . . . . . . . . . . . . . . . . .   9
-       6.1.2.  'c' Parameter . . . . . . . . . . . . . . . . . . . .   9
-       6.1.3.  'dkl' Parameter . . . . . . . . . . . . . . . . . . .   9
-     6.2.  PBES2 Key Encryption Algorithms . . . . . . . . . . . . .   9
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
-     7.1.  JSON Web Key Types Registration . . . . . . . . . . . . .  10
-     7.2.  JSON Web Key Parameters Registration  . . . . . . . . . .  10
-     7.3.  JSON Web Encryption Algorithms  . . . . . . . . . . . . .  10
-   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
-     8.1.  Re-using Keying Material  . . . . . . . . . . . . . . . .  11
-     8.2.  Lifetime of Protected Keys  . . . . . . . . . . . . . . .  11
-     8.3.  Using Passwords and Passphrases . . . . . . . . . . . . .  11
-   9.  Internationalization Considerations . . . . . . . . . . . . .  11
-   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  12
-     10.1.  Normative References . . . . . . . . . . . . . . . . . .  12
-     10.2.  Informative References . . . . . . . . . . . . . . . . .  13
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  13
+     3.1.  Details for Private Keys  . . . . . . . . . . . . . . . .   4
+     3.2.  Details for Symmetric Keys  . . . . . . . . . . . . . . .   4
+   4.  Private Key Example . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Symmetric Key Example . . . . . . . . . . . . . . . . . . . .   7
+   6.  Using Password-Based Cryptography . . . . . . . . . . . . . .   9
+     6.1.  PBKDF2 Key Type . . . . . . . . . . . . . . . . . . . . .   9
+       6.1.1.  'S' Parameter . . . . . . . . . . . . . . . . . . . .  10
+       6.1.2.  'c' Parameter . . . . . . . . . . . . . . . . . . . .  10
+       6.1.3.  'dkl' Parameter . . . . . . . . . . . . . . . . . . .  10
+     6.2.  PBES2 Key Encryption Algorithms . . . . . . . . . . . . .  10
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
+     7.1.  JSON Web Key Types Registration . . . . . . . . . . . . .  11
+     7.2.  JSON Web Key Parameters Registration  . . . . . . . . . .  11
+     7.3.  JSON Web Encryption Algorithms  . . . . . . . . . . . . .  11
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
+     8.1.  Re-using Keying Material  . . . . . . . . . . . . . . . .  12
+     8.2.  Lifetime of Protected Keys  . . . . . . . . . . . . . . .  12
+     8.3.  Using Passwords and Passphrases . . . . . . . . . . . . .  12
+   9.  Internationalization Considerations . . . . . . . . . . . . .  13
+   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
+     10.1.  Normative References . . . . . . . . . . . . . . . . . .  13
+     10.2.  Informative References . . . . . . . . . . . . . . . . .  14
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  14
 
 1.  Introduction
 
    There are times when it is necessary for transporting or exchanging a
    private or symmetric key, but the transport mechanism might not
-   provide any protection of the key.  For instance, end-to-end
-   scenarios where the key holder and key recipient are linked through
-   multiple network hops that might or might not emply TLS, or exchange
-   of a key using physical media such as a USB drive.
+   provide adequate content protection for the key.  For instance, end-
+   to-end scenarios where the key holder and key recipient are linked
+   through multiple network hops that might or might not employ
+   transport layer security ([RFC5246]), or exchange of a key using
+   physical media such as a USB drive that is not itself encrypted.
 
    This document specifies an approach that uses [JOSE-JWE] to encryt a
    private or symmetric key which is formatted as [JOSE-JWK].  This
-   document also specifies JSON Web Key formats and JSON Web Encryption
-   algorithms based on [RFC2898] that allow for protecting keys using a
-   password.
+   document also specifies and registers JSON Web Key formats and JSON
+   Web Encryption algorithms based on [RFC2898] that allow for
+   protecting keys using a password.
 
 2.  Terminology
 
-   This document inherits JSON Web Algorithms (JWA)-related terminology
-   from [JOSE-JWA], JSON Web Encryption (JWE)-related terminology from
-   [JOSE-JWE], JSON Web Key (JWK)-related terminology from [JOSE-JWK],
-   and password-based cryptography-related terminology from [RFC2898].
-   Security-related terms are to be understood in the sense defined in
-   [RFC4949].
+
+
+
 
 
 
@@ -114,12 +114,23 @@ Miller                  Expires August 02, 2013                 [Page 2]
 Internet-Draft             JWE Protected JWK                January 2013
 
 
+   This document inherits JSON Web Algorithms (JWA)-related terminology
+   from [JOSE-JWA], JSON Web Encryption (JWE)-related terminology from
+   [JOSE-JWE], JSON Web Key (JWK)-related terminology from [JOSE-JWK],
+   and password-based cryptography-related terminology from [RFC2898].
+   Security-related terms are to be understood in the sense defined in
+   [RFC4949].
+
    The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
    "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
    "OPTIONAL" in this document are to be interpreted as described in
    [RFC2119].
 
 3.  Protecting Keys
+
+   The process for protecting private keys and symmetric keys are
+   identical.  The only differences are typically the algorithms used to
+   protect the key.
 
    To protect a key, the key holder performs the following steps:
 
@@ -152,6 +163,32 @@ Internet-Draft             JWE Protected JWK                January 2013
        Compact Serialization documented in [JOSE-JWE].
 
 
+
+
+Miller                  Expires August 02, 2013                 [Page 3]
+
+Internet-Draft             JWE Protected JWK                January 2013
+
+
+3.1.  Details for Private Keys
+
+   Private keys are typically protected using a symmetric key.  This
+   symmetric key can be exchanged or determined in various ways, such as
+   deriving one from a user-supplied password.  The algorithms
+   "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" are defined herein to
+   enable this.
+
+3.2.  Details for Symmetric Keys
+
+   Symmetric keys are typically protected using public-private key
+   pairs.  It is assumed the key holder has the appropriate public
+   key(s) for the key recipient(s).
+
+   While more compact to simply encrypt the symmetric key directly with
+   a public key, this process defined herin expects JWK objects.  This
+   allows for protecting additional properies of the symmetric key, such
+   as expected lifetime or acceptable uses.
+
 4.  Private Key Example
 
    NOTE: unless otherwise indiciated, all line breaks are included for
@@ -165,7 +202,26 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-Miller                  Expires August 02, 2013                 [Page 3]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Miller                  Expires August 02, 2013                 [Page 4]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
@@ -221,7 +277,7 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-Miller                  Expires August 02, 2013                 [Page 4]
+Miller                  Expires August 02, 2013                 [Page 5]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
@@ -277,7 +333,7 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-Miller                  Expires August 02, 2013                 [Page 5]
+Miller                  Expires August 02, 2013                 [Page 6]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
@@ -333,7 +389,7 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-Miller                  Expires August 02, 2013                 [Page 6]
+Miller                  Expires August 02, 2013                 [Page 7]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
@@ -389,7 +445,7 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-Miller                  Expires August 02, 2013                 [Page 7]
+Miller                  Expires August 02, 2013                 [Page 8]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
@@ -445,7 +501,7 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-Miller                  Expires August 02, 2013                 [Page 8]
+Miller                  Expires August 02, 2013                 [Page 9]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
@@ -501,7 +557,7 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-Miller                  Expires August 02, 2013                 [Page 9]
+Miller                  Expires August 02, 2013                [Page 10]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
@@ -557,7 +613,7 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-Miller                  Expires August 02, 2013                [Page 10]
+Miller                  Expires August 02, 2013                [Page 11]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
@@ -576,14 +632,18 @@ Internet-Draft             JWE Protected JWK                January 2013
 
    It is NOT RECOMMENDED to re-use all of the same keying material (Key
    Encryption Key, Content Master Key, Initialization Vector, etc) to
-   protect multiple JWK objects.
+   protect multiple JWK objects, or to protect the same JWK object
+   multiple times.  When using "PBES2-HS245+A128KW" or
+   "PBES2-HS512+A256KW", implmentations MUST NOT use the same Key
+   Encryption Key for a given password, and SHOULD take steps to prevent
+   the same Key Encryption Key being used by different passwords.
 
 8.2.  Lifetime of Protected Keys
 
    Depending on the application, a protected JWK could potentially be
-   stored for an indefinite time, anywhere from milliseconds (e.g.  the
-   time it takes for a protected JWK to be broadcasted for a computer
-   network) to years (e.g.  stored as a file).
+   stored for an indefinite time, anywhere from milliseconds (e.g.
+   broadcasted over a computer network) to years (e.g.  stored as a
+   file).
 
 8.3.  Using Passwords and Passphrases
 
@@ -592,18 +652,15 @@ Internet-Draft             JWE Protected JWK                January 2013
    from [RFC2898] to derive cryptographic keys from user-supplied
    passwords.
 
-   Of particular importance is the selection of salt and iteration count
-   values.  The salt provides for a larger injection of entropy in the
-   key selection process, while the iteration count adds computational
-   expense.
+   The salt expands the possibly keys that can be derived from a given
+   password.  [RFC2898] originally recommended a minimum slat length of
+   8 octets (since there is no concern here of a derived key re-used for
+   different purposes).  The salt MUST be generated randomly; see
+   [RFC4086] for considerations on generating random values.
 
-   The length of the password is also important.  An ideal password is
-   one that is as large (or larger) than the derived key length but less
-   than the PRF's block size.  For "PBES2-HS256+A128KW", the ideal
-   password is 16 to 64 octets long; for "PBES2-HS512+A256KW", the ideal
-   password is 32 to 128 octets long.
-
-9.  Internationalization Considerations
+   The iteration count adds computational expense, ideally compounded by
+   the possible range of keys introduced by the salt.  [RFC2898]
+   originally recommended a minimum iteration count of 1000.
 
 
 
@@ -612,11 +669,18 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-
-Miller                  Expires August 02, 2013                [Page 11]
+Miller                  Expires August 02, 2013                [Page 12]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
+
+   An ideal password is one that is as large (or larger) than the
+   derived key length but less than the PRF's block size.  For
+   "PBES2-HS256+A128KW", the ideal password is between 16 and 64 octets
+   long; for "PBES2-HS512+A256KW", the ideal password is between 32 and
+   128 octets long.
+
+9.  Internationalization Considerations
 
    Passwords obtained from users are likely to require preparation and
    normalization to account for differences of octet sequences generated
@@ -659,25 +723,26 @@ Internet-Draft             JWE Protected JWK                January 2013
    [RFC2898]  Kaliski, B., "Password-Based Cryptography Specification",
               RFC 2898, September 2000.
 
+
+
+Miller                  Expires August 02, 2013                [Page 13]
+
+Internet-Draft             JWE Protected JWK                January 2013
+
+
    [RFC3394]  Schaad, J. and R. Housley, "Advanced Encryption Standard
               (AES) Key Wrap Algorithm", RFC 3394, September 2002.
 
    [RFC4686]  Josefsson, S., "The Base16, Base32, and Base64 Data
               Encodings", RFC 4648, October 2006.
 
-
-
-
-
-Miller                  Expires August 02, 2013                [Page 12]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
-
    [RFC4949]  Shirey, R., "Internet Security Glossary, Version 2", RFC
               4949, August 2007.
 
 10.2.  Informative References
+
+   [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
+              (TLS) Protocol Version 1.2", RFC 5246, August 2008.
 
    [RFC3447]  Jonsson, J. and B. Kaliski, "Public-Key Cryptography
               Standards (PKCS) #1: RSA Cryptography Specifications
@@ -715,13 +780,4 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-
-Miller                  Expires August 02, 2013                [Page 13]
+Miller                  Expires August 02, 2013                [Page 14]

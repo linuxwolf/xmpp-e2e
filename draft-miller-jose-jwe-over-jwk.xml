@@ -32,14 +32,15 @@
   </front>
   <middle>
     <section title="Introduction" anchor="intro">
-      <t>There are times when it is necessary for transporting or exchanging a private or symmetric key, but the transport mechanism might not provide any protection of the key. For instance, end-to-end scenarios where the key holder and key recipient are linked through multiple network hops that might or might not emply TLS, or exchange of a key using physical media such as a USB drive.</t>
-      <t>This document specifies an approach that uses <xref target="JOSE-JWE"/> to encryt a private or symmetric key which is formatted as <xref target="JOSE-JWK"/>. This document also specifies JSON Web Key formats and JSON Web Encryption algorithms based on <xref target="RFC2898"/> that allow for protecting keys using a password.</t>
+      <t>There are times when it is necessary for transporting or exchanging a private or symmetric key, but the transport mechanism might not provide adequate content protection for the key. For instance, end-to-end scenarios where the key holder and key recipient are linked through multiple network hops that might or might not employ transport layer security (<xref target="RFC5246"/>), or exchange of a key using physical media such as a USB drive that is not itself encrypted.</t>
+      <t>This document specifies an approach that uses <xref target="JOSE-JWE"/> to encryt a private or symmetric key which is formatted as <xref target="JOSE-JWK"/>. This document also specifies and registers JSON Web Key formats and JSON Web Encryption algorithms based on <xref target="RFC2898"/> that allow for protecting keys using a password.</t>
     </section>
     <section title="Terminology" anchor="terms">
       <t>This document inherits JSON Web Algorithms (JWA)-related terminology from <xref target="JOSE-JWA"/>, JSON Web Encryption (JWE)-related terminology from <xref target="JOSE-JWE"/>, JSON Web Key (JWK)-related terminology from <xref target="JOSE-JWK"/>, and password-based cryptography-related terminology from <xref target="RFC2898"/>.  Security-related terms are to be understood in the sense defined in <xref target="RFC4949"/>.</t>
       <t>The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
     </section>
     <section title="Protecting Keys" anchor="protect">
+      <t>The process for protecting private keys and symmetric keys are identical. The only differences are typically the algorithms used to protect the key.</t>
       <t>To protect a key, the key holder performs the following steps:<vspace blankLines="1"/>
         <list style="numbers">
           <t>Converts the JWK object to a UTF-8 encoded string (K').<vspace blankLines="1"/></t>
@@ -55,6 +56,13 @@
           <t>Serializes to the appriopriate format for exchange, such as the Compact Serialization documented in <xref target="JOSE-JWE"/>.<vspace blankLines="1"/></t>
         </list>
       </t>
+      <section title="Details for Private Keys" anchor="protect-private">
+        <t>Private keys are typically protected using a symmetric key. This symmetric key can be exchanged or determined in various ways, such as deriving one from a user-supplied password. The algorithms "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" are defined herein to enable this.</t>
+      </section>
+      <section title="Details for Symmetric Keys" anchor="protect-symmetric">
+        <t>Symmetric keys are typically protected using public-private key pairs. It is assumed the key holder has the appropriate public key(s) for the key recipient(s).</t>
+        <t>While more compact to simply encrypt the symmetric key directly with a public key, this process defined herin expects JWK objects. This allows for protecting additional properies of the symmetric key, such as expected lifetime or acceptable uses.</t>
+      </section>
     </section>
     <section title="Private Key Example" anchor="example-privkey">
       <t>NOTE: unless otherwise indiciated, all line breaks are included for readability.</t>
@@ -369,15 +377,16 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
     </section>
     <section title="Security Considerations" anchor="security">
       <section title="Re-using Keying Material" anchor="security-reuse">
-        <t>It is NOT RECOMMENDED to re-use all of the same keying material (Key Encryption Key, Content Master Key, Initialization Vector, etc) to protect multiple JWK objects.</t>
+        <t>It is NOT RECOMMENDED to re-use all of the same keying material (Key Encryption Key, Content Master Key, Initialization Vector, etc) to protect multiple JWK objects, or to protect the same JWK object multiple times. When using "PBES2-HS245+A128KW" or "PBES2-HS512+A256KW", implmentations MUST NOT use the same Key Encryption Key for a given password, and SHOULD take steps to prevent the same Key Encryption Key being used by different passwords.</t>
       </section>
       <section title="Lifetime of Protected Keys" anchor="security-store">
-        <t>Depending on the application, a protected JWK could potentially be stored for an indefinite time, anywhere from milliseconds (e.g. the time it takes for a protected JWK to be broadcasted for a computer network) to years (e.g. stored as a file).</t>
+        <t>Depending on the application, a protected JWK could potentially be stored for an indefinite time, anywhere from milliseconds (e.g. broadcasted over a computer network) to years (e.g. stored as a file).</t>
       </section>
       <section title="Using Passwords and Passphrases" anchor="security-pwd">
         <t>While convenient for end users, passwords have many drawbacks. To help mitigate these limitations, this document applies principals from <xref target="RFC2898"/> to derive cryptographic keys from user-supplied passwords.</t>
-        <t>Of particular importance is the selection of salt and iteration count values. The salt provides for a larger injection of entropy in the key selection process, while the iteration count adds computational expense.</t>
-        <t>The length of the password is also important. An ideal password is one that is as large (or larger) than the derived key length but less than the PRF's block size. For "PBES2-HS256+A128KW", the ideal password is 16 to 64 octets long; for "PBES2-HS512+A256KW", the ideal password is 32 to 128 octets long.</t>
+        <t>The salt expands the possibly keys that can be derived from a given password. <xref target="RFC2898"/> originally recommended a minimum slat length of 8 octets (since there is no concern here of a derived key re-used for different purposes). The salt MUST be generated randomly; see [RFC4086] for considerations on generating random values.</t>
+        <t>The iteration count adds computational expense, ideally compounded by the possible range of keys introduced by the salt. <xref target="RFC2898"/> originally recommended a minimum iteration count of 1000.</t>
+        <t>An ideal password is one that is as large (or larger) than the derived key length but less than the PRF's block size. For "PBES2-HS256+A128KW", the ideal password is between 16 and 64 octets long; for "PBES2-HS512+A256KW", the ideal password is between 32 and 128 octets long.</t>
       </section>
     </section>
     <section title="Internationalization Considerations" anchor="i18n">
@@ -556,6 +565,19 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
       </reference>
     </references>
     <references title="Informative References">
+      <reference anchor="RFC5246">
+        <front>
+          <title>The Transport Layer Security (TLS) Protocol Version 1.2</title>
+          <author initials="T." surname="Dierks" fullname="Tim Dierks"/>
+          <author initials="E." surname="Rescorla" fullname="Eric REscorla"/>
+          <date month="August" year="2008"/>
+          <abstract>
+            <t>This document specifies Version 1.2 of the Transport Layer Security (TLS) protocol.  The TLS protocol provides communications security over the Internet.  The protocol allows client/server applications to communicate in a way that is designed to prevent eavesdropping, tampering, or message forgery.</t>
+          </abstract>
+        </front>
+        <seriesInfo name="RFC" value="5246"/>
+        <format type="TXT" target="http://www.ietf.org/rfc/rfc5246"/>
+      </reference>
       <reference anchor="RFC3447">
         <front>
           <title>Public-Key Cryptography Standards (PKCS) #1: RSA Cryptography Specifications Version 2.1</title>
