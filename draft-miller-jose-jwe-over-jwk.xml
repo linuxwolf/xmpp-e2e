@@ -61,7 +61,7 @@
       </section>
       <section title="Details for Symmetric Keys" anchor="protect-symmetric">
         <t>Symmetric keys are typically protected using public-private key pairs. It is assumed the key holder has the appropriate public key(s) for the key recipient(s).</t>
-        <t>While more compact to simply encrypt the symmetric key directly with a public key, this process defined herin expects JWK objects. This allows for protecting additional properies of the symmetric key, such as expected lifetime or acceptable uses.</t>
+        <t>The process defined herein expects JWK objects. While more compact to simply encrypt the symmetric key directly with a public key, using the complete JWE process around content JWK objects allows additional properties to be protected (e.g. expected lifetime, acceptable uses) without exceeding the input limits inherent in most public-private key operations.</t>
       </section>
     </section>
     <section title="Private Key Example" anchor="example-privkey">
@@ -204,7 +204,7 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
     </section>
     <section title="Symmetric Key Example" anchor="protect-example-symm">
       <t>NOTE: unless otherwise indiciated, all line breaks are included for readability.</t>
-      <t>The key holder begins with the <xref target="JOSE-JWK"/> representation of the symmetric key (here using an AES 128-bit key, formatted as per <xref target="JOSE-PRIVKEY"/>):
+      <t>The key holder begins with the <xref target="JOSE-JWK"/> representation of the symmetric key (here using a <xref target="AES"/> 128-bit key, formatted as per <xref target="JOSE-PRIVKEY"/>):
         <figure>
           <artwork><![CDATA[
 {
@@ -311,12 +311,12 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
         </section>
       </section>
       <section title="PBES2 Key Encryption Algorithms" anchor="pbcrypto-pbes2-jwe">
-        <t>The "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" <xref target="JOSE-JWE"/> algorithms are used to encrypt a JWE Content Master Key using a user-supplied password to derive the key encryption key. With these algorithms, the derived key is used to encrypt the JWE Content Master Key. These algorithms combine PBKDF2 with a key wrapping algorithm to encrypt the JWE Content Master Key according to PBES2 from section 6.2 of <xref target="RFC2898"/>.</t>
+        <t>The "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" <xref target="JOSE-JWE"/> algorithms are used to encrypt a JWE Content Master Key using a user-supplied password to derive the key encryption key. With these algorithms, the derived key is used to encrypt the JWE Content Master Key. These algorithms combine a key derivation function with an encryption scheme to encrypt the JWE Content Master Key according to PBES2 from section 6.2 of <xref target="RFC2898"/>.</t>
         <section title="PBES2-HS256+A128KW" anchor="pbcrypto-pbes2-jwe-hs256-a128kw">
-          <t>The "PBES2-HS256+A128KW" algorithm uses HMAC-SHA256 as the PRF and AES128-Wrap as defined in <xref target="RFC3394"/> for the encryption scheme. The salt (S) and iteration count (c) MUST be specified by the "S" and "c" parameters (respectively) in the applicable "PBKDF2" JWK object. The derived-key length (dkLen) is 16 octets.</t>
+          <t>The "PBES2-HS256+A128KW" algorithm uses "HMAC-SHA256" as the PRF and "AES128-WRAP" as defined in <xref target="RFC3394"/> for the encryption scheme. The salt (S) and iteration count (c) MUST be specified by the "S" and "c" parameters (respectively) in the applicable "PBKDF2" JWK object. The derived-key length (dkLen) is 16 octets.</t>
         </section>
         <section title="PBES2-HS512+A256KW" anchor="pbcrypto-pbes2-jwe-hs512-a256kw">
-          <t>The "PBES2-HS512+A256KW" algorithm uses HMAC-SHA512 as the PRF and AES256-Wrap as defined in <xref target="RFC3394"/> for the encryption scheme. The salt (S) and iteration count (c) MUST be specified by the "S" and "c" parameters (respectively) in the applicable "PBKDF2" JWK object. The derived-key length (dkLen) is 32 octets.</t>
+          <t>The "PBES2-HS512+A256KW" algorithm uses "HMAC-SHA512" as the PRF "and "AES256-WRAP" as defined in <xref target="RFC3394"/> for the encryption scheme. The salt (S) and iteration count (c) MUST be specified by the "S" and "c" parameters (respectively) in the applicable "PBKDF2" JWK object. The derived-key length (dkLen) is 32 octets.</t>
         </section>
       </section>
     </section>
@@ -584,6 +584,17 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
       </reference>
     </references>
     <references title="Informative References">
+      <reference anchor="AES">
+        <front>
+          <title>Advanced Encryption Standard (AES)</title>
+          <author>
+            <organization>National Institute of Standards and Technology (NIST)</organization>
+          </author>
+          <date month="November" year="2001"/>
+        </front>
+        <seriesInfo name="FIPS" value="PUB 197"/>
+        <format target="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf" type="PDF"/>
+      </reference>
       <reference anchor="RFC3447">
         <front>
           <title>Public-Key Cryptography Standards (PKCS) #1: RSA Cryptography Specifications Version 2.1</title>
