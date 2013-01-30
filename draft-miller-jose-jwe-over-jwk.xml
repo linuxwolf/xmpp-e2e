@@ -66,7 +66,7 @@
     </section>
     <section title="Private Key Example" anchor="example-privkey">
       <t>NOTE: unless otherwise indiciated, all line breaks are included for readability.</t>
-      <t>The key holder begins with the <xref target="JOSE-JWK"/> representation of the private key (here using a <xref target="JOSE-PRIVKEY"/> formatted RSA <xref target="RFC3447"/> private key):
+      <t>The key holder begins with the <xref target="JOSE-JWK"/> representation of the private key (here using a <xref target="RFC3447"/> RSA private key, formatted per <xref target="JOSE-PRIVKEY"/>):
         <figure>
           <artwork><![CDATA[
 {
@@ -204,7 +204,7 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
     </section>
     <section title="Symmetric Key Example" anchor="protect-example-symm">
       <t>NOTE: unless otherwise indiciated, all line breaks are included for readability.</t>
-      <t>The key holder begins with the <xref target="JOSE-JWK"/> representation of the symmetric key (formatted as per <xref target="JOSE-PRIVKEY"/>):
+      <t>The key holder begins with the <xref target="JOSE-JWK"/> representation of the symmetric key (here using an AES 128-bit key, formatted as per <xref target="JOSE-PRIVKEY"/>):
         <figure>
           <artwork><![CDATA[
 {
@@ -304,7 +304,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
       <section title="PBKDF2 Key Type" anchor="pbcrypto-pbkdf2-jwk">
         <t>The "PBKDF2" <xref target="JOSE-JWK"/> type is used to contain the parameters necessary to derive a cipher key from a password. The following parameters are defined:</t>
         <section title="'S' Parameter" anchor="pbcrypto-pbkdf2-jwk-S">
-          <t>The REQUIRED "S" parameter contains the PBKDF2 salt value (S), as a base64url encoded string. This value SHOULD NOT be the empty string "".</t>
+          <t>The REQUIRED "S" parameter contains the PBKDF2 salt value (S), as a base64url encoded string (per <xref target="RFC4686"/>). This value MUST NOT be the empty string "".</t>
         </section>
         <section title="'c' Parameter" anchor="pbcrypto-pbkdf2-jwk-c">
           <t>The REQUIRED "c" parameter contains the PBKDF2 iteration count (c), as an integer. This value MUST NOT be less than 1, as per <xref target="RFC2898"/>.</t>
@@ -384,7 +384,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
       </section>
       <section title="Password Considerations" anchor="security-pwd">
         <t>While convenient for end users, passwords have many drawbacks. To help mitigate these limitations, this document applies principals from <xref target="RFC2898"/> to derive cryptographic keys from user-supplied passwords.</t>
-        <t>The salt expands the possibly keys that can be derived from a given password. <xref target="RFC2898"/> originally recommended a minimum slat length of 8 octets (since there is no concern here of a derived key re-used for different purposes). The salt MUST be generated randomly; see [RFC4086] for considerations on generating random values.</t>
+        <t>The salt expands the possibly keys that can be derived from a given password. <xref target="RFC2898"/> originally recommended a minimum slat length of 8 octets (since there is no concern here of a derived key re-used for different purposes). The salt MUST be generated randomly; see <xref target="RFC4086"/> for considerations on generating random values.</t>
         <t>The iteration count adds computational expense, ideally compounded by the possible range of keys introduced by the salt. <xref target="RFC2898"/> originally recommended a minimum iteration count of 1000.</t>
         <t>An ideal password is one that is as large (or larger) than the derived key length but less than the PRF's block size. For "PBES2-HS256+A128KW", the ideal password is between 16 and 64 octets long; for "PBES2-HS512+A256KW", the ideal password is between 32 and 128 octets long.</t>
       </section>
@@ -535,6 +535,32 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
         <seriesInfo name="RFC" value="3394"/>
         <format type="TXT" target="http://www.ietf.org/rfc/rfc3394.txt"/>
       </reference>
+      <reference anchor="RFC4086">
+        <front>
+          <title>Randomness Requirements for Security</title>
+          <author initials="D." surname="Eastlake" fullname="Donald E. Eastlake 3rd">
+            <organization>Motorola Laboratories</organization>
+            <address>
+              <email>donald.eastlake@motorola.com</email>
+            </address>
+          </author>
+          <author initials="J." surname="Schiller" fullname="Jeffrey I. Schiller">
+            <organization>MIT, Room E30-311</organization>
+            <address>
+              <email>jis@mit.edu</email>
+            </address>
+          </author>
+          <author initials="S." surname="Crocker" fullname="Steve Crocker">
+            <organization/>
+            <address>
+              <email>steve@stevecrocker.com</email>
+            </address>
+          </author>
+          <date month="June" year="2005"/>
+        </front>
+        <seriesInfo name="RFC" value="4086"/>
+        <format type="TXT" target="http://tools.ietf.org/rfc/rfc4086.txt"/>
+      </reference>
       <reference anchor="RFC4686">
         <front>
           <title>The Base16, Base32, and Base64 Data Encodings</title>
@@ -565,19 +591,6 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
       </reference>
     </references>
     <references title="Informative References">
-      <reference anchor="RFC5246">
-        <front>
-          <title>The Transport Layer Security (TLS) Protocol Version 1.2</title>
-          <author initials="T." surname="Dierks" fullname="Tim Dierks"/>
-          <author initials="E." surname="Rescorla" fullname="Eric REscorla"/>
-          <date month="August" year="2008"/>
-          <abstract>
-            <t>This document specifies Version 1.2 of the Transport Layer Security (TLS) protocol.  The TLS protocol provides communications security over the Internet.  The protocol allows client/server applications to communicate in a way that is designed to prevent eavesdropping, tampering, or message forgery.</t>
-          </abstract>
-        </front>
-        <seriesInfo name="RFC" value="5246"/>
-        <format type="TXT" target="http://www.ietf.org/rfc/rfc5246"/>
-      </reference>
       <reference anchor="RFC3447">
         <front>
           <title>Public-Key Cryptography Standards (PKCS) #1: RSA Cryptography Specifications Version 2.1</title>
@@ -594,6 +607,19 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
         </front>
         <seriesInfo name="RFC" value="2898"/>
         <format type="TXT" target="http://www.ietf.org/rfc/rfc2898.txt"/>
+      </reference>
+      <reference anchor="RFC5246">
+        <front>
+          <title>The Transport Layer Security (TLS) Protocol Version 1.2</title>
+          <author initials="T." surname="Dierks" fullname="Tim Dierks"/>
+          <author initials="E." surname="Rescorla" fullname="Eric REscorla"/>
+          <date month="August" year="2008"/>
+          <abstract>
+            <t>This document specifies Version 1.2 of the Transport Layer Security (TLS) protocol.  The TLS protocol provides communications security over the Internet.  The protocol allows client/server applications to communicate in a way that is designed to prevent eavesdropping, tampering, or message forgery.</t>
+          </abstract>
+        </front>
+        <seriesInfo name="RFC" value="5246"/>
+        <format type="TXT" target="http://www.ietf.org/rfc/rfc5246"/>
       </reference>
     </references>
   </back>
