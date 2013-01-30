@@ -27,7 +27,7 @@
     <keyword>Internet-Draft</keyword>
     <keyword>JOSE</keyword>
     <abstract>
-      <t></t>
+      <t>This document specifies an approach to protecting private JSON Web Key (JWK) objects using JSON Web Encryption (JWE). This document also specifies a set of algorithms for encrypting content using password-based cryptography.</t>
     </abstract>
   </front>
   <middle>

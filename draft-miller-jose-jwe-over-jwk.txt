@@ -14,6 +14,11 @@ Expires: August 02, 2013
 
 Abstract
 
+   This document specifies an approach to protecting private JSON Web
+   Key (JWK) objects using JSON Web Encryption (JWE).  This document
+   also specifies a set of algorithms for encrypting content using
+   password-based cryptography.
+
 Status of This Memo
 
    This Internet-Draft is submitted in full conformance with the
@@ -46,11 +51,6 @@ Copyright Notice
    the Trust Legal Provisions and are provided without warranty as
    described in the Simplified BSD License.
 
-Table of Contents
-
-   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
-   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   2
-
 
 
 Miller                  Expires August 02, 2013                 [Page 1]
@@ -58,6 +58,10 @@ Miller                  Expires August 02, 2013                 [Page 1]
 Internet-Draft             JWE Protected JWK                January 2013
 
 
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   2
    3.  Protecting Keys . . . . . . . . . . . . . . . . . . . . . . .   3
      3.1.  Details for Private Keys  . . . . . . . . . . . . . . . .   4
      3.2.  Details for Symmetric Keys  . . . . . . . . . . . . . . .   4
@@ -83,6 +87,7 @@ Internet-Draft             JWE Protected JWK                January 2013
      10.2.  Informative References . . . . . . . . . . . . . . . . .  14
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  14
 
+
 1.  Introduction
 
    There are times when it is necessary for transporting or exchanging a
@@ -100,11 +105,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    protecting keys using a password.
 
 2.  Terminology
-
-
-
-
-
 
 
 
