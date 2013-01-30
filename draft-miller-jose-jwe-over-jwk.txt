@@ -14,10 +14,10 @@ Expires: August 02, 2013
 
 Abstract
 
-   This document specifies an approach to protecting private JSON Web
-   Key (JWK) objects using JSON Web Encryption (JWE).  This document
-   also specifies a set of algorithms for encrypting content using
-   password-based cryptography.
+   This document specifies an approach to protecting JSON Web Key (JWK)
+   objects using JSON Web Encryption (JWE).  This document also
+   specifies a set of algorithms for encrypting content using password-
+   based cryptography.
 
 Status of This Memo
 
@@ -80,7 +80,7 @@ Table of Contents
    8.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
      8.1.  Re-using Keying Material  . . . . . . . . . . . . . . . .  12
      8.2.  Lifetime of Protected Keys  . . . . . . . . . . . . . . .  12
-     8.3.  Using Passwords and Passphrases . . . . . . . . . . . . .  12
+     8.3.  Password Considerations . . . . . . . . . . . . . . . . .  12
    9.  Internationalization Considerations . . . . . . . . . . . . .  13
    10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
      10.1.  Normative References . . . . . . . . . . . . . . . . . .  13
@@ -95,8 +95,8 @@ Table of Contents
    provide adequate content protection for the key.  For instance, end-
    to-end scenarios where the key holder and key recipient are linked
    through multiple network hops that might or might not employ
-   transport layer security ([RFC5246]), or exchange of a key using
-   physical media such as a USB drive that is not itself encrypted.
+   transport layer security (TLS, [RFC5246]), or exchange of a key using
+   physical media such as a USB drive that itself is not encrypted.
 
    This document specifies an approach that uses [JOSE-JWE] to encryt a
    private or symmetric key which is formatted as [JOSE-JWK].  This
@@ -645,7 +645,7 @@ Internet-Draft             JWE Protected JWK                January 2013
    broadcasted over a computer network) to years (e.g.  stored as a
    file).
 
-8.3.  Using Passwords and Passphrases
+8.3.  Password Considerations
 
    While convenient for end users, passwords have many drawbacks.  To
    help mitigate these limitations, this document applies principals

@@ -27,12 +27,12 @@
     <keyword>Internet-Draft</keyword>
     <keyword>JOSE</keyword>
     <abstract>
-      <t>This document specifies an approach to protecting private JSON Web Key (JWK) objects using JSON Web Encryption (JWE). This document also specifies a set of algorithms for encrypting content using password-based cryptography.</t>
+      <t>This document specifies an approach to protecting JSON Web Key (JWK) objects using JSON Web Encryption (JWE). This document also specifies a set of algorithms for encrypting content using password-based cryptography.</t>
     </abstract>
   </front>
   <middle>
     <section title="Introduction" anchor="intro">
-      <t>There are times when it is necessary for transporting or exchanging a private or symmetric key, but the transport mechanism might not provide adequate content protection for the key. For instance, end-to-end scenarios where the key holder and key recipient are linked through multiple network hops that might or might not employ transport layer security (<xref target="RFC5246"/>), or exchange of a key using physical media such as a USB drive that is not itself encrypted.</t>
+      <t>There are times when it is necessary for transporting or exchanging a private or symmetric key, but the transport mechanism might not provide adequate content protection for the key. For instance, end-to-end scenarios where the key holder and key recipient are linked through multiple network hops that might or might not employ transport layer security (TLS, <xref target="RFC5246"/>), or exchange of a key using physical media such as a USB drive that itself is not encrypted.</t>
       <t>This document specifies an approach that uses <xref target="JOSE-JWE"/> to encryt a private or symmetric key which is formatted as <xref target="JOSE-JWK"/>. This document also specifies and registers JSON Web Key formats and JSON Web Encryption algorithms based on <xref target="RFC2898"/> that allow for protecting keys using a password.</t>
     </section>
     <section title="Terminology" anchor="terms">
@@ -382,7 +382,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
       <section title="Lifetime of Protected Keys" anchor="security-store">
         <t>Depending on the application, a protected JWK could potentially be stored for an indefinite time, anywhere from milliseconds (e.g. broadcasted over a computer network) to years (e.g. stored as a file).</t>
       </section>
-      <section title="Using Passwords and Passphrases" anchor="security-pwd">
+      <section title="Password Considerations" anchor="security-pwd">
         <t>While convenient for end users, passwords have many drawbacks. To help mitigate these limitations, this document applies principals from <xref target="RFC2898"/> to derive cryptographic keys from user-supplied passwords.</t>
         <t>The salt expands the possibly keys that can be derived from a given password. <xref target="RFC2898"/> originally recommended a minimum slat length of 8 octets (since there is no concern here of a derived key re-used for different purposes). The salt MUST be generated randomly; see [RFC4086] for considerations on generating random values.</t>
         <t>The iteration count adds computational expense, ideally compounded by the possible range of keys introduced by the salt. <xref target="RFC2898"/> originally recommended a minimum iteration count of 1000.</t>
