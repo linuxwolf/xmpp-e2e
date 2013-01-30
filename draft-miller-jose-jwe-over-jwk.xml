@@ -309,15 +309,15 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
         <section title="'c' Parameter" anchor="pbcrypto-pbkdf2-jwk-c">
           <t>The REQUIRED "c" parameter contains the PBKDF2 iteration count (c), as an integer. This value MUST NOT be less than 1, as per <xref target="RFC2898"/>.</t>
         </section>
-        <section title="'dkl' Parameter" anchor="pbcrypto-pbkdf2-jwk-dkl">
-          <t>The OPTIONAL "dkl" parameter contains the PBKDF2 derived key octet length (dkLen), as an integer. This parameter SHOULD be omitted (and MUST be ignored) when the key encryption algorithm requires a specific key length.</t>
-        </section>
       </section>
       <section title="PBES2 Key Encryption Algorithms" anchor="pbcrypto-pbes2-jwe">
         <t>The "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" <xref target="JOSE-JWE"/> algorithms are used to encrypt a JWE Content Master Key using a user-supplied password to derive the key encryption key. With these algorithms, the derived key is used to encrypt the JWE Content Master Key. These algorithms combine PBKDF2 with a key wrapping algorithm to encrypt the JWE Content Master Key according to PBES2 from section 6.2 of <xref target="RFC2898"/>.</t>
-        <t>The "PBES2-HS256+A128KW" algorithm uses HMAC-SHA256 as the PRF and AES128-Wrap as defined in <xref target="RFC3394"/> for the encryption scheme. The dervied key length is 16 octets.</t>
-        <t>The "PBES2-HS512+A256KW" algorithm uses HMAC-SHA512 as the PRF and AES256-Wrap as defined in <xref target="RFC3394"/> for the encryption scheme. The dkLen of 32 octets.</t>
-        <t>The salt (S) and iteration count (c) MUST be specified by the "S" and "c" parameters (respectively) in the applicable "PBKDF2" JWK object. The dkLen (dkLen) SHOULD NOT be specified in the applicable "PBKDF2" JWK object, instead using the algorithm's value as above. However, if specified it MUST be equal to the size in octets for the algorithm's keywrap function.</t>
+        <section title="PBES2-HS256+A128KW" anchor="pbcrypto-pbes2-jwe-hs256-a128kw">
+          <t>The "PBES2-HS256+A128KW" algorithm uses HMAC-SHA256 as the PRF and AES128-Wrap as defined in <xref target="RFC3394"/> for the encryption scheme. The salt (S) and iteration count (c) MUST be specified by the "S" and "c" parameters (respectively) in the applicable "PBKDF2" JWK object. The derived-key length (dkLen) is 16 octets.</t>
+        </section>
+        <section title="PBES2-HS512+A256KW" anchor="pbcrypto-pbes2-jwe-hs512-a256kw">
+          <t>The "PBES2-HS512+A256KW" algorithm uses HMAC-SHA512 as the PRF and AES256-Wrap as defined in <xref target="RFC3394"/> for the encryption scheme. The salt (S) and iteration count (c) MUST be specified by the "S" and "c" parameters (respectively) in the applicable "PBKDF2" JWK object. The derived-key length (dkLen) is 32 octets.</t>
+        </section>
       </section>
     </section>
     <section title="IANA Considerations" anchor="iana">
@@ -346,13 +346,6 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
             <t>Specification Document(s): <xref target="pbcrypto-pbkdf2-jwk-c"/> of [[ this document ]]<vspace blankLines="1"/></t>
           </list>
         </t>
-        <t>
-          <list style="symbols">
-            <t>Parameter Name: "dkl"<vspace blankLines="1"/></t>
-            <t>Change Controller: IETF<vspace blankLines="1"/></t>
-            <t>Specification Document(s): <xref target="pbcrypto-pbkdf2-jwk-dkl"/> of [[ this document ]]<vspace blankLines="1"/></t>
-          </list>
-        </t>
       </section>
       <section title="JSON Web Encryption Algorithms" anchor="iana-jwe-algs">
         <t>
@@ -361,7 +354,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
             <t>Algorithm Usage Location(s): "alg"</t>
             <t>Implementation Requirements: OPTIONAL<vspace blankLines="1"/></t>
             <t>Change Controller: IETF<vspace blankLines="1"/></t>
-            <t>Specification Document(s): <xref target="pbcrypto-pbes2-jwe"/> of [[ this document ]]<vspace blankLines="1"/></t>
+            <t>Specification Document(s): <xref target="pbcrypto-pbes2-jwe-hs256-a128kw"/> of [[ this document ]]<vspace blankLines="1"/></t>
           </list>
         </t>
         <t>
@@ -370,7 +363,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
             <t>Algorithm Usage Location(s): "alg"</t>
             <t>Implementation Requirements: OPTIONAL<vspace blankLines="1"/></t>
             <t>Change Controller: IETF<vspace blankLines="1"/></t>
-            <t>Specification Document(s): <xref target="pbcrypto-pbes2-jwe"/> of [[ this document ]]<vspace blankLines="1"/></t>
+            <t>Specification Document(s): <xref target="pbcrypto-pbes2-jwe-hs512-a256kw"/> of [[ this document ]]<vspace blankLines="1"/></t>
           </list>
         </t>
       </section>

@@ -71,9 +71,10 @@ Table of Contents
      6.1.  PBKDF2 Key Type . . . . . . . . . . . . . . . . . . . . .  10
        6.1.1.  'S' Parameter . . . . . . . . . . . . . . . . . . . .  10
        6.1.2.  'c' Parameter . . . . . . . . . . . . . . . . . . . .  10
-       6.1.3.  'dkl' Parameter . . . . . . . . . . . . . . . . . . .  10
      6.2.  PBES2 Key Encryption Algorithms . . . . . . . . . . . . .  10
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
+       6.2.1.  PBES2-HS256+A128KW  . . . . . . . . . . . . . . . . .  10
+       6.2.2.  PBES2-HS512+A256KW  . . . . . . . . . . . . . . . . .  10
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
      7.1.  JSON Web Key Types Registration . . . . . . . . . . . . .  11
      7.2.  JSON Web Key Parameters Registration  . . . . . . . . . .  11
      7.3.  JSON Web Encryption Algorithms  . . . . . . . . . . . . .  11
@@ -81,7 +82,7 @@ Table of Contents
      8.1.  Re-using Keying Material  . . . . . . . . . . . . . . . .  12
      8.2.  Lifetime of Protected Keys  . . . . . . . . . . . . . . .  12
      8.3.  Password Considerations . . . . . . . . . . . . . . . . .  12
-   9.  Internationalization Considerations . . . . . . . . . . . . .  13
+   9.  Internationalization Considerations . . . . . . . . . . . . .  12
    10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
      10.1.  Normative References . . . . . . . . . . . . . . . . . .  13
      10.2.  Informative References . . . . . . . . . . . . . . . . .  14
@@ -105,7 +106,6 @@ Table of Contents
    protecting keys using a password.
 
 2.  Terminology
-
 
 
 
@@ -526,13 +526,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    The REQUIRED "c" parameter contains the PBKDF2 iteration count (c),
    as an integer.  This value MUST NOT be less than 1, as per [RFC2898].
 
-6.1.3.  'dkl' Parameter
-
-   The OPTIONAL "dkl" parameter contains the PBKDF2 derived key octet
-   length (dkLen), as an integer.  This parameter SHOULD be omitted (and
-   MUST be ignored) when the key encryption algorithm requires a
-   specific key length.
-
 6.2.  PBES2 Key Encryption Algorithms
 
    The "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" [JOSE-JWE]
@@ -543,17 +536,24 @@ Internet-Draft             JWE Protected JWK                January 2013
    to encrypt the JWE Content Master Key according to PBES2 from section
    6.2 of [RFC2898].
 
+6.2.1.  PBES2-HS256+A128KW
+
    The "PBES2-HS256+A128KW" algorithm uses HMAC-SHA256 as the PRF and
    AES128-Wrap as defined in [RFC3394] for the encryption scheme.  The
-   dervied key length is 16 octets.
+   salt (S) and iteration count (c) MUST be specified by the "S" and "c"
+   parameters (respectively) in the applicable "PBKDF2" JWK object.  The
+   derived-key length (dkLen) is 16 octets.
+
+6.2.2.  PBES2-HS512+A256KW
 
    The "PBES2-HS512+A256KW" algorithm uses HMAC-SHA512 as the PRF and
    AES256-Wrap as defined in [RFC3394] for the encryption scheme.  The
-   dkLen of 32 octets.
+   salt (S) and iteration count (c) MUST be specified by the "S" and "c"
+   parameters (respectively) in the applicable "PBKDF2" JWK object.  The
+   derived-key length (dkLen) is 32 octets.
 
-   The salt (S) and iteration count (c) MUST be specified by the "S" and
-   "c" parameters (respectively) in the applicable "PBKDF2" JWK object.
-   The dkLen (dkLen) SHOULD NOT be specified in the applicable "PBKDF2"
+7.  IANA Considerations
+
 
 
 
@@ -561,12 +561,6 @@ Miller                  Expires August 02, 2013                [Page 10]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
-
-   JWK object, instead using the algorithm's value as above.  However,
-   if specified it MUST be equal to the size in octets for the
-   algorithm's keywrap function.
-
-7.  IANA Considerations
 
 7.1.  JSON Web Key Types Registration
 
@@ -595,13 +589,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    o  Specification Document(s): Section 6.1.2 of [[ this document ]]
 
 
-   o  Parameter Name: "dkl"
-
-   o  Change Controller: IETF
-
-   o  Specification Document(s): Section 6.1.3 of [[ this document ]]
-
-
 7.3.  JSON Web Encryption Algorithms
 
    o  Algorithm Name: "PBES2-HS256+A128KW"
@@ -611,14 +598,7 @@ Internet-Draft             JWE Protected JWK                January 2013
 
    o  Change Controller: IETF
 
-
-
-Miller                  Expires August 02, 2013                [Page 11]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
-
-   o  Specification Document(s): Section 6.2 of [[ this document ]]
+   o  Specification Document(s): Section 6.2.1 of [[ this document ]]
 
 
    o  Algorithm Name: "PBES2-HS512+A256KW"
@@ -628,7 +608,14 @@ Internet-Draft             JWE Protected JWK                January 2013
 
    o  Change Controller: IETF
 
-   o  Specification Document(s): Section 6.2 of [[ this document ]]
+   o  Specification Document(s): Section 6.2.2 of [[ this document ]]
+
+
+
+
+Miller                  Expires August 02, 2013                [Page 11]
+
+Internet-Draft             JWE Protected JWK                January 2013
 
 
 8.  Security Considerations
@@ -667,13 +654,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    the possible range of keys introduced by the salt.  [RFC2898]
    originally recommended a minimum iteration count of 1000.
 
-
-
-Miller                  Expires August 02, 2013                [Page 12]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
-
    An ideal password is one that is as large (or larger) than the
    derived key length but less than the PRF's block size.  For
    "PBES2-HS256+A128KW", the ideal password is between 16 and 64 octets
@@ -686,6 +666,14 @@ Internet-Draft             JWE Protected JWK                January 2013
    normalization to account for differences of octet sequences generated
    by different input devices, locales, etc.  It is RECOMMENDED for
    applications to perform the steps outlined in [SASLPREP] to prepare a
+
+
+
+Miller                  Expires August 02, 2013                [Page 12]
+
+Internet-Draft             JWE Protected JWK                January 2013
+
+
    user-supplied password before performing key derivation and
    encryption.
 
@@ -723,13 +711,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    [RFC2898]  Kaliski, B., "Password-Based Cryptography Specification",
               RFC 2898, September 2000.
 
-
-
-Miller                  Expires August 02, 2013                [Page 13]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
-
    [RFC3394]  Schaad, J. and R. Housley, "Advanced Encryption Standard
               (AES) Key Wrap Algorithm", RFC 3394, September 2002.
 
@@ -741,6 +722,13 @@ Internet-Draft             JWE Protected JWK                January 2013
 
    [RFC4949]  Shirey, R., "Internet Security Glossary, Version 2", RFC
               4949, August 2007.
+
+
+
+Miller                  Expires August 02, 2013                [Page 13]
+
+Internet-Draft             JWE Protected JWK                January 2013
+
 
 10.2.  Informative References
 
@@ -761,6 +749,18 @@ Author's Address
 
    Phone: +1-303-308-3204
    Email: mamille2@cisco.com
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
