@@ -572,7 +572,7 @@ Internet-Draft             JWE Protected JWK                January 2013
 
    o  "kty" Paramater value: "PBKDF2"
 
-   o  Implementation Requirements: RECOMMENDED-
+   o  Implementation Requirements: OPTIONAL
 
    o  Change Controller: IETF
 
@@ -607,7 +607,7 @@ Internet-Draft             JWE Protected JWK                January 2013
    o  Algorithm Name: "PBES2-HS256+A128KW"
 
    o  Algorithm Usage Location(s): "alg"
-   o  Implementation Requirements: RECOMMENDED-
+   o  Implementation Requirements: OPTIONAL
 
    o  Change Controller: IETF
 
@@ -624,7 +624,7 @@ Internet-Draft             JWE Protected JWK                January 2013
    o  Algorithm Name: "PBES2-HS512+A256KW"
 
    o  Algorithm Usage Location(s): "alg"
-   o  Implementation Requirements: RECOMMENDED-
+   o  Implementation Requirements: OPTIONAL
 
    o  Change Controller: IETF
 

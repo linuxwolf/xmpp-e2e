@@ -325,7 +325,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
         <t>
           <list style="symbols">
             <t>"kty" Paramater value: "PBKDF2"<vspace blankLines="1"/></t>
-            <t>Implementation Requirements: RECOMMENDED-<vspace blankLines="1"/></t>
+            <t>Implementation Requirements: OPTIONAL<vspace blankLines="1"/></t>
             <t>Change Controller: IETF<vspace blankLines="1"/></t>
             <t>Specification Document(s): <xref target="pbcrypto-pbkdf2-jwk"/> of [[ this document ]]<vspace blankLines="1"/></t>
           </list>
@@ -359,7 +359,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
           <list style="symbols">
             <t>Algorithm Name: "PBES2-HS256+A128KW"<vspace blankLines="1"/></t>
             <t>Algorithm Usage Location(s): "alg"</t>
-            <t>Implementation Requirements: RECOMMENDED-<vspace blankLines="1"/></t>
+            <t>Implementation Requirements: OPTIONAL<vspace blankLines="1"/></t>
             <t>Change Controller: IETF<vspace blankLines="1"/></t>
             <t>Specification Document(s): <xref target="pbcrypto-pbes2-jwe"/> of [[ this document ]]<vspace blankLines="1"/></t>
           </list>
@@ -368,7 +368,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
           <list style="symbols">
             <t>Algorithm Name: "PBES2-HS512+A256KW"<vspace blankLines="1"/></t>
             <t>Algorithm Usage Location(s): "alg"</t>
-            <t>Implementation Requirements: RECOMMENDED-<vspace blankLines="1"/></t>
+            <t>Implementation Requirements: OPTIONAL<vspace blankLines="1"/></t>
             <t>Change Controller: IETF<vspace blankLines="1"/></t>
             <t>Specification Document(s): <xref target="pbcrypto-pbes2-jwe"/> of [[ this document ]]<vspace blankLines="1"/></t>
           </list>
