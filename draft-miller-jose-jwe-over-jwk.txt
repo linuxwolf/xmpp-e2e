@@ -70,22 +70,22 @@ Table of Contents
    6.  Using Password-Based Cryptography . . . . . . . . . . . . . .   9
      6.1.  PBKDF2 Key Type . . . . . . . . . . . . . . . . . . . . .   9
        6.1.1.  'S' Parameter . . . . . . . . . . . . . . . . . . . .   9
-       6.1.2.  'c' Parameter . . . . . . . . . . . . . . . . . . . .   9
-     6.2.  PBES2 Key Encryption Algorithms . . . . . . . . . . . . .   9
+       6.1.2.  'c' Parameter . . . . . . . . . . . . . . . . . . . .  10
+     6.2.  PBES2 Key Encryption Algorithms . . . . . . . . . . . . .  10
        6.2.1.  PBES2-HS256+A128KW  . . . . . . . . . . . . . . . . .  10
        6.2.2.  PBES2-HS512+A256KW  . . . . . . . . . . . . . . . . .  10
    7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
      7.1.  JSON Web Key Types Registration . . . . . . . . . . . . .  10
-     7.2.  JSON Web Key Parameters Registration  . . . . . . . . . .  10
+     7.2.  JSON Web Key Parameters Registration  . . . . . . . . . .  11
      7.3.  JSON Web Encryption Algorithms  . . . . . . . . . . . . .  11
-   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
-     8.1.  Re-using Keying Material  . . . . . . . . . . . . . . . .  11
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
+     8.1.  Re-using Keying Material  . . . . . . . . . . . . . . . .  12
      8.2.  Lifetime of Protected Keys  . . . . . . . . . . . . . . .  12
      8.3.  Password Considerations . . . . . . . . . . . . . . . . .  12
    9.  Internationalization Considerations . . . . . . . . . . . . .  12
-   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  12
+   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
      10.1.  Normative References . . . . . . . . . . . . . . . . . .  13
-     10.2.  Informative References . . . . . . . . . . . . . . . . .  13
+     10.2.  Informative References . . . . . . . . . . . . . . . . .  14
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  14
 
 
@@ -264,7 +264,23 @@ Internet-Draft             JWE Protected JWK                January 2013
    The key holder uses the following [JOSE-JWE] inputs:
 
 
-   o  JWE Header
+   JWE Header:
+
+
+
+
+
+
+
+
+
+
+
+
+Miller                  Expires August 03, 2013                 [Page 5]
+
+Internet-Draft             JWE Protected JWK                January 2013
+
 
    {
      "alg":"PBES2-HS256+A128KW",
@@ -274,31 +290,23 @@ Internet-Draft             JWE Protected JWK                January 2013
        "S":"2WCTcJZ1Rvd_CJuJripQ1w",
        "c":4096
      }
-
-
-
-Miller                  Expires August 03, 2013                 [Page 5]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
-
    }
 
 
 
-   o  Password:
+   Password:
 
    Thus from my lips, by yours, my sin is purged.
 
 
 
-   o  Content Master Key (encoded as base64url per [RFC4686]):
+   Content Master Key (encoded as base64url per [RFC4686]):
 
    1ICvnpc3zPRNS7JoJ9bnJ929eX7EnRwmc0CHNOF1zKc
 
 
 
-   o  Initialization Vector (encoded as base64url per [RFC4686]):
+   Initialization Vector (encoded as base64url per [RFC4686]):
 
    B9BVK3hIsEu9zUOWjKeOSg
 
@@ -322,14 +330,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    evdQoEKtS9LnimKTP8YmeqAnU1Y3VoUkgeRTZikKhQ_kwpAxakaRuBzfaIOKjqY
    X5J_jSJuuBQU_4fgHPkvrq1zJ3TnUAWZIqFcw27dKGMxXLMlz_sbW2YerZ0BULc
    xbe8bJpbHkE64r7Nc86iZyL6e-8htkUvpGmdQGqno-q723Ry-u2Iz1-exjgjbNu
-   z4tbSrf49Y0_VSFEuHLnCRChVQE8cgupCy8GioEpuC7v1hMNE7JZTVbG3Ud3QzZ
-   Webr0sAYjWwqa2ySoJ7AaRfIiVgMdTAS2_gBdbYRSYI2pkQTHpyZ8D_lp5RvYFR
-   FNsHWoEToXeL1P_csuKaGsikKbzgXdevrjmCJTOpByGYO5cb2O8xFyYy1VX_pM6
-   bxqj5ai8-jyiCoDKvF_40wT_9F6H79UIZtuc3L7r7OxKrmY32LLvfofVRsfdIcK
-   AhMvnvOCpzRN3sHiR7iAx1bvaIaz40Mshf8z-__70GEqr5oWxRwyv2uhCiPHtV6
-   lBIhCqki6th317-n_lR58LHw894ja0xbOOxUJfZziaG14O9tqjetTSB0JGKXC4S
-   ry6zzeyqDwsSpY439Uqn7va_V5ELLfJf9S7fh0AtZS3ogpw4oT-6LbywFPf0jH9
-   LgNmatORG_J2wgu8R8QpKogo_WTQK7izHVtEMe1vQQElAy8P2SUjOJiOU6wAW4o
 
 
 
@@ -338,6 +338,14 @@ Miller                  Expires August 03, 2013                 [Page 6]
 Internet-Draft             JWE Protected JWK                January 2013
 
 
+   z4tbSrf49Y0_VSFEuHLnCRChVQE8cgupCy8GioEpuC7v1hMNE7JZTVbG3Ud3QzZ
+   Webr0sAYjWwqa2ySoJ7AaRfIiVgMdTAS2_gBdbYRSYI2pkQTHpyZ8D_lp5RvYFR
+   FNsHWoEToXeL1P_csuKaGsikKbzgXdevrjmCJTOpByGYO5cb2O8xFyYy1VX_pM6
+   bxqj5ai8-jyiCoDKvF_40wT_9F6H79UIZtuc3L7r7OxKrmY32LLvfofVRsfdIcK
+   AhMvnvOCpzRN3sHiR7iAx1bvaIaz40Mshf8z-__70GEqr5oWxRwyv2uhCiPHtV6
+   lBIhCqki6th317-n_lR58LHw894ja0xbOOxUJfZziaG14O9tqjetTSB0JGKXC4S
+   ry6zzeyqDwsSpY439Uqn7va_V5ELLfJf9S7fh0AtZS3ogpw4oT-6LbywFPf0jH9
+   LgNmatORG_J2wgu8R8QpKogo_WTQK7izHVtEMe1vQQElAy8P2SUjOJiOU6wAW4o
    neU7HUUwD3cvFSn-ykze48FurI5f6DXyPNTVtzaEjBnVVP517bGb_3V_-1SCBdZ
    1f_sYWJ0S8r2u5ccy28CP_7MhZOY8r4oJJn2NmT_jDOllCNtJLKVdKon0QslEER
    GXa8r6Jtp3UbfLVjZQbnFl2mBygH4PoWbyGVxUNDE66mZVKM4Y-6ng5L84PrDt5
@@ -380,20 +388,18 @@ Internet-Draft             JWE Protected JWK                January 2013
    The key holder uses the following [JOSE-JWE] inputs:
 
 
-   o  JWE Header
-
-   {
-     "alg":"RSA-OAEP",
-     "enc":"A128CBC+HS256",
-     "jwk":{
-
-
 
 Miller                  Expires August 03, 2013                 [Page 7]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
 
+   JWE Header:
+
+   {
+     "alg":"RSA-OAEP",
+     "enc":"A128CBC+HS256",
+     "jwk":{
        "kty":"RSA",
        "n":"ALekPD1kotXZCY_YUz_ITWBZb2nTOw35VvZlnqTiYSeusO58qCtYDz
             ahTEkEcjtduRqfkxJKHYVq9Iro4x1cewXFdJZUuMOQAhoD63AHemXE
@@ -408,13 +414,13 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-   o  Content Master Key (encoded as base64url per [RFC4686]):
+   Content Master Key (encoded as base64url per [RFC4686]):
 
    ci5IlLIHnFLn-1lhL5CWOS3DdbXGU-BPuFCrLspXAkA
 
 
 
-   o  Initialization Vector (encoded as base64url per [RFC4686]):
+   Initialization Vector (encoded as base64url per [RFC4686]):
 
    _dYbckd_xuJUBUNsxkT9yw
 
@@ -436,12 +442,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    UW26BTjbDGjgQ288JXJpGGpbZVV3WyZYJdm1Fvux8wM_t7bh6UbjbOdYXjL3rzD
    phZteaD-DXiKrdGaVndTMLUmjg78H0R9K2WHxWNhTWiq8iMDGtw6BYnHW_r5DSf
    vhojcDhCCBKWyO-QLXvTO1mfgo6UQwYY32Lvz-IrbxphrfBePsEXVYm75PLIIft
-   PnRwN3fWDMkKLCq2AesvWDuRWtKVjsh7uu_AX2ky6dvov2Lw_xMiDshsNz62RES
-   bNUW-ylMqNNn_VAYWKHK83k5CZppPlBb_8MDEUBPyGe_NDCa3118eo20tJGMn8v
-   XRg8k7D0nJ051hGlzAkMQ0S_x9g.
-   _dYbckd_xuJUBUNsxkT9yw.
-   QHkwptAlO0Gdo5BrbkaGPSek6wASr-twP8ZQ3YYHOkbRMedtsM0QwpvdnfUXoJL
-   7HZ0fbI-5YwO3PHvTOMXKx-K26cA-Hn9aseBvuICL2getFnrUcXs3vQI416PCw7
 
 
 
@@ -450,6 +450,12 @@ Miller                  Expires August 03, 2013                 [Page 8]
 Internet-Draft             JWE Protected JWK                January 2013
 
 
+   PnRwN3fWDMkKLCq2AesvWDuRWtKVjsh7uu_AX2ky6dvov2Lw_xMiDshsNz62RES
+   bNUW-ylMqNNn_VAYWKHK83k5CZppPlBb_8MDEUBPyGe_NDCa3118eo20tJGMn8v
+   XRg8k7D0nJ051hGlzAkMQ0S_x9g.
+   _dYbckd_xuJUBUNsxkT9yw.
+   QHkwptAlO0Gdo5BrbkaGPSek6wASr-twP8ZQ3YYHOkbRMedtsM0QwpvdnfUXoJL
+   7HZ0fbI-5YwO3PHvTOMXKx-K26cA-Hn9aseBvuICL2getFnrUcXs3vQI416PCw7
    n39HtFLozCaBhJBaMv5x41CT6eaeRCMXE9Kbgz8lFicKNS9GYB7bUQfPXJl-qP7
    05v-qkY4m2BAfofWtyGK-bnbs2ZKhKgaRTdRZlbnZTC19eSS8bPlalSNBrpr2eP
    kDGDsYIKJvtbqD_xHeb7u5BT3ELmDl4CDjMruB3RiNwINcwNkCAhkg9tgV_vFCm
@@ -491,12 +497,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    base64url encoded string (per [RFC4686]).  This value MUST NOT be the
    empty string "".
 
-6.1.2.  'c' Parameter
-
-   The REQUIRED "c" parameter contains the PBKDF2 iteration count (c),
-   as an integer.  This value MUST NOT be less than 1, as per [RFC2898].
-
-6.2.  PBES2 Key Encryption Algorithms
 
 
 
@@ -505,6 +505,13 @@ Miller                  Expires August 03, 2013                 [Page 9]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
+
+6.1.2.  'c' Parameter
+
+   The REQUIRED "c" parameter contains the PBKDF2 iteration count (c),
+   as an integer.  This value MUST NOT be less than 1, as per [RFC2898].
+
+6.2.  PBES2 Key Encryption Algorithms
 
    The "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" [JOSE-JWE]
    algorithms are used to encrypt a JWE Content Master Key using a user-
@@ -546,13 +553,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    o  Specification Document(s): Section 6.1 of [[ this document ]]
 
 
-7.2.  JSON Web Key Parameters Registration
-
-   o  Parameter Name: "S"
-
-
-   o  Change Controller: IETF
-
 
 
 
@@ -560,6 +560,14 @@ Internet-Draft             JWE Protected JWK                January 2013
 Miller                  Expires August 03, 2013                [Page 10]
 
 Internet-Draft             JWE Protected JWK                January 2013
+
+
+7.2.  JSON Web Key Parameters Registration
+
+   o  Parameter Name: "S"
+
+
+   o  Change Controller: IETF
 
 
    o  Specification Document(s): Section 6.1.1 of [[ this document ]]
@@ -604,20 +612,18 @@ Internet-Draft             JWE Protected JWK                January 2013
    o  Specification Document(s): Section 6.2.2 of [[ this document ]]
 
 
-8.  Security Considerations
-
-8.1.  Re-using Keying Material
-
-   It is NOT RECOMMENDED to re-use all of the same keying material (Key
-   Encryption Key, Content Master Key, Initialization Vector, etc) to
-
-
 
 Miller                  Expires August 03, 2013                [Page 11]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
 
+8.  Security Considerations
+
+8.1.  Re-using Keying Material
+
+   It is NOT RECOMMENDED to re-use all of the same keying material (Key
+   Encryption Key, Content Master Key, Initialization Vector, etc) to
    protect multiple JWK objects, or to protect the same JWK object
    multiple times.  When using "PBES2-HS245+A128KW" or
    "PBES2-HS512+A256KW", implmentations MUST NOT use the same Key
@@ -660,12 +666,6 @@ Internet-Draft             JWE Protected JWK                January 2013
    normalization to account for differences of octet sequences generated
    by different input devices, locales, etc.  It is RECOMMENDED for
    applications to perform the steps outlined in [SASLPREP] to prepare a
-   user-supplied password before performing key derivation and
-   encryption.
-
-10.  References
-
-
 
 
 
@@ -673,6 +673,11 @@ Miller                  Expires August 03, 2013                [Page 12]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
+
+   user-supplied password before performing key derivation and
+   encryption.
+
+10.  References
 
 10.1.  Normative References
 
@@ -718,17 +723,14 @@ Internet-Draft             JWE Protected JWK                January 2013
    [RFC4949]  Shirey, R., "Internet Security Glossary, Version 2", RFC
               4949, August 2007.
 
-10.2.  Informative References
-
-
-
-
 
 
 Miller                  Expires August 03, 2013                [Page 13]
 
 Internet-Draft             JWE Protected JWK                January 2013
 
+
+10.2.  Informative References
 
    [AES]      National Institute of Standards and Technology (NIST),
               "Advanced Encryption Standard (AES)", FIPS PUB 197,
@@ -751,8 +753,6 @@ Author's Address
 
    Phone: +1-303-308-3204
    Email: mamille2@cisco.com
-
-
 
 
 

@@ -66,7 +66,8 @@
     </section>
     <section title="Private Key Example" anchor="example-privkey">
       <t>NOTE: unless otherwise indiciated, all line breaks are included for readability.</t>
-      <t>The key holder begins with the <xref target="JOSE-JWK"/> representation of the private key (here using a <xref target="RFC3447"/> RSA private key, formatted per <xref target="JOSE-PRIVKEY"/>):
+      <t>The key holder begins with the <xref target="JOSE-JWK"/> representation of the private key (here using a <xref target="RFC3447"/> RSA private key, formatted per <xref target="JOSE-PRIVKEY"/>):</t>
+      <t>
         <figure>
           <artwork><![CDATA[
 {
@@ -112,11 +113,11 @@
           ]]></artwork>
         </figure>
       </t>
-      <t>The key holder uses the following <xref target="JOSE-JWE"/> inputs:<vspace blankLines="1"/>
-        <list style="symbols">
-          <t>JWE Header
-              <figure>
-                <artwork><![CDATA[
+      <t>The key holder uses the following <xref target="JOSE-JWE"/> inputs:<vspace blankLines="1"/></t>
+      <t>
+          <figure>
+            <preamble>JWE Header:</preamble>
+            <artwork><![CDATA[
 {
   "alg":"PBES2-HS256+A128KW",
   "enc":"A128CBC+HS256",
@@ -126,33 +127,39 @@
     "c":4096
   }
 }
-                ]]></artwork>
-              </figure>
-          <vspace blankLines="1"/></t>
-          <t>Password:
-            <figure>
-              <artwork><![CDATA[
-Thus from my lips, by yours, my sin is purged.
-              ]]></artwork>
-            </figure>
-          <vspace blankLines="1"/></t>
-          <t>Content Master Key (encoded as base64url per <xref target="RFC4686"/>):
-            <figure>
-              <artwork><![CDATA[
-1ICvnpc3zPRNS7JoJ9bnJ929eX7EnRwmc0CHNOF1zKc
-              ]]></artwork>
-            </figure>
-          <vspace blankLines="1"/></t>
-          <t>Initialization Vector (encoded as base64url per <xref target="RFC4686"/>):
-            <figure>
-              <artwork><![CDATA[
-B9BVK3hIsEu9zUOWjKeOSg
-              ]]></artwork>
-            </figure>
-          <vspace blankLines="1"/></t>
-        </list>
+            ]]></artwork>
+          </figure>
+        <vspace blankLines="1"/>
       </t>
-      <t>The key holder performs steps 1 and 2 to generate the <xref target="JOSE-JWE"/> outputs (represented using the Compact Serialization):<vspace blankLines="1"/>
+      <t>
+        <figure>
+          <preamble>Password:</preamble>
+          <artwork><![CDATA[
+Thus from my lips, by yours, my sin is purged.
+            ]]></artwork>
+          </figure>
+        <vspace blankLines="1"/>
+      </t>
+      <t>
+        <figure>
+          <preamble>Content Master Key (encoded as base64url per <xref target="RFC4686"/>):</preamble>
+          <artwork><![CDATA[
+1ICvnpc3zPRNS7JoJ9bnJ929eX7EnRwmc0CHNOF1zKc
+          ]]></artwork>
+        </figure>
+        <vspace blankLines="1"/>
+      </t>
+      <t>
+        <figure>
+          <preamble>Initialization Vector (encoded as base64url per <xref target="RFC4686"/>):</preamble>
+          <artwork><![CDATA[
+B9BVK3hIsEu9zUOWjKeOSg
+          ]]></artwork>
+        </figure>
+        <vspace blankLines="1"/>
+      </t>
+      <t>The key holder performs steps 1 and 2 to generate the <xref target="JOSE-JWE"/> outputs (represented using the Compact Serialization):<vspace blankLines="1"/></t>
+      <t>
         <figure>
           <artwork><![CDATA[
 eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDK0hTMjU
@@ -204,7 +211,8 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
     </section>
     <section title="Symmetric Key Example" anchor="protect-example-symm">
       <t>NOTE: unless otherwise indiciated, all line breaks are included for readability.</t>
-      <t>The key holder begins with the <xref target="JOSE-JWK"/> representation of the symmetric key (here using a <xref target="AES"/> 128-bit key, formatted as per <xref target="JOSE-PRIVKEY"/>):
+      <t>The key holder begins with the <xref target="JOSE-JWK"/> representation of the symmetric key (here using a <xref target="AES"/> 128-bit key, formatted as per <xref target="JOSE-PRIVKEY"/>):</t>
+      <t>
         <figure>
           <artwork><![CDATA[
 {
@@ -215,11 +223,11 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
           ]]></artwork>
         </figure>
       </t>
-      <t>The key holder uses the following <xref target="JOSE-JWE"/> inputs:<vspace blankLines="1"/>
-        <list style="symbols">
-          <t>JWE Header
-              <figure>
-                <artwork><![CDATA[
+      <t>The key holder uses the following <xref target="JOSE-JWE"/> inputs:</t>
+      <t>
+        <figure>
+          <preamble>JWE Header:</preamble>
+          <artwork><![CDATA[
 {
   "alg":"RSA-OAEP",
   "enc":"A128CBC+HS256",
@@ -235,27 +243,30 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
     "e":"AQAB"
   }
 }
-                ]]></artwork>
-              </figure>
-          <vspace blankLines="1"/></t>
-
-          <t>Content Master Key (encoded as base64url per <xref target="RFC4686"/>):
-            <figure>
-              <artwork><![CDATA[
-ci5IlLIHnFLn-1lhL5CWOS3DdbXGU-BPuFCrLspXAkA
-              ]]></artwork>
-            </figure>
-          <vspace blankLines="1"/></t>
-          <t>Initialization Vector (encoded as base64url per <xref target="RFC4686"/>):
-            <figure>
-              <artwork><![CDATA[
-_dYbckd_xuJUBUNsxkT9yw
-              ]]></artwork>
-            </figure>
-          <vspace blankLines="1"/></t>
-        </list>
+            ]]></artwork>
+          </figure>
+          <vspace blankLines="1"/>
       </t>
-      <t>The key holder performs steps 1 and 2 to generate the <xref target="JOSE-JWE"/> outputs (represented using the Compact Serialization):<vspace blankLines="1"/>
+      <t>
+        <figure>
+          <preamble>Content Master Key (encoded as base64url per <xref target="RFC4686"/>):</preamble>
+          <artwork><![CDATA[
+ci5IlLIHnFLn-1lhL5CWOS3DdbXGU-BPuFCrLspXAkA
+          ]]></artwork>
+        </figure>
+        <vspace blankLines="1"/>
+      </t>
+      <t>
+        <figure>
+          <preamble>Initialization Vector (encoded as base64url per <xref target="RFC4686"/>):</preamble>
+          <artwork><![CDATA[
+_dYbckd_xuJUBUNsxkT9yw
+            ]]></artwork>
+          </figure>
+        <vspace blankLines="1"/>
+      </t>
+      <t>The key holder performs steps 1 and 2 to generate the <xref target="JOSE-JWE"/> outputs (represented using the Compact Serialization):<vspace blankLines="1"/></t>
+      <t>
         <figure>
           <artwork><![CDATA[
 eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhDQkMrSFMyNTYiLCJqd2siOns
