@@ -24,8 +24,8 @@
     </author>
     <date month="February" day="1" year="2013"/>
     <area>Security</area>
+    <workgroup>JOSE Working Group</workgroup>
     <keyword>Internet-Draft</keyword>
-    <keyword>JOSE</keyword>
     <abstract>
       <t>This document specifies an approach to protecting JSON Web Key (JWK) objects using JSON Web Encryption (JWE). This document also specifies a set of algorithms for encrypting content using password-based cryptography.</t>
     </abstract>
@@ -46,10 +46,10 @@
           <t>Converts the JWK object to a UTF-8 encoded string (K').<vspace blankLines="1"/></t>
           <t>Performs the message encryption steps from <xref target="JWE"/> to generate the JWE header H, JWE Encrypted Key E, JWE Initialization Vector IV, JWE Ciphertext C, and JWE Integrity Value I, using the following inputs:<vspace blankLines="1"/>
             <list style="symbols">
-              <t>The 'alg' property set to the intended key encryption algorithm (e.g. "RSA-OAEP", or "PBES2-HS512+A256KW" from below).<vspace blankLines="1"/></t>
-              <t>Keying material appropriate for the selected key encryption algorithm  (e.g. private key for "RSA-OAEP", or shared password, salt, and iteration count for "PBES2-HS512+A256KW").<vspace blankLines="1"/></t>
-              <t>The 'enc' property set to the intended content encryption algorithm (e.g. "A256GCM" or "A256CBC+HS512").<vspace blankLines="1"/></t>
-              <t>Keying material appropriate for the selected content encryption algorithm (e.g. Content Encryption Key and Initialization Vector).<vspace blankLines="1"/></t>
+              <t>The 'alg' property set to the intended key encryption algorithm (e.g., "RSA-OAEP", or "PBES2-HS512+A256KW" from below).<vspace blankLines="1"/></t>
+              <t>Keying material appropriate for the selected key encryption algorithm  (e.g., private key for "RSA-OAEP", or shared password, salt, and iteration count for "PBES2-HS512+A256KW").<vspace blankLines="1"/></t>
+              <t>The 'enc' property set to the intended content encryption algorithm (e.g., "A256GCM" or "A256CBC+HS512").<vspace blankLines="1"/></t>
+              <t>Keying material appropriate for the selected content encryption algorithm (e.g., Content Encryption Key and Initialization Vector).<vspace blankLines="1"/></t>
               <t>K' as the plaintext content to encrypt.</t>
             </list>
           </t>
@@ -61,7 +61,7 @@
       </section>
       <section title="Details for Symmetric Keys" anchor="protect-symmetric">
         <t>Symmetric keys are typically protected using public-private key pairs. It is assumed the key holder has the appropriate public key(s) for the key recipient(s).</t>
-        <t>The process defined herein expects JWK objects. While more compact to simply encrypt the symmetric key directly with a public key, using the complete JWE process on complete content JWK objects allows additional properties to be protected (e.g. expected lifetime, acceptable uses) without exceeding the input limits inherent in most public-private key operations.</t>
+        <t>The process defined herein expects JWK objects. While more compact to simply encrypt the symmetric key directly with a public key, using the complete JWE process on complete JWK objects allows additional properties to be protected (e.g., expected lifetime, acceptable uses) without exceeding the input limits inherent in most public-private key operations.</t>
       </section>
     </section>
     <section title="Private Key Example" anchor="example-privkey">
@@ -384,7 +384,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
         <t>It is NOT RECOMMENDED to re-use the same keying material (Key Encryption Key, Content Master Key, Initialization Vector, etc) to protect multiple JWK objects, or to protect the same JWK object multiple times. When using "PBES2-HS256+A128KW" or "PBES2-HS512+A256KW", implementations MUST NOT use the same Key Encryption Key for a given password, and SHOULD take steps to prevent the same Key Encryption Key being used by different passwords.</t>
       </section>
       <section title="Lifetime of Protected Keys" anchor="security-store">
-        <t>Depending on the application, a protected JWK could potentially be stored for an indefinite time, anywhere from milliseconds (e.g. broadcasted over a computer network) to years (e.g. stored as a file).</t>
+        <t>Depending on the application, a protected JWK could potentially be stored for an indefinite time, anywhere from milliseconds (e.g., broadcasted over a computer network) to years (e.g., stored as a file).</t>
       </section>
       <section title="Password Considerations" anchor="security-pwd">
         <t>While convenient for end users, passwords have many drawbacks. To help mitigate these limitations, this document applies principles from <xref target="RFC2898"/> to derive cryptographic keys from user-supplied passwords.</t>

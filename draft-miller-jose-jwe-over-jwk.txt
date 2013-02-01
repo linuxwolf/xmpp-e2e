@@ -2,9 +2,9 @@
 
 
 
-Network Working Group                                          M. Miller
+JOSE Working Group                                             M. Miller
 Internet-Draft                                       Cisco Systems, Inc.
-Intended status: Standards Track                        February 1, 2013
+Intended status: Standards Track                       February 01, 2013
 Expires: August 05, 2013
 
 
@@ -152,12 +152,12 @@ Internet-Draft             JWE Protected JWK               February 2013
 
 
        *  The 'alg' property set to the intended key encryption
-          algorithm (e.g.  "RSA-OAEP", or "PBES2-HS512+A256KW" from
+          algorithm (e.g., "RSA-OAEP", or "PBES2-HS512+A256KW" from
           below).
 
 
        *  Keying material appropriate for the selected key encryption
-          algorithm (e.g.  private key for "RSA-OAEP", or shared
+          algorithm (e.g., private key for "RSA-OAEP", or shared
           password, salt, and iteration count for "PBES2-HS512+A256KW").
 
 
@@ -171,11 +171,11 @@ Internet-Draft             JWE Protected JWK               February 2013
 
 
        *  The 'enc' property set to the intended content encryption
-          algorithm (e.g.  "A256GCM" or "A256CBC+HS512").
+          algorithm (e.g., "A256GCM" or "A256CBC+HS512").
 
 
        *  Keying material appropriate for the selected content
-          encryption algorithm (e.g.  Content Encryption Key and
+          encryption algorithm (e.g., Content Encryption Key and
           Initialization Vector).
 
 
@@ -201,10 +201,10 @@ Internet-Draft             JWE Protected JWK               February 2013
 
    The process defined herein expects JWK objects.  While more compact
    to simply encrypt the symmetric key directly with a public key, using
-   the complete JWE process on complete content JWK objects allows
-   additional properties to be protected (e.g.  expected lifetime,
-   acceptable uses) without exceeding the input limits inherent in most
-   public-private key operations.
+   the complete JWE process on complete JWK objects allows additional
+   properties to be protected (e.g., expected lifetime, acceptable uses)
+   without exceeding the input limits inherent in most public-private
+   key operations.
 
 4.  Private Key Example
 
@@ -633,8 +633,8 @@ Internet-Draft             JWE Protected JWK               February 2013
 8.2.  Lifetime of Protected Keys
 
    Depending on the application, a protected JWK could potentially be
-   stored for an indefinite time, anywhere from milliseconds (e.g.
-   broadcasted over a computer network) to years (e.g.  stored as a
+   stored for an indefinite time, anywhere from milliseconds (e.g.,
+   broadcasted over a computer network) to years (e.g., stored as a
    file).
 
 8.3.  Password Considerations
