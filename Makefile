@@ -1,7 +1,9 @@
 RFC2TXT=xml2rfc --text
 RFC2HTML=xml2rfc --html
-OUTPUT=draft-miller-xmpp-e2e.txt draft-miller-xmpp-e2e.html \
-		draft-miller-jose-jwe-over-jwk.txt draft-miller-jose-jwe-over-jwk.html
+SOURCES=draft-miller-xmpp-e2e.xml \
+		draft-miller-jose-jwe-protected-jwk.xml
+OUTPUT=$(SOURCES:.xml=.txt) \
+		$(SOURCES:.xml=.html)
 
 all :	$(OUTPUT)
 

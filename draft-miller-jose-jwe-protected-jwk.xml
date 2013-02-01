@@ -5,7 +5,7 @@
 <?rfc symrefs="yes"?>
 <?rfc toc="yes"?>
 <?rfc tocdepth="4"?>
-<rfc category="std" docName="draft-miller-jose-jwe-over-jwk-00" ipr="trust200902">
+<rfc category="std" docName="draft-miller-jose-jwe-protected-jwk-00" ipr="trust200902">
   <front>
     <title abbrev="JWE Protected JWK">Using JSON Web Encryption (JWE) for Protecting JSON Web Key (JWK) Objects</title>
     <author initials="M." surname="Miller" fullname="Matthew Miller">

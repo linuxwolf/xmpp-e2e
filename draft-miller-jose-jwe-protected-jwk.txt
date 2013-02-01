@@ -10,7 +10,7 @@ Expires: August 05, 2013
 
    Using JSON Web Encryption (JWE) for Protecting JSON Web Key (JWK)
                                 Objects
-                   draft-miller-jose-jwe-over-jwk-00
+                 draft-miller-jose-jwe-protected-jwk-00
 
 Abstract
 
