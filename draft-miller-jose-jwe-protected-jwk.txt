@@ -70,22 +70,22 @@ Table of Contents
    6.  Using Password-Based Cryptography . . . . . . . . . . . . . .   9
      6.1.  PBKDF2 Key Type . . . . . . . . . . . . . . . . . . . . .   9
        6.1.1.  's' Parameter . . . . . . . . . . . . . . . . . . . .   9
-       6.1.2.  'c' Parameter . . . . . . . . . . . . . . . . . . . .  10
+       6.1.2.  'c' Parameter . . . . . . . . . . . . . . . . . . . .   9
      6.2.  PBES2 Key Encryption Algorithms . . . . . . . . . . . . .  10
        6.2.1.  PBES2-HS256+A128KW  . . . . . . . . . . . . . . . . .  10
        6.2.2.  PBES2-HS512+A256KW  . . . . . . . . . . . . . . . . .  10
    7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
      7.1.  JSON Web Key Types Registration . . . . . . . . . . . . .  10
-     7.2.  JSON Web Key Parameters Registration  . . . . . . . . . .  11
+     7.2.  JSON Web Key Parameters Registration  . . . . . . . . . .  10
      7.3.  JSON Web Encryption Algorithms  . . . . . . . . . . . . .  11
-   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
      8.1.  Re-using Keying Material  . . . . . . . . . . . . . . . .  12
      8.2.  Lifetime of Protected Keys  . . . . . . . . . . . . . . .  12
      8.3.  Password Considerations . . . . . . . . . . . . . . . . .  12
    9.  Internationalization Considerations . . . . . . . . . . . . .  12
    10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
      10.1.  Normative References . . . . . . . . . . . . . . . . . .  13
-     10.2.  Informative References . . . . . . . . . . . . . . . . .  13
+     10.2.  Informative References . . . . . . . . . . . . . . . . .  14
    Appendix A.  Acknowledgements . . . . . . . . . . . . . . . . . .  14
    Appendix B.  Document History . . . . . . . . . . . . . . . . . .  14
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  14
@@ -189,9 +189,9 @@ Internet-Draft             JWE Protected JWK               February 2013
 
    Private keys are typically protected using a symmetric key.  This
    symmetric key can be exchanged or determined in various ways, such as
-   deriving one from a user-supplied password.  The algorithms
-   "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" are defined herein to
-   enable this.
+   deriving one from a user-supplied password; the algorithms
+   "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" (defined in
+   Section 6.2) enable this.
 
 3.2.  Details for Symmetric Keys
 
@@ -482,14 +482,13 @@ Internet-Draft             JWE Protected JWK               February 2013
    There are often times when a key is exchanged through immediate human
    interaction.  To help facilitate such exchanges, a number of
    password-based cryptography schemes utilizing [RFC2898] are defined
-   to supplement the key format, agreement, and encryption algorithms
-   from [JWA].
+   to supplement the key format and encryption algorithms from [JWA].
 
 6.1.  PBKDF2 Key Type
 
    The "PBKDF2" key type is used to contain the parameters necessary to
-   derive a cipher key from a password.  The following parameters are
-   defined:
+   derive a cipher key from a password using the PBKDF2 algorithm from
+   [RFC2898].  The following parameters are defined:
 
 6.1.1.  's' Parameter
 
@@ -497,6 +496,7 @@ Internet-Draft             JWE Protected JWK               February 2013
    base64url encoded string (per [RFC4686]).  This value MUST NOT be the
    empty string "".
 
+6.1.2.  'c' Parameter
 
 
 
@@ -505,8 +505,6 @@ Miller                  Expires August 05, 2013                 [Page 9]
 
 Internet-Draft             JWE Protected JWK               February 2013
 
-
-6.1.2.  'c' Parameter
 
    The REQUIRED "c" parameter contains the PBKDF2 iteration count (c),
    as an integer.  This value MUST NOT be less than 1, as per [RFC2898].
@@ -553,18 +551,15 @@ Internet-Draft             JWE Protected JWK               February 2013
    o  Specification Document(s): Section 6.1 of [[ this document ]]
 
 
+7.2.  JSON Web Key Parameters Registration
 
+   o  Parameter Name: "s"
 
 
 
 Miller                  Expires August 05, 2013                [Page 10]
 
 Internet-Draft             JWE Protected JWK               February 2013
-
-
-7.2.  JSON Web Key Parameters Registration
-
-   o  Parameter Name: "s"
 
 
    o  Change Controller: IETF
@@ -612,13 +607,16 @@ Internet-Draft             JWE Protected JWK               February 2013
    o  Specification Document(s): Section 6.2.2 of [[ this document ]]
 
 
+8.  Security Considerations
+
+
+
+
 
 Miller                  Expires August 05, 2013                [Page 11]
 
 Internet-Draft             JWE Protected JWK               February 2013
 
-
-8.  Security Considerations
 
 8.1.  Re-using Keying Material
 
@@ -628,7 +626,8 @@ Internet-Draft             JWE Protected JWK               February 2013
    multiple times.  When using "PBES2-HS256+A128KW" or
    "PBES2-HS512+A256KW", implementations MUST NOT use the same Key
    Encryption Key for a given password, and SHOULD take steps to prevent
-   the same Key Encryption Key being used by different passwords.
+   the same Key Encryption Key being used by different passwords when
+   possible.
 
 8.2.  Lifetime of Protected Keys
 
@@ -662,10 +661,11 @@ Internet-Draft             JWE Protected JWK               February 2013
 
 9.  Internationalization Considerations
 
-   Passwords obtained from users are likely to require preparation and
-   normalization to account for differences of octet sequences generated
-   by different input devices, locales, etc.  It is RECOMMENDED for
-   applications to perform the steps outlined in [SASLPREP] to prepare a
+
+
+
+
+
 
 
 
@@ -674,6 +674,10 @@ Miller                  Expires August 05, 2013                [Page 12]
 Internet-Draft             JWE Protected JWK               February 2013
 
 
+   Passwords obtained from users are likely to require preparation and
+   normalization to account for differences of octet sequences generated
+   by different input devices, locales, etc.  It is RECOMMENDED for
+   applications to perform the steps outlined in [SASLPREP] to prepare a
    user-supplied password before performing key derivation and
    encryption.
 
@@ -719,16 +723,14 @@ Internet-Draft             JWE Protected JWK               February 2013
    [RFC4949]  Shirey, R., "Internet Security Glossary, Version 2", RFC
               4949, August 2007.
 
-10.2.  Informative References
-
-
-
 
 
 Miller                  Expires August 05, 2013                [Page 13]
 
 Internet-Draft             JWE Protected JWK               February 2013
 
+
+10.2.  Informative References
 
    [AES]      National Institute of Standards and Technology (NIST),
               "Advanced Encryption Standard (AES)", FIPS PUB 197,
@@ -757,8 +759,6 @@ Author's Address
 
    Phone: +1-303-308-3204
    Email: mamille2@cisco.com
-
-
 
 
 

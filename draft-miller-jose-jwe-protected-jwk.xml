@@ -57,7 +57,7 @@
         </list>
       </t>
       <section title="Details for Private Keys" anchor="protect-private">
-        <t>Private keys are typically protected using a symmetric key. This symmetric key can be exchanged or determined in various ways, such as deriving one from a user-supplied password. The algorithms "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" are defined herein to enable this.</t>
+        <t>Private keys are typically protected using a symmetric key. This symmetric key can be exchanged or determined in various ways, such as deriving one from a user-supplied password; the algorithms "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" (defined in <xref target="pbcrypto-pbes2-jwe"/>) enable this.</t>
       </section>
       <section title="Details for Symmetric Keys" anchor="protect-symmetric">
         <t>Symmetric keys are typically protected using public-private key pairs. It is assumed the key holder has the appropriate public key(s) for the key recipient(s).</t>
@@ -311,9 +311,9 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
       </t>
     </section>
     <section title="Using Password-Based Cryptography" anchor="pbcrypto">
-      <t>There are often times when a key is exchanged through immediate human interaction. To help facilitate such exchanges, a number of password-based cryptography schemes utilizing <xref target="RFC2898"/> are defined to supplement the key format, agreement, and encryption algorithms from <xref target="JWA"/>.</t>
+      <t>There are often times when a key is exchanged through immediate human interaction. To help facilitate such exchanges, a number of password-based cryptography schemes utilizing <xref target="RFC2898"/> are defined to supplement the key format and encryption algorithms from <xref target="JWA"/>.</t>
       <section title="PBKDF2 Key Type" anchor="pbcrypto-pbkdf2-jwk">
-        <t>The "PBKDF2" key type is used to contain the parameters necessary to derive a cipher key from a password. The following parameters are defined:</t>
+        <t>The "PBKDF2" key type is used to contain the parameters necessary to derive a cipher key from a password using the PBKDF2 algorithm from <xref target="RFC2898"/>. The following parameters are defined:</t>
         <section title="'s' Parameter" anchor="pbcrypto-pbkdf2-jwk-S">
           <t>The REQUIRED "s" parameter contains the PBKDF2 salt value (S), as a base64url encoded string (per <xref target="RFC4686"/>). This value MUST NOT be the empty string "".</t>
         </section>
@@ -381,7 +381,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
     </section>
     <section title="Security Considerations" anchor="security">
       <section title="Re-using Keying Material" anchor="security-reuse">
-        <t>It is NOT RECOMMENDED to re-use the same keying material (Key Encryption Key, Content Master Key, Initialization Vector, etc) to protect multiple JWK objects, or to protect the same JWK object multiple times. When using "PBES2-HS256+A128KW" or "PBES2-HS512+A256KW", implementations MUST NOT use the same Key Encryption Key for a given password, and SHOULD take steps to prevent the same Key Encryption Key being used by different passwords.</t>
+        <t>It is NOT RECOMMENDED to re-use the same keying material (Key Encryption Key, Content Master Key, Initialization Vector, etc) to protect multiple JWK objects, or to protect the same JWK object multiple times. When using "PBES2-HS256+A128KW" or "PBES2-HS512+A256KW", implementations MUST NOT use the same Key Encryption Key for a given password, and SHOULD take steps to prevent the same Key Encryption Key being used by different passwords when possible.</t>
       </section>
       <section title="Lifetime of Protected Keys" anchor="security-store">
         <t>Depending on the application, a protected JWK could potentially be stored for an indefinite time, anywhere from milliseconds (e.g., broadcasted over a computer network) to years (e.g., stored as a file).</t>
