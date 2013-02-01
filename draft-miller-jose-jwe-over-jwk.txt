@@ -4,8 +4,8 @@
 
 Network Working Group                                          M. Miller
 Internet-Draft                                       Cisco Systems, Inc.
-Intended status: Standards Track                        January 30, 2013
-Expires: August 03, 2013
+Intended status: Standards Track                        February 1, 2013
+Expires: August 05, 2013
 
 
    Using JSON Web Encryption (JWE) for Protecting JSON Web Key (JWK)
@@ -34,7 +34,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 03, 2013.
+   This Internet-Draft will expire on August 05, 2013.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Miller                  Expires August 03, 2013                 [Page 1]
+Miller                  Expires August 05, 2013                 [Page 1]
 
-Internet-Draft             JWE Protected JWK                January 2013
+Internet-Draft             JWE Protected JWK               February 2013
 
 
 Table of Contents
@@ -69,7 +69,7 @@ Table of Contents
    5.  Symmetric Key Example . . . . . . . . . . . . . . . . . . . .   7
    6.  Using Password-Based Cryptography . . . . . . . . . . . . . .   9
      6.1.  PBKDF2 Key Type . . . . . . . . . . . . . . . . . . . . .   9
-       6.1.1.  'S' Parameter . . . . . . . . . . . . . . . . . . . .   9
+       6.1.1.  's' Parameter . . . . . . . . . . . . . . . . . . . .   9
        6.1.2.  'c' Parameter . . . . . . . . . . . . . . . . . . . .  10
      6.2.  PBES2 Key Encryption Algorithms . . . . . . . . . . . . .  10
        6.2.1.  PBES2-HS256+A128KW  . . . . . . . . . . . . . . . . .  10
@@ -85,43 +85,48 @@ Table of Contents
    9.  Internationalization Considerations . . . . . . . . . . . . .  12
    10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
      10.1.  Normative References . . . . . . . . . . . . . . . . . .  13
-     10.2.  Informative References . . . . . . . . . . . . . . . . .  14
+     10.2.  Informative References . . . . . . . . . . . . . . . . .  13
+   Appendix A.  Acknowledgements . . . . . . . . . . . . . . . . . .  14
+   Appendix B.  Document History . . . . . . . . . . . . . . . . . .  14
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  14
 
 
 1.  Introduction
 
-   There are times when it is necessary for transporting or exchanging a
+   There are times when it is necessary to transport or exchange a
    private or symmetric key, but the transport mechanism might not
    provide adequate content protection for the key.  For instance, end-
    to-end scenarios where the key holder and key recipient are linked
    through multiple network hops that might or might not employ
-   transport layer security (TLS, [RFC5246]), or exchange of a key using
-   physical media such as a USB drive that itself is not encrypted.
-
-   This document specifies an approach that uses [JOSE-JWE] to encryt a
-   private or symmetric key which is formatted as [JOSE-JWK].  This
-   document also specifies and registers JSON Web Key formats and JSON
-   Web Encryption algorithms based on [RFC2898] that allow for
-   protecting keys using a password.
+   transport layer security (TLS, [RFC5246]), nor might exchange of a
+   key using physical media such as a USB drive that itself is not
+   encrypted.
 
 
 
 
 
-Miller                  Expires August 03, 2013                 [Page 2]
+
+
+
+Miller                  Expires August 05, 2013                 [Page 2]
 
-Internet-Draft             JWE Protected JWK                January 2013
+Internet-Draft             JWE Protected JWK               February 2013
 
+
+   This document specifies an approach that uses [JWE] to encrypt a
+   private or symmetric key that is formatted as [JWK].  This document
+   also specifies and registers JSON Web Key formats and JSON Web
+   Encryption algorithms based on [RFC2898] that allow for protecting
+   keys using a password.
 
 2.  Terminology
 
    This document inherits JSON Web Algorithms (JWA)-related terminology
-   from [JOSE-JWA], JSON Web Encryption (JWE)-related terminology from
-   [JOSE-JWE], JSON Web Key (JWK)-related terminology from [JOSE-JWK],
-   and password-based cryptography-related terminology from [RFC2898].
-   Security-related terms are to be understood in the sense defined in
-   [RFC4949].
+   from [JWA], JSON Web Encryption (JWE)-related terminology from [JWE],
+   JSON Web Key (JWK)-related terminology from [JWK], and password-based
+   cryptography-related terminology from [RFC2898].  Security-related
+   terms are to be understood in the sense defined in [RFC4949].
 
    The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
    "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
@@ -140,13 +145,13 @@ Internet-Draft             JWE Protected JWK                January 2013
    1.  Converts the JWK object to a UTF-8 encoded string (K').
 
 
-   2.  Performs the message encryption steps from [JOSE-JWE] to generate
-       the JWE header H, JWE Encrypted Key E, JWE Initialization Vector
-       IV, JWE Ciphertext C, and JWE Integrity Value I, using the
-       following inputs:
+   2.  Performs the message encryption steps from [JWE] to generate the
+       JWE header H, JWE Encrypted Key E, JWE Initialization Vector IV,
+       JWE Ciphertext C, and JWE Integrity Value I, using the following
+       inputs:
 
 
-       *  The 'alg' property set to the intented key encryption
+       *  The 'alg' property set to the intended key encryption
           algorithm (e.g.  "RSA-OAEP", or "PBES2-HS512+A256KW" from
           below).
 
@@ -156,18 +161,17 @@ Internet-Draft             JWE Protected JWK                January 2013
           password, salt, and iteration count for "PBES2-HS512+A256KW").
 
 
+
+
+
+
+Miller                  Expires August 05, 2013                 [Page 3]
+
+Internet-Draft             JWE Protected JWK               February 2013
+
+
        *  The 'enc' property set to the intended content encryption
           algorithm (e.g.  "A256GCM" or "A256CBC+HS512").
-
-
-
-
-
-
-
-Miller                  Expires August 03, 2013                 [Page 3]
-
-Internet-Draft             JWE Protected JWK                January 2013
 
 
        *  Keying material appropriate for the selected content
@@ -177,8 +181,8 @@ Internet-Draft             JWE Protected JWK                January 2013
 
        *  K' as the plaintext content to encrypt.
 
-   3.  Serializes to the appriopriate format for exchange, such as the
-       Compact Serialization documented in [JOSE-JWE].
+   3.  Serializes to the appropriate format for exchange, such as the
+       Compact Serialization documented in [JWE].
 
 
 3.1.  Details for Private Keys
@@ -197,35 +201,34 @@ Internet-Draft             JWE Protected JWK                January 2013
 
    The process defined herein expects JWK objects.  While more compact
    to simply encrypt the symmetric key directly with a public key, using
-   the complete JWE process around content JWK objects allows additional
-   properties to be protected (e.g.  expected lifetime, acceptable uses)
-   without exceeding the input limits inherent in most public-private
-   key operations.
+   the complete JWE process on complete content JWK objects allows
+   additional properties to be protected (e.g.  expected lifetime,
+   acceptable uses) without exceeding the input limits inherent in most
+   public-private key operations.
 
 4.  Private Key Example
 
-   NOTE: unless otherwise indiciated, all line breaks are included for
+   NOTE: unless otherwise indicated, all line breaks are included for
    readability.
 
-   The key holder begins with the [JOSE-JWK] representation of the
-   private key (here using a [RFC3447] RSA private key, formatted per
-   [JOSE-PRIVKEY]):
+   The key holder begins with the [JWK] representation of the private
+   key (here using a [RFC3447] RSA private key, formatted per [JPSK]):
 
    {
        "kty":"RSA",
        "kid":"juliet@capulet.lit",
        "n":"ALekPD1kotXZCY_YUz_ITWBZb2nTOw35VvZlnqTiYSeusO58qCtYDz
+
+
+
+Miller                  Expires August 05, 2013                 [Page 4]
+
+Internet-Draft             JWE Protected JWK               February 2013
+
+
             ahTEkEcjtduRqfkxJKHYVq9Iro4x1cewXFdJZUuMOQAhoD63AHemXE
             kdPiKqJvkBXDT_Eo4NPOjMKKkFPy2MsJQBmdtVknUvzxEchhYjZ490
             EJTvGJ7OYwrSwkcCxy9D29XxL-OQLkSLlH1XD8kgVmJw8hsb42Bg0j
-
-
-
-Miller                  Expires August 03, 2013                 [Page 4]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
-
             PgKlkvcyENmYpYE_hqlJoqYNFzgtAnNtK4C3tspix46R3IgilQG2Of
             i99vpUnmTvjrOlNef2l65PRsPHD1Gl9fyPLCxrkolXbdwvxZ9j2d2f
             Iu-OBTxRhnBtarNls_k",
@@ -261,7 +264,7 @@ Internet-Draft             JWE Protected JWK                January 2013
    }
 
 
-   The key holder uses the following [JOSE-JWE] inputs:
+   The key holder uses the following [JWE] inputs:
 
 
    JWE Header:
@@ -274,12 +277,9 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-
-
-
-Miller                  Expires August 03, 2013                 [Page 5]
+Miller                  Expires August 05, 2013                 [Page 5]
 
-Internet-Draft             JWE Protected JWK                January 2013
+Internet-Draft             JWE Protected JWK               February 2013
 
 
    {
@@ -287,7 +287,7 @@ Internet-Draft             JWE Protected JWK                January 2013
      "enc":"A128CBC+HS256",
      "jwk":{
        "kty":"PBKDF2",
-       "S":"2WCTcJZ1Rvd_CJuJripQ1w",
+       "s":"2WCTcJZ1Rvd_CJuJripQ1w",
        "c":4096
      }
    }
@@ -312,8 +312,8 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-   The key holder performs steps 1 and 2 to generate the [JOSE-JWE]
-   outputs (represented using the Compact Serialization):
+   The key holder performs steps 1 and 2 to generate the [JWE] outputs
+   (represented using the Compact Serialization):
 
 
    eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDK0hTMjU
@@ -333,9 +333,9 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-Miller                  Expires August 03, 2013                 [Page 6]
+Miller                  Expires August 05, 2013                 [Page 6]
 
-Internet-Draft             JWE Protected JWK                January 2013
+Internet-Draft             JWE Protected JWK               February 2013
 
 
    z4tbSrf49Y0_VSFEuHLnCRChVQE8cgupCy8GioEpuC7v1hMNE7JZTVbG3Ud3QzZ
@@ -371,12 +371,11 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 5.  Symmetric Key Example
 
-   NOTE: unless otherwise indiciated, all line breaks are included for
+   NOTE: unless otherwise indicated, all line breaks are included for
    readability.
 
-   The key holder begins with the [JOSE-JWK] representation of the
-   symmetric key (here using a [AES] 128-bit key, formatted as per
-   [JOSE-PRIVKEY]):
+   The key holder begins with the [JWK] representation of the symmetric
+   key (here using a [AES] 128-bit key, formatted as per [JPSK]):
 
    {
        "kty":"oct",
@@ -385,13 +384,14 @@ Internet-Draft             JWE Protected JWK                January 2013
    }
 
 
-   The key holder uses the following [JOSE-JWE] inputs:
+   The key holder uses the following [JWE] inputs:
 
 
 
-Miller                  Expires August 03, 2013                 [Page 7]
+
+Miller                  Expires August 05, 2013                 [Page 7]
 
-Internet-Draft             JWE Protected JWK                January 2013
+Internet-Draft             JWE Protected JWK               February 2013
 
 
    JWE Header:
@@ -426,8 +426,8 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-   The key holder performs steps 1 and 2 to generate the [JOSE-JWE]
-   outputs (represented using the Compact Serialization):
+   The key holder performs steps 1 and 2 to generate the [JWE] outputs
+   (represented using the Compact Serialization):
 
 
    eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhDQkMrSFMyNTYiLCJqd2siOns
@@ -445,9 +445,9 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-Miller                  Expires August 03, 2013                 [Page 8]
+Miller                  Expires August 05, 2013                 [Page 8]
 
-Internet-Draft             JWE Protected JWK                January 2013
+Internet-Draft             JWE Protected JWK               February 2013
 
 
    PnRwN3fWDMkKLCq2AesvWDuRWtKVjsh7uu_AX2ky6dvov2Lw_xMiDshsNz62RES
@@ -483,17 +483,17 @@ Internet-Draft             JWE Protected JWK                January 2013
    interaction.  To help facilitate such exchanges, a number of
    password-based cryptography schemes utilizing [RFC2898] are defined
    to supplement the key format, agreement, and encryption algorithms
-   from [JOSE-JWA].
+   from [JWA].
 
 6.1.  PBKDF2 Key Type
 
-   The "PBKDF2" [JOSE-JWK] type is used to contain the parameters
-   necessary to derive a cipher key from a password.  The following
-   parameters are defined:
+   The "PBKDF2" key type is used to contain the parameters necessary to
+   derive a cipher key from a password.  The following parameters are
+   defined:
 
-6.1.1.  'S' Parameter
+6.1.1.  's' Parameter
 
-   The REQUIRED "S" parameter contains the PBKDF2 salt value (S), as a
+   The REQUIRED "s" parameter contains the PBKDF2 salt value (S), as a
    base64url encoded string (per [RFC4686]).  This value MUST NOT be the
    empty string "".
 
@@ -501,9 +501,9 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-Miller                  Expires August 03, 2013                 [Page 9]
+Miller                  Expires August 05, 2013                 [Page 9]
 
-Internet-Draft             JWE Protected JWK                January 2013
+Internet-Draft             JWE Protected JWK               February 2013
 
 
 6.1.2.  'c' Parameter
@@ -513,8 +513,8 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 6.2.  PBES2 Key Encryption Algorithms
 
-   The "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" [JOSE-JWE]
-   algorithms are used to encrypt a JWE Content Master Key using a user-
+   The "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" algorithms defined
+   below are used to encrypt a JWE Content Master Key using a user-
    supplied password to derive the key encryption key.  With these
    algorithms, the derived key is used to encrypt the JWE Content Master
    Key.  These algorithms combine a key derivation function with an
@@ -525,7 +525,7 @@ Internet-Draft             JWE Protected JWK                January 2013
 
    The "PBES2-HS256+A128KW" algorithm uses "HMAC-SHA256" as the PRF and
    "AES128-WRAP" as defined in [RFC3394] for the encryption scheme.  The
-   salt (S) and iteration count (c) MUST be specified by the "S" and "c"
+   salt (S) and iteration count (c) MUST be specified by the "s" and "c"
    parameters (respectively) in the applicable "PBKDF2" JWK object.  The
    derived-key length (dkLen) is 16 octets.
 
@@ -533,7 +533,7 @@ Internet-Draft             JWE Protected JWK                January 2013
 
    The "PBES2-HS512+A256KW" algorithm uses "HMAC-SHA512" as the PRF "and
    "AES256-WRAP" as defined in [RFC3394] for the encryption scheme.  The
-   salt (S) and iteration count (c) MUST be specified by the "S" and "c"
+   salt (S) and iteration count (c) MUST be specified by the "s" and "c"
    parameters (respectively) in the applicable "PBKDF2" JWK object.  The
    derived-key length (dkLen) is 32 octets.
 
@@ -557,14 +557,14 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-Miller                  Expires August 03, 2013                [Page 10]
+Miller                  Expires August 05, 2013                [Page 10]
 
-Internet-Draft             JWE Protected JWK                January 2013
+Internet-Draft             JWE Protected JWK               February 2013
 
 
 7.2.  JSON Web Key Parameters Registration
 
-   o  Parameter Name: "S"
+   o  Parameter Name: "s"
 
 
    o  Change Controller: IETF
@@ -613,20 +613,20 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-Miller                  Expires August 03, 2013                [Page 11]
+Miller                  Expires August 05, 2013                [Page 11]
 
-Internet-Draft             JWE Protected JWK                January 2013
+Internet-Draft             JWE Protected JWK               February 2013
 
 
 8.  Security Considerations
 
 8.1.  Re-using Keying Material
 
-   It is NOT RECOMMENDED to re-use all of the same keying material (Key
+   It is NOT RECOMMENDED to re-use the same keying material (Key
    Encryption Key, Content Master Key, Initialization Vector, etc) to
    protect multiple JWK objects, or to protect the same JWK object
-   multiple times.  When using "PBES2-HS245+A128KW" or
-   "PBES2-HS512+A256KW", implmentations MUST NOT use the same Key
+   multiple times.  When using "PBES2-HS256+A128KW" or
+   "PBES2-HS512+A256KW", implementations MUST NOT use the same Key
    Encryption Key for a given password, and SHOULD take steps to prevent
    the same Key Encryption Key being used by different passwords.
 
@@ -640,15 +640,15 @@ Internet-Draft             JWE Protected JWK                January 2013
 8.3.  Password Considerations
 
    While convenient for end users, passwords have many drawbacks.  To
-   help mitigate these limitations, this document applies principals
+   help mitigate these limitations, this document applies principles
    from [RFC2898] to derive cryptographic keys from user-supplied
    passwords.
 
-   The salt expands the possibly keys that can be derived from a given
-   password.  [RFC2898] originally recommended a minimum slat length of
-   8 octets (since there is no concern here of a derived key re-used for
-   different purposes).  The salt MUST be generated randomly; see
-   [RFC4086] for considerations on generating random values.
+   The salt expands the possible keys that can be derived from a given
+   password.  [RFC2898] originally recommended a minimum salt length of
+   8 octets (since there is no concern here of a derived key being re-
+   used for different purposes).  The salt MUST be generated randomly;
+   see [RFC4086] for considerations on generating random values.
 
    The iteration count adds computational expense, ideally compounded by
    the possible range of keys introduced by the salt.  [RFC2898]
@@ -669,9 +669,9 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 
 
-Miller                  Expires August 03, 2013                [Page 12]
+Miller                  Expires August 05, 2013                [Page 12]
 
-Internet-Draft             JWE Protected JWK                January 2013
+Internet-Draft             JWE Protected JWK               February 2013
 
 
    user-supplied password before performing key derivation and
@@ -681,21 +681,17 @@ Internet-Draft             JWE Protected JWK                January 2013
 
 10.1.  Normative References
 
-   [JOSE-JWA]
-              Jones, M., "JSON Web Algorithms (JWA)", draft-ietf-jose-
+   [JWA]      Jones, M., "JSON Web Algorithms (JWA)", draft-ietf-jose-
               json-web-algorithms-08 (work in progress), December 2012.
 
-   [JOSE-JWE]
-              Jones, M., Rescola, E., and J. Hildebrand, "JSON Web
+   [JWE]      Jones, M., Rescola, E., and J. Hildebrand, "JSON Web
               Encryption (JWE)", draft-ietf-jose-json-web-encryption-08
               (work in progress), December 2012.
 
-   [JOSE-JWK]
-              Jones, M., "JSON Web Key (JWK)", draft-ietf-jose-json-web-
+   [JWK]      Jones, M., "JSON Web Key (JWK)", draft-ietf-jose-json-web-
               key-08 (work in progress), December 2012.
 
-   [JOSE-PRIVKEY]
-              Jones, M., "JSON Private and Symmetric Key", draft-jones-
+   [JPSK]     Jones, M., "JSON Private and Symmetric Key", draft-jones-
               jose-json-private-and-symmetric-key-00 (work in progress),
               December 2012.
 
@@ -723,14 +719,16 @@ Internet-Draft             JWE Protected JWK                January 2013
    [RFC4949]  Shirey, R., "Internet Security Glossary, Version 2", RFC
               4949, August 2007.
 
-
-
-Miller                  Expires August 03, 2013                [Page 13]
-
-Internet-Draft             JWE Protected JWK                January 2013
-
-
 10.2.  Informative References
+
+
+
+
+
+Miller                  Expires August 05, 2013                [Page 13]
+
+Internet-Draft             JWE Protected JWK               February 2013
+
 
    [AES]      National Institute of Standards and Technology (NIST),
               "Advanced Encryption Standard (AES)", FIPS PUB 197,
@@ -742,6 +740,12 @@ Internet-Draft             JWE Protected JWK                January 2013
 
    [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
               (TLS) Protocol Version 1.2", RFC 5246, August 2008.
+
+Appendix A.  Acknowledgements
+
+Appendix B.  Document History
+
+   -00  Initial revision
 
 Author's Address
 
@@ -776,8 +780,4 @@ Author's Address
 
 
 
-
-
-
-
-Miller                  Expires August 03, 2013                [Page 14]
+Miller                  Expires August 05, 2013                [Page 14]

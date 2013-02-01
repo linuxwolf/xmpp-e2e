@@ -22,7 +22,7 @@
         <email>mamille2@cisco.com</email>
       </address>
     </author>
-    <date month="January" day="25" year="2013"/>
+    <date month="February" day="1" year="2013"/>
     <area>Security</area>
     <keyword>Internet-Draft</keyword>
     <keyword>JOSE</keyword>
@@ -32,11 +32,11 @@
   </front>
   <middle>
     <section title="Introduction" anchor="intro">
-      <t>There are times when it is necessary for transporting or exchanging a private or symmetric key, but the transport mechanism might not provide adequate content protection for the key. For instance, end-to-end scenarios where the key holder and key recipient are linked through multiple network hops that might or might not employ transport layer security (TLS, <xref target="RFC5246"/>), or exchange of a key using physical media such as a USB drive that itself is not encrypted.</t>
-      <t>This document specifies an approach that uses <xref target="JOSE-JWE"/> to encryt a private or symmetric key which is formatted as <xref target="JOSE-JWK"/>. This document also specifies and registers JSON Web Key formats and JSON Web Encryption algorithms based on <xref target="RFC2898"/> that allow for protecting keys using a password.</t>
+      <t>There are times when it is necessary to transport or exchange a private or symmetric key, but the transport mechanism might not provide adequate content protection for the key. For instance, end-to-end scenarios where the key holder and key recipient are linked through multiple network hops that might or might not employ transport layer security (TLS, <xref target="RFC5246"/>), nor might exchange of a key using physical media such as a USB drive that itself is not encrypted.</t>
+      <t>This document specifies an approach that uses <xref target="JWE"/> to encrypt a private or symmetric key that is formatted as <xref target="JWK"/>. This document also specifies and registers JSON Web Key formats and JSON Web Encryption algorithms based on <xref target="RFC2898"/> that allow for protecting keys using a password.</t>
     </section>
     <section title="Terminology" anchor="terms">
-      <t>This document inherits JSON Web Algorithms (JWA)-related terminology from <xref target="JOSE-JWA"/>, JSON Web Encryption (JWE)-related terminology from <xref target="JOSE-JWE"/>, JSON Web Key (JWK)-related terminology from <xref target="JOSE-JWK"/>, and password-based cryptography-related terminology from <xref target="RFC2898"/>.  Security-related terms are to be understood in the sense defined in <xref target="RFC4949"/>.</t>
+      <t>This document inherits JSON Web Algorithms (JWA)-related terminology from <xref target="JWA"/>, JSON Web Encryption (JWE)-related terminology from <xref target="JWE"/>, JSON Web Key (JWK)-related terminology from <xref target="JWK"/>, and password-based cryptography-related terminology from <xref target="RFC2898"/>.  Security-related terms are to be understood in the sense defined in <xref target="RFC4949"/>.</t>
       <t>The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
     </section>
     <section title="Protecting Keys" anchor="protect">
@@ -44,16 +44,16 @@
       <t>To protect a key, the key holder performs the following steps:<vspace blankLines="1"/>
         <list style="numbers">
           <t>Converts the JWK object to a UTF-8 encoded string (K').<vspace blankLines="1"/></t>
-          <t>Performs the message encryption steps from <xref target="JOSE-JWE"/> to generate the JWE header H, JWE Encrypted Key E, JWE Initialization Vector IV, JWE Ciphertext C, and JWE Integrity Value I, using the following inputs:<vspace blankLines="1"/>
+          <t>Performs the message encryption steps from <xref target="JWE"/> to generate the JWE header H, JWE Encrypted Key E, JWE Initialization Vector IV, JWE Ciphertext C, and JWE Integrity Value I, using the following inputs:<vspace blankLines="1"/>
             <list style="symbols">
-              <t>The 'alg' property set to the intented key encryption algorithm (e.g. "RSA-OAEP", or "PBES2-HS512+A256KW" from below).<vspace blankLines="1"/></t>
+              <t>The 'alg' property set to the intended key encryption algorithm (e.g. "RSA-OAEP", or "PBES2-HS512+A256KW" from below).<vspace blankLines="1"/></t>
               <t>Keying material appropriate for the selected key encryption algorithm  (e.g. private key for "RSA-OAEP", or shared password, salt, and iteration count for "PBES2-HS512+A256KW").<vspace blankLines="1"/></t>
               <t>The 'enc' property set to the intended content encryption algorithm (e.g. "A256GCM" or "A256CBC+HS512").<vspace blankLines="1"/></t>
               <t>Keying material appropriate for the selected content encryption algorithm (e.g. Content Encryption Key and Initialization Vector).<vspace blankLines="1"/></t>
               <t>K' as the plaintext content to encrypt.</t>
             </list>
           </t>
-          <t>Serializes to the appriopriate format for exchange, such as the Compact Serialization documented in <xref target="JOSE-JWE"/>.<vspace blankLines="1"/></t>
+          <t>Serializes to the appropriate format for exchange, such as the Compact Serialization documented in <xref target="JWE"/>.<vspace blankLines="1"/></t>
         </list>
       </t>
       <section title="Details for Private Keys" anchor="protect-private">
@@ -61,12 +61,12 @@
       </section>
       <section title="Details for Symmetric Keys" anchor="protect-symmetric">
         <t>Symmetric keys are typically protected using public-private key pairs. It is assumed the key holder has the appropriate public key(s) for the key recipient(s).</t>
-        <t>The process defined herein expects JWK objects. While more compact to simply encrypt the symmetric key directly with a public key, using the complete JWE process around content JWK objects allows additional properties to be protected (e.g. expected lifetime, acceptable uses) without exceeding the input limits inherent in most public-private key operations.</t>
+        <t>The process defined herein expects JWK objects. While more compact to simply encrypt the symmetric key directly with a public key, using the complete JWE process on complete content JWK objects allows additional properties to be protected (e.g. expected lifetime, acceptable uses) without exceeding the input limits inherent in most public-private key operations.</t>
       </section>
     </section>
     <section title="Private Key Example" anchor="example-privkey">
-      <t>NOTE: unless otherwise indiciated, all line breaks are included for readability.</t>
-      <t>The key holder begins with the <xref target="JOSE-JWK"/> representation of the private key (here using a <xref target="RFC3447"/> RSA private key, formatted per <xref target="JOSE-PRIVKEY"/>):</t>
+      <t>NOTE: unless otherwise indicated, all line breaks are included for readability.</t>
+      <t>The key holder begins with the <xref target="JWK"/> representation of the private key (here using a <xref target="RFC3447"/> RSA private key, formatted per <xref target="JPSK"/>):</t>
       <t>
         <figure>
           <artwork><![CDATA[
@@ -113,7 +113,7 @@
           ]]></artwork>
         </figure>
       </t>
-      <t>The key holder uses the following <xref target="JOSE-JWE"/> inputs:<vspace blankLines="1"/></t>
+      <t>The key holder uses the following <xref target="JWE"/> inputs:<vspace blankLines="1"/></t>
       <t>
           <figure>
             <preamble>JWE Header:</preamble>
@@ -123,7 +123,7 @@
   "enc":"A128CBC+HS256",
   "jwk":{
     "kty":"PBKDF2",
-    "S":"2WCTcJZ1Rvd_CJuJripQ1w",
+    "s":"2WCTcJZ1Rvd_CJuJripQ1w",
     "c":4096
   }
 }
@@ -158,7 +158,7 @@ B9BVK3hIsEu9zUOWjKeOSg
         </figure>
         <vspace blankLines="1"/>
       </t>
-      <t>The key holder performs steps 1 and 2 to generate the <xref target="JOSE-JWE"/> outputs (represented using the Compact Serialization):<vspace blankLines="1"/></t>
+      <t>The key holder performs steps 1 and 2 to generate the <xref target="JWE"/> outputs (represented using the Compact Serialization):<vspace blankLines="1"/></t>
       <t>
         <figure>
           <artwork><![CDATA[
@@ -210,8 +210,8 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
       </t>
     </section>
     <section title="Symmetric Key Example" anchor="protect-example-symm">
-      <t>NOTE: unless otherwise indiciated, all line breaks are included for readability.</t>
-      <t>The key holder begins with the <xref target="JOSE-JWK"/> representation of the symmetric key (here using a <xref target="AES"/> 128-bit key, formatted as per <xref target="JOSE-PRIVKEY"/>):</t>
+      <t>NOTE: unless otherwise indicated, all line breaks are included for readability.</t>
+      <t>The key holder begins with the <xref target="JWK"/> representation of the symmetric key (here using a <xref target="AES"/> 128-bit key, formatted as per <xref target="JPSK"/>):</t>
       <t>
         <figure>
           <artwork><![CDATA[
@@ -223,7 +223,7 @@ big8BFT-dXJqoKGScpLk0ssjuyWn7fxDvJc7AN7ONPw
           ]]></artwork>
         </figure>
       </t>
-      <t>The key holder uses the following <xref target="JOSE-JWE"/> inputs:</t>
+      <t>The key holder uses the following <xref target="JWE"/> inputs:</t>
       <t>
         <figure>
           <preamble>JWE Header:</preamble>
@@ -265,7 +265,7 @@ _dYbckd_xuJUBUNsxkT9yw
           </figure>
         <vspace blankLines="1"/>
       </t>
-      <t>The key holder performs steps 1 and 2 to generate the <xref target="JOSE-JWE"/> outputs (represented using the Compact Serialization):<vspace blankLines="1"/></t>
+      <t>The key holder performs steps 1 and 2 to generate the <xref target="JWE"/> outputs (represented using the Compact Serialization):<vspace blankLines="1"/></t>
       <t>
         <figure>
           <artwork><![CDATA[
@@ -311,23 +311,23 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
       </t>
     </section>
     <section title="Using Password-Based Cryptography" anchor="pbcrypto">
-      <t>There are often times when a key is exchanged through immediate human interaction. To help facilitate such exchanges, a number of password-based cryptography schemes utilizing <xref target="RFC2898"/> are defined to supplement the key format, agreement, and encryption algorithms from <xref target='JOSE-JWA'/>.</t>
+      <t>There are often times when a key is exchanged through immediate human interaction. To help facilitate such exchanges, a number of password-based cryptography schemes utilizing <xref target="RFC2898"/> are defined to supplement the key format, agreement, and encryption algorithms from <xref target="JWA"/>.</t>
       <section title="PBKDF2 Key Type" anchor="pbcrypto-pbkdf2-jwk">
-        <t>The "PBKDF2" <xref target="JOSE-JWK"/> type is used to contain the parameters necessary to derive a cipher key from a password. The following parameters are defined:</t>
-        <section title="'S' Parameter" anchor="pbcrypto-pbkdf2-jwk-S">
-          <t>The REQUIRED "S" parameter contains the PBKDF2 salt value (S), as a base64url encoded string (per <xref target="RFC4686"/>). This value MUST NOT be the empty string "".</t>
+        <t>The "PBKDF2" key type is used to contain the parameters necessary to derive a cipher key from a password. The following parameters are defined:</t>
+        <section title="'s' Parameter" anchor="pbcrypto-pbkdf2-jwk-S">
+          <t>The REQUIRED "s" parameter contains the PBKDF2 salt value (S), as a base64url encoded string (per <xref target="RFC4686"/>). This value MUST NOT be the empty string "".</t>
         </section>
         <section title="'c' Parameter" anchor="pbcrypto-pbkdf2-jwk-c">
           <t>The REQUIRED "c" parameter contains the PBKDF2 iteration count (c), as an integer. This value MUST NOT be less than 1, as per <xref target="RFC2898"/>.</t>
         </section>
       </section>
       <section title="PBES2 Key Encryption Algorithms" anchor="pbcrypto-pbes2-jwe">
-        <t>The "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" <xref target="JOSE-JWE"/> algorithms are used to encrypt a JWE Content Master Key using a user-supplied password to derive the key encryption key. With these algorithms, the derived key is used to encrypt the JWE Content Master Key. These algorithms combine a key derivation function with an encryption scheme to encrypt the JWE Content Master Key according to PBES2 from section 6.2 of <xref target="RFC2898"/>.</t>
+        <t>The "PBES2-HS256+A128KW" and "PBES2-HS512+A256KW" algorithms defined below are used to encrypt a JWE Content Master Key using a user-supplied password to derive the key encryption key. With these algorithms, the derived key is used to encrypt the JWE Content Master Key. These algorithms combine a key derivation function with an encryption scheme to encrypt the JWE Content Master Key according to PBES2 from section 6.2 of <xref target="RFC2898"/>.</t>
         <section title="PBES2-HS256+A128KW" anchor="pbcrypto-pbes2-jwe-hs256-a128kw">
-          <t>The "PBES2-HS256+A128KW" algorithm uses "HMAC-SHA256" as the PRF and "AES128-WRAP" as defined in <xref target="RFC3394"/> for the encryption scheme. The salt (S) and iteration count (c) MUST be specified by the "S" and "c" parameters (respectively) in the applicable "PBKDF2" JWK object. The derived-key length (dkLen) is 16 octets.</t>
+          <t>The "PBES2-HS256+A128KW" algorithm uses "HMAC-SHA256" as the PRF and "AES128-WRAP" as defined in <xref target="RFC3394"/> for the encryption scheme. The salt (S) and iteration count (c) MUST be specified by the "s" and "c" parameters (respectively) in the applicable "PBKDF2" JWK object. The derived-key length (dkLen) is 16 octets.</t>
         </section>
         <section title="PBES2-HS512+A256KW" anchor="pbcrypto-pbes2-jwe-hs512-a256kw">
-          <t>The "PBES2-HS512+A256KW" algorithm uses "HMAC-SHA512" as the PRF "and "AES256-WRAP" as defined in <xref target="RFC3394"/> for the encryption scheme. The salt (S) and iteration count (c) MUST be specified by the "S" and "c" parameters (respectively) in the applicable "PBKDF2" JWK object. The derived-key length (dkLen) is 32 octets.</t>
+          <t>The "PBES2-HS512+A256KW" algorithm uses "HMAC-SHA512" as the PRF "and "AES256-WRAP" as defined in <xref target="RFC3394"/> for the encryption scheme. The salt (S) and iteration count (c) MUST be specified by the "s" and "c" parameters (respectively) in the applicable "PBKDF2" JWK object. The derived-key length (dkLen) is 32 octets.</t>
         </section>
       </section>
     </section>
@@ -345,7 +345,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
       <section title="JSON Web Key Parameters Registration" anchor="iana-jwk-params">
         <t>
           <list style="symbols">
-            <t>Parameter Name: "S"<vspace blankLines="1"/></t>
+            <t>Parameter Name: "s"<vspace blankLines="1"/></t>
             <t>Change Controller: IETF<vspace blankLines="1"/></t>
             <t>Specification Document(s): <xref target="pbcrypto-pbkdf2-jwk-S"/> of [[ this document ]]<vspace blankLines="1"/></t>
           </list>
@@ -381,14 +381,14 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
     </section>
     <section title="Security Considerations" anchor="security">
       <section title="Re-using Keying Material" anchor="security-reuse">
-        <t>It is NOT RECOMMENDED to re-use all of the same keying material (Key Encryption Key, Content Master Key, Initialization Vector, etc) to protect multiple JWK objects, or to protect the same JWK object multiple times. When using "PBES2-HS245+A128KW" or "PBES2-HS512+A256KW", implmentations MUST NOT use the same Key Encryption Key for a given password, and SHOULD take steps to prevent the same Key Encryption Key being used by different passwords.</t>
+        <t>It is NOT RECOMMENDED to re-use the same keying material (Key Encryption Key, Content Master Key, Initialization Vector, etc) to protect multiple JWK objects, or to protect the same JWK object multiple times. When using "PBES2-HS256+A128KW" or "PBES2-HS512+A256KW", implementations MUST NOT use the same Key Encryption Key for a given password, and SHOULD take steps to prevent the same Key Encryption Key being used by different passwords.</t>
       </section>
       <section title="Lifetime of Protected Keys" anchor="security-store">
         <t>Depending on the application, a protected JWK could potentially be stored for an indefinite time, anywhere from milliseconds (e.g. broadcasted over a computer network) to years (e.g. stored as a file).</t>
       </section>
       <section title="Password Considerations" anchor="security-pwd">
-        <t>While convenient for end users, passwords have many drawbacks. To help mitigate these limitations, this document applies principals from <xref target="RFC2898"/> to derive cryptographic keys from user-supplied passwords.</t>
-        <t>The salt expands the possibly keys that can be derived from a given password. <xref target="RFC2898"/> originally recommended a minimum slat length of 8 octets (since there is no concern here of a derived key re-used for different purposes). The salt MUST be generated randomly; see <xref target="RFC4086"/> for considerations on generating random values.</t>
+        <t>While convenient for end users, passwords have many drawbacks. To help mitigate these limitations, this document applies principles from <xref target="RFC2898"/> to derive cryptographic keys from user-supplied passwords.</t>
+        <t>The salt expands the possible keys that can be derived from a given password. <xref target="RFC2898"/> originally recommended a minimum salt length of 8 octets (since there is no concern here of a derived key being re-used for different purposes). The salt MUST be generated randomly; see <xref target="RFC4086"/> for considerations on generating random values.</t>
         <t>The iteration count adds computational expense, ideally compounded by the possible range of keys introduced by the salt. <xref target="RFC2898"/> originally recommended a minimum iteration count of 1000.</t>
         <t>An ideal password is one that is as large (or larger) than the derived key length but less than the PRF's block size. For "PBES2-HS256+A128KW", the ideal password is between 16 and 64 octets long; for "PBES2-HS512+A256KW", the ideal password is between 32 and 128 octets long.</t>
       </section>
@@ -399,7 +399,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
   </middle>
   <back>
     <references title="Normative References">
-      <reference anchor="JOSE-JWA">
+      <reference anchor="JWA">
         <front>
           <title>JSON Web Algorithms (JWA)</title>
           <author initials="M." surname="Jones" fullname="Michael B. Jones">
@@ -413,7 +413,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
         <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-algorithms-08"/>
         <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-algorithms-08.txt"/>
       </reference>
-      <reference anchor="JOSE-JWE">
+      <reference anchor="JWE">
         <front>
           <title>JSON Web Encryption (JWE)</title>
           <author initials="M." surname="Jones" fullname="Michael B. Jones">
@@ -439,7 +439,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
         <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-encryption-08"/>
         <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-encryption-08.txt"/>
       </reference>
-      <reference anchor="JOSE-JWK">
+      <reference anchor="JWK">
         <front>
           <title>JSON Web Key (JWK)</title>
           <author initials="M." surname="Jones" fullname="Michael B. Jones">
@@ -453,7 +453,7 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
         <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-key-08"/>
         <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-key-08.txt"/>
       </reference>
-      <reference anchor="JOSE-PRIVKEY">
+      <reference anchor="JPSK">
         <front>
           <title>JSON Private and Symmetric Key</title>
           <author initials="M." surname="Jones" fullname="Michael B. Jones">
@@ -637,5 +637,14 @@ PnWwSPZ6TWOHKQwCIIt1HcCLhXof1j4frx2IcLXjIQ0
         <format type="TXT" target="http://www.ietf.org/rfc/rfc5246"/>
       </reference>
     </references>
+    <section title="Acknowledgements" anchor="acknowledgements">
+    </section>
+    <section title="Document History" anchor="history">
+      <t>
+        <list style="hanging">
+          <t hangText="-00">Initial revision</t>
+        </list>
+      </t>
+    </section>
   </back>
 </rfc>
