@@ -22,7 +22,7 @@
         <email>mamille2@cisco.com</email>
       </address>
     </author>
-    <date month="January" day="10" year="2013"/>
+    <date month="February" day="18" year="2013"/>
     <area>RAI</area>
     <keyword>Internet-Draft</keyword>
     <keyword>XMPP</keyword>
@@ -42,7 +42,7 @@
       <t>The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
     </section>
     <section title="Determining Support" anchor="disco">
-      <t>If an agent supports end-to-end object encryption, it MUST advertiset that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:4".
+      <t>If an agent supports end-to-end object encryption, it MUST advertiset that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:5".
         <figure>
           <artwork><![CDATA[
 <iq xmlns='jabber:client'
@@ -51,7 +51,7 @@
     type='result'>
   <query xmlns='http://jabber.org/protocol/disco#info'>
     ...
-    <feature xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'/>
+    <feature xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'/>
     ...
   </query>
 </iq>
@@ -96,14 +96,14 @@
               <t>M' as the plaintext content to encrypt.<vspace blankLines="1"/></t>  
             </list>
           </t>
-          <t>Constructs an &lt;e2e/&gt; element qualified by the  "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace as follows:<vspace blankLines="1"/>
+          <t>Constructs an &lt;e2e/&gt; element qualified by the  "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the identifier value SID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character as E, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;iv/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character as IV, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as C, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;mac/&gt; qualified by the "urn"ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as I, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character as E, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;iv/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character as IV, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as C, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;mac/&gt; qualified by the "urn"ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as I, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;e2e/&gt; element as the payload of a stanza that SHOULD match the stanza from step 1 in kind (e.g., &lt;message/&gt;), type (e.g., "chat"), and addressing (e.g. to="romeo@montague.net" from="juliet@capulet.net/balcony"). If the original stanza (S) has a value for the "id" attribute, this stanza MUST NOT use the same value for its "id" attribute.<vspace blankLines="1"/></t>
@@ -134,7 +134,7 @@
           <list style="symbols">
             <t>Sender JID as "juliet@capulet.lit/balcony"<vspace blankLines="1"/></t>
             <t>Recipient JID as "romeo@montegue.lit"<vspace blankLines="1"/></t>
-            <t>Session Master Key 'SMK' as (base64 encoded) "xWtdjhYsH4Va_9SfYSefsJfZu03m5RrbXo_UavxxeU8=" <vspace blankLines="1"/></t>
+            <t>Session Master Key 'SMK' as (base64 encoded) "xWtdjhYsH4Va_9SfYSefsJfZu03m5RrbXo_UavxxeU8"<vspace blankLines="1"/></t>
             <t>SMK identifier SID as "835c92a8-94cd-4e96-b3f3-b2e75a438f92"<vspace blankLines="1"/></t>
           </list>
         </t>
@@ -160,13 +160,13 @@
 </forwarded>
           ]]></artwork>
         </figure>
-        <t>Then the sending agent performs steps 4 through 7 (with Content Master Key as "-ElMo6FndEkMxWP3TIkp1dDfVKqmqAAgrlcvVnUVpOc=", base64 encoded) to generate the <xref target="JOSE-JWE"/> outputs:</t>
+        <t>Then the sending agent performs steps 4 through 7 (with Content Master Key as "upIjc_ePSomSETgi0DEnXsoT8ZEGf0QxsSHr_eDZRnlkJAJBFyenb6tm1WDAoqFD7-BHBtWqO5hOJlj2oxlDwQ", base64url encoded) to generate the <xref target="JOSE-JWE"/> outputs:</t>
         <figure>
           <preamble>JWE Header</preamble>
           <artwork><![CDATA[
 {
   "alg":"A256KW",
-  "enc":"A256CCM",
+  "enc":"A256CBC+HS512",
   "kid":"835c92a8-94cd-4e96-b3f3-b2e75a438f92"
 }
           ]]></artwork>
@@ -174,7 +174,8 @@
         <figure>
           <preamble>JWE Content Encryption Key</preamble>
           <artwork><![CDATA[
-XvySjpkqv6m-hUrG2VSEwIM9wZqVcdP037trOMpqFbK_i2AvHLqiNA
+4ui5xwE1gEYjuptNgSIaMFlwWrAOxMqBkaplTxeJ6b2iT8kQP2HHy5PYpqqmDxl
+QgT5I5rO9mgAD7AUJ9Lx35fGdi5CMiRww
           ]]></artwork>
         </figure>
         <figure>
@@ -186,20 +187,26 @@ B7waCj2vF_sLaJfe-1GHrA
         <figure>
           <preamble>JWE Ciphertext</preamble>
           <artwork><![CDATA[
-7LlMXd-qqPAQ_LZm6u9AR2csyDgT09z5DWdn8K5GLr_qbWRDKw2ufZrmO9YZ-jHl
-1IDeXeQ9azbNNViv8gpa-prDYkXOo3QoqYOJiA0RAkPU-UjN41wqqVvV62gad_OB
-Dd9q2xsNnK1PI5frIGTCZSexOIeSD3EcP0cDI_0MzMEKqpVnPbYQDkWQNrtxPs2b
-lE15KcQXbHVxA9rEz7y0a-ITXruV_fOXGftkRVDuiF1yVh2xNRPa-TQxDegZh1D_
-u_c2mwPLO6ED_1ZlvL7075_VL0DT01YGtDDQeyzrQWnQNEBJ4G5jFpCyqtCszbgx
-9kjWjxLYNLLGxbMOtwF45OLCd8JFUIQAHoLeKp4aIWr5yp7aATX8dKvQm5_TFICt
-nLonaM1e5mRPnRgg5zNeMErx6FFkqowOI1h7hVl_QHF8Ofoy99CmWKiVT3Nq5ngL
-74Xm4CtiJMHnAEn2Q-10-fWuIHIEA0u4GwBaXo0ToBw4uCM4ZhG1SFSKyCKkjXmr
-7TL-5jwSuuQHX6efS8Hhi7fujmqw9VXekeubsY2btl5put0SWT8_0S8ZBDMjrkXj
-y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
-93Fr1nfFLNhXLCZYhZ7By6T9NN8omp4ZYE92HMpPzgo-eCGP
+UYbe-ziNGBL74581rynr9MWu0Ble_6M5LFCH9xOYXgALtlDih28Ilmf-Rs68uaZ
+sOND-7Ii9zK4H4XBwJjxaUlDGChZPWdwotRZdQKt9ZLpiQmjkzrQgKVQqyexP6m
+qhfWRHutEKgs6vR32O2P98J-4LAWoUza5qYCZHP5NCogLUBVKi-v-vGpHDKBG_S
+w3ejHSXuZOEZtyXShL2d6EXOhEzft8ViaTUKhiBCLz1q39hI5TsPdS7NPHGQDUX
+Db_gSw8yVCiJgxcSbfWJKj9v_zIZgxawZby6-qif7vTIizluirnSTRO-5-2xM_n
+sJEpG7ZOqofzp_WKLPkOQfa8roYGp61R5BK2M3q9LKM6y1XlMrtYFyPWH70bVPC
+S_kOMrrn_48G7zmPEl-2SZWrBj4llu0oPzO2EU4uh3ipb_xUwkPPQfTkwxEdcdl
+Cbi4FFIQtw81_7bPwZ3m799O_-aPspkk4uFn_cKayeN3XKf8T-i9pYPWYEOugGq
+GU3H0I-jfwvqt2K6GGctoXWD6-d56WFlLhv4v6qGPT5C30vO-xM22BU9nwc-rff
+4Q7cFBBM_7ciZrrTQf_PBjBhWS_pTYsmIUL-h7dwhcgQ1LEdgpqAWbZ23aMDWx-
+RSQSkRY6OlPYKkbrXUbXHWxlgb5B76eA
           ]]></artwork>
         </figure>
-        <t>NOTE: For CCM <xref target="RFC3610"/>, the integrity value is encoded as part of the ciphertext, therefore the resulting Integrity Value is an octet string of length 0.</t>
+        <figure>
+          <preamble>JWE Integrity Value</preamble>
+          <artwork><![CDATA[
+G5csTEYKIXipYM1Ey4_4JSUeHpgpd8lMvYxTHwPvSd7w916w0Q8VQekY1tz8VnA
+DJ751V6YiJ295_3jQUphxmQ
+          ]]></artwork>
+        </figure>
         <t>Then the sending agent performs steps 8 and 9, and sends the following:</t>
         <figure>
           <artwork><![CDATA[
@@ -208,35 +215,37 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>
-      eyJlbmMiOiJBMjU2Q0NNIiwiaXYiOiJCN3dhQ2oydkZfc0xhSmZlLTFHS
-      HJBPT0iLCJhZGF0YSI6IjQ5Mi0wNS0xMlQyMDowNzozNy4wMTJaIiwibX
-      NpemUiOiIxNiJ9
+      eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDK0hTNTEyIiwia2lkI
+      joiODM1YzkyYTgtOTRjZC00ZTk2LWIzZjMtYjJlNzVhNDM4ZjkyIn0
     </header>
     <cmk>
-      XvySjpkqv6m-hUrG2VSEwIM9wZqVcdP037trOMpqFbK_i2AvHLqiNA
+      4ui5xwE1gEYjuptNgSIaMFlwWrAOxMqBkaplTxeJ6b2iT8kQP2HHy5PYp
+      qqmDxlQgT5I5rO9mgAD7AUJ9Lx35fGdi5CMiRww
     </cmk>
     <iv>
       B7waCj2vF_sLaJfe-1GHrA
     </iv>
     <data>
-      7LlMXd-qqPAQ_LZm6u9AR2csyDgT09z5DWdn8K5GLr_qbWRDKw2ufZrmO
-      9YZ-jHl1IDeXeQ9azbNNViv8gpa-prDYkXOo3QoqYOJiA0RAkPU-UjN41
-      wqqVvV62gad_OBDd9q2xsNnK1PI5frIGTCZSexOIeSD3EcP0cDI_0MzME
-      KqpVnPbYQDkWQNrtxPs2blE15KcQXbHVxA9rEz7y0a-ITXruV_fOXGftk
-      RVDuiF1yVh2xNRPa-TQxDegZh1D_u_c2mwPLO6ED_1ZlvL7075_VL0DT0
-      1YGtDDQeyzrQWnQNEBJ4G5jFpCyqtCszbgx9kjWjxLYNLLGxbMOtwF45O
-      LCd8JFUIQAHoLeKp4aIWr5yp7aATX8dKvQm5_TFICtnLonaM1e5mRPnRg
-      g5zNeMErx6FFkqowOI1h7hVl_QHF8Ofoy99CmWKiVT3Nq5ngL74Xm4Cti
-      JMHnAEn2Q-10-fWuIHIEA0u4GwBaXo0ToBw4uCM4ZhG1SFSKyCKkjXmr7
-      TL-5jwSuuQHX6efS8Hhi7fujmqw9VXekeubsY2btl5put0SWT8_0S8ZBD
-      MjrkXjy7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_g
-      E_HalWUL0HoqL93Fr1nfFLNhXLCZYhZ7By6T9NN8omp4ZYE92HMpPzgo-
-      eCGP
+      UYbe-ziNGBL74581rynr9MWu0Ble_6M5LFCH9xOYXgALtlDih28Ilmf-R
+      s68uaZsOND-7Ii9zK4H4XBwJjxaUlDGChZPWdwotRZdQKt9ZLpiQmjkzr
+      QgKVQqyexP6mqhfWRHutEKgs6vR32O2P98J-4LAWoUza5qYCZHP5NCogL
+      UBVKi-v-vGpHDKBG_Sw3ejHSXuZOEZtyXShL2d6EXOhEzft8ViaTUKhiB
+      CLz1q39hI5TsPdS7NPHGQDUXDb_gSw8yVCiJgxcSbfWJKj9v_zIZgxawZ
+      by6-qif7vTIizluirnSTRO-5-2xM_nsJEpG7ZOqofzp_WKLPkOQfa8roY
+      Gp61R5BK2M3q9LKM6y1XlMrtYFyPWH70bVPCS_kOMrrn_48G7zmPEl-2S
+      ZWrBj4llu0oPzO2EU4uh3ipb_xUwkPPQfTkwxEdcdlCbi4FFIQtw81_7b
+      PwZ3m799O_-aPspkk4uFn_cKayeN3XKf8T-i9pYPWYEOugGqGU3H0I-jf
+      wvqt2K6GGctoXWD6-d56WFlLhv4v6qGPT5C30vO-xM22BU9nwc-rff4Q7
+      cFBBM_7ciZrrTQf_PBjBhWS_pTYsmIUL-h7dwhcgQ1LEdgpqAWbZ23aMD
+      Wx-RSQSkRY6OlPYKkbrXUbXHWxlgb5B76eA
     </data>
-    <mac/>
+    <mac>
+      G5csTEYKIXipYM1Ey4_4JSUeHpgpd8lMvYxTHwPvSd7w916w0Q8VQekY1
+      tz8VnADJ751V6YiJ295_3jQUphxmQ
+    </mac>
   </e2e>
 </message>
           ]]></artwork>
@@ -276,7 +285,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
     <data>[XML character data]</header>
@@ -285,7 +294,7 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
     <bad-request
         xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
     <insufficient-information
-        xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'/>
+        xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'/>
   </error>
 </message>
           ]]></artwork>
@@ -301,14 +310,14 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
     <data>[XML character data]</header>
   </e2e>
   <error type='modify'>
     <bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
-    <decryption-failed xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'/>
+    <decryption-failed xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'/>
   </error>
 </message>
           ]]></artwork>
@@ -324,14 +333,14 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
-  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
     <data>[XML character data]</header>
   </e2e>
   <error type='modify'>
     <bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
-    <bad-timestamp xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'/>
+    <bad-timestamp xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'/>
   </error>
 </message>
           ]]></artwork>
@@ -349,10 +358,10 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
         <t>To request a SMK, the receiving agent performs the following:<vspace blankLines="1"/>
         <list style="numbers">
           <t>Constructs a <xref target="JOSE-JWK"/> JWK Set (KS), containing information about each public key the requesting agent wishes to use.  Each key SHOULD include a value for the property 'kid' which uniquely identifies it within the context of all provided keys.  Each key MUST include a value for the property 'kid' if any two keys use the same algorithm.<vspace blankLines="1"/></t>
-          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace as follows:<vspace blankLines="1"/>
+          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the SMK identifier value SID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;pkey/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as KS, encoded base64url as pre <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;pkey/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as KS, encoded base64url as pre <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;keyreq/&gt; element as the payload of an &lt;iq/&gt; stanza with the attribute 'type' set to "get", the attribute 'to' set to the full JID of the original encrypted stanza's sender, and the attribute 'id' set to an opaque string value the receiving agent uses to track the &lt;iq/&gt; response.<vspace blankLines="1"/></t>
@@ -360,21 +369,35 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
         </t>
       </section>
       <section title="Accept Process" anchor="keyreq-process-accept">
-        <t>If the sending agent approves the request, it performs the following:<vspace blankLines="1"/>
+        <t>If the sending agent approves the request, it performs the following steps:<vspace blankLines="1"/>
         <list style="numbers">
+          <t>Generate a JSON Web Key (JWK) representing the SMK (according to <xref target="JOSE-JPSK"/>):<vspace blankLines="1"/>
+            <list style="symbols">
+              <t>The "kty" parameter MUST be "oct".<vspace blankLines="1"/></t>
+              <t>The "kid" parameter MUST be the SID.<vspace blankLines="1"/></t>
+              <t>The "k" parameter MUST be the SMK, encoded as base64url.<vspace blankLines="1"/></t>
+              <t>The "use" parameter, if present, MUST be set to the algorithm in use for encrypting messages from <xref target="encrypt"/>.<vspace blankLines="1"/></t>
+              <t>The "use" parameter, if present, MUST be set to "enc".<vspace blankLines="1"/></t>
+            </list>
+          </t>
           <t>Chooses a key (PK) from the keys provided via KS, and notes its identifier value 'kid'.<vspace blankLines="1"/></t>
-          <t>Constructs a parial <xref target="JOSE-JWE"/> header (H) as follows:<vspace blankLines="1"/>
-          <list style="symbols">
-            <t>The property 'alg' set to the cryptographic algorithm for PK, which is used to secure the content master key SMK.<vspace blankLines="1"/></t>
-            <t>The property 'kid' set to the identifier matching PK.<vspace blankLines="1"/></t>
-          </list>
-          <vspace blankLines="1"/></t>
-          <t>Encrypts the content master key SMK using the key PK, i.e. SMK' = pki-encrypt(PK, SMK).<vspace blankLines="1"/></t>
-          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace as follows:<vspace blankLines="1"/>
+          <t>Protects the SMK using the process outlined in <xref target="JOSE-KEYPROTECT"/>, using the encryption key PK and the content as SMK (formatted as JSON Web Key (JWK) according to <xref target="JOSE-JPSK"/>). The outputs are a JWE object:<vspace blankLines="1"/>
+            <list style="symbols">
+              <t>JWE Header (H) apprpriate for the protected SMK.<vspace blankLines="1"/></t>
+              <t>Encoded JWE Encrypted Content Key (E).<vspace blankLines="1"/></t>
+              <t>JWE Initialization Vector (IV).<vspace blankLines="1"/></t>
+              <t>JWE Ciphertext (M).<vspace blankLines="1"/></t>
+              <t>JWE Integrity Value (I).<vspace blankLines="1"/></t>
+            </list>
+          </t>
+          <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the SMK identifier SID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as SMK', encoded base64url as per <xref target='RFC4684'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as E, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;iv/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as IV, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as M, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;mac/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as I, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;keyreq/&gt; element as the payload of an &lt;iq/&gt; stanza with the attribute 'type' set to "result", the attribute 'to' set to the full JID from the request &lt;iq/&gt;'s 'from' attribute, and the attribute 'id' set to the value of the request &lt;iq/&gt;'s 'id' attribute.<vspace blankLines="1"/></t>
@@ -397,15 +420,15 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
           <artwork><![CDATA[
 {
   "keys": [{
-    "alg":"RSA-OAEP",
-    "mod":"vtqejkMF01h8oKEaHfHEYO0C2jM7eISbbSvNs0SNItYWO6GbjpJf
+    "kty":"RSA",
+    "kid":"romeo@montegue.lit/garden",
+    "n":"vtqejkMF01h8oKEaHfHEYO0C2jM7eISbbSvNs0SNItYWO6GbjpJf
     N4ldXw2vpVRdysnwU3zk6o2_SD0YCH1WgeuI0QK1knMTDdNSXx52e1c4BTw
     hlA8iHuutTWmpBqesn1GNZmqB3jYsJOkVBYwCJtkB9APaBvk0itlRtizjCf
     1HHnau7nGStyshgu8-srxi_d8rC5TTLSB_zT1i6fP8fwDloemXOtC0U65by
     5P-1ZHxaf_bD8fpjps6gwSgdkZKMJAI0bOWZWuMpp2ntqa0wLB7Ndxb2Ijr
-    eog_s5ssAoSiXDVdoswSbp36ZP-1lnCk2j-vZ4qbhaFg5bZtgt-gwQ==",
-    "exp":"AQAB",
-    "kid":"romeo@montegue.lit/garden"
+    eog_s5ssAoSiXDVdoswSbp36ZP-1lnCk2j-vZ4qbhaFg5bZtgt-gwQ",
+    "e":"AQAB"
   }]
 }
           ]]></artwork>
@@ -413,19 +436,19 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
         <t>Then the receiving agent performs step 2 to generate the &lt;keyreq/&gt;:</t>
         <figure>
           <artwork><![CDATA[
-<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
+<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
         id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
   <pkey>
-    W3siYWxnIjoiUlNBIiwibW9kIjoiQUw3YW5vNURCZE5ZZktDaEdoM3h4R0R
-    0QXRvek8zaUVtMjByemJORWpTTFdGanVobTQ2U1h6ZUpYVjhOcjZWVVhjck
-    o4Rk44NU9xTnYwZzlHQWg5Vm9IcmlORUN0Wkp6RXczVFVsOGVkbnRYT0FVO
-    ElaUVBJaDdyclUxcHFRYW5ySjlSaldacWdkNDJMQ1RwRlFXTUFpYlpBZlFE
-    MmdiNU5JclpVYllzNHduOVJ4NTJydTV4a3JjcklZTHZQcks4WXYzZkt3dVU
-    weTBnZjgwOVl1bnpfSDhBNWFIcGx6clF0Rk91Vzh1VF90V1I4V25fMndfSD
-    ZZNmJPb01Fb0haR1NqQ1FDTkd6bG1WcmpLYWRwN2FtdE1Dd2V6WGNXOWlJN
-    jNxSVA3T2JMQUtFb2x3MVhhTE1FbTZkLW1UX3RaWndwTm9fcjJlS200V2hZ
-    T1cyYllMZm9NRT0iLCJleHAiOiJBUUFCIiwia2lkIjoicm9tZW9AbW9udGV
-    ndWUubGl0L2dhcmRlbiJ9XQ==
+    eyJrZXlzIjpbeyJrdHkiOiJSU0EiLCJraWQiOiJyb21lb0Btb250ZWd1ZS5
+    saXQvZ2FyZGVuIiwibiI6InZ0cWVqa01GMDFoOG9LRWFIZkhFWU8wQzJqTT
+    dlSVNiYlN2TnMwU05JdFlXTzZHYmpwSmZONGxkWHcydnBWUmR5c253VTN6a
+    zZvMl9TRDBZQ0gxV2dldUkwUUsxa25NVERkTlNYeDUyZTFjNEJUd2hsQThp
+    SHV1dFRXbXBCcWVzbjFHTlptcUIzallzSk9rVkJZd0NKdGtCOUFQYUJ2azB
+    pdGxSdGl6akNmMUhIbmF1N25HU3R5c2hndTgtc3J4aV9kOHJDNVRUTFNCX3
+    pUMWk2ZlA4ZndEbG9lbVhPdEMwVTY1Ynk1UC0xWkh4YWZfYkQ4ZnBqcHM2Z
+    3dTZ2RrWktNSkFJMGJPV1pXdU1wcDJudHFhMHdMQjdOZHhiMklqcmVvZ19z
+    NXNzQW9TaVhEVmRvc3dTYnAzNlpQLTFsbkNrMmotdlo0cWJoYUZnNWJadGd
+    0LWd3USIsImUiOiJBUUFCIn1dfQ
   </pkey>
 </keyreq>
           ]]></artwork>
@@ -438,61 +461,106 @@ y7iI5NUOhQMms3ou1r01NZdzNVKcqiX5q3z1eB1FLWmGymnnj_gE_HalWUL0HoqL
     id='xdJbWMA+'
     to='juliet@capulet.lit/balcony'
     type='get'>
-  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
+  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
           id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <pkey>
-      W3siYWxnIjoiUlNBIiwibW9kIjoiQUw3YW5vNURCZE5ZZktDaEdoM3h4R
-      0R0QXRvek8zaUVtMjByemJORWpTTFdGanVobTQ2U1h6ZUpYVjhOcjZWVV
-      hjcko4Rk44NU9xTnYwZzlHQWg5Vm9IcmlORUN0Wkp6RXczVFVsOGVkbnR
-      YT0FVOElaUVBJaDdyclUxcHFRYW5ySjlSaldacWdkNDJMQ1RwRlFXTUFp
-      YlpBZlFEMmdiNU5JclpVYllzNHduOVJ4NTJydTV4a3JjcklZTHZQcks4W
-      XYzZkt3dVUweTBnZjgwOVl1bnpfSDhBNWFIcGx6clF0Rk91Vzh1VF90V1
-      I4V25fMndfSDZZNmJPb01Fb0haR1NqQ1FDTkd6bG1WcmpLYWRwN2FtdE1
-      Dd2V6WGNXOWlJNjNxSVA3T2JMQUtFb2x3MVhhTE1FbTZkLW1UX3RaWndw
-      Tm9fcjJlS200V2hZT1cyYllMZm9NRT0iLCJleHAiOiJBUUFCIiwia2lkI
-      joicm9tZW9AbW9udGVndWUubGl0L2dhcmRlbiJ9XQ==
+      eyJrZXlzIjpbeyJrdHkiOiJSU0EiLCJraWQiOiJyb21lb0Btb250ZWd1Z
+      S5saXQvZ2FyZGVuIiwibiI6InZ0cWVqa01GMDFoOG9LRWFIZkhFWU8wQz
+      JqTTdlSVNiYlN2TnMwU05JdFlXTzZHYmpwSmZONGxkWHcydnBWUmR5c25
+      3VTN6azZvMl9TRDBZQ0gxV2dldUkwUUsxa25NVERkTlNYeDUyZTFjNEJU
+      d2hsQThpSHV1dFRXbXBCcWVzbjFHTlptcUIzallzSk9rVkJZd0NKdGtCO
+      UFQYUJ2azBpdGxSdGl6akNmMUhIbmF1N25HU3R5c2hndTgtc3J4aV9kOH
+      JDNVRUTFNCX3pUMWk2ZlA4ZndEbG9lbVhPdEMwVTY1Ynk1UC0xWkh4YWZ
+      fYkQ4ZnBqcHM2Z3dTZ2RrWktNSkFJMGJPV1pXdU1wcDJudHFhMHdMQjdO
+      ZHhiMklqcmVvZ19zNXNzQW9TaVhEVmRvc3dTYnAzNlpQLTFsbkNrMmotd
+      lo0cWJoYUZnNWJadGd0LWd3USIsImUiOiJBUUFCIn1dfQ
     </pkey>
   </keyreq>
 </iq>
           ]]></artwork>
         </figure>
-        <t>If the sending agent accepts this key request, it performs steps 1 and 2 from <xref target="keyreq-process-accept"/> to generate the partial <xref target="JOSE-JWE"/> header:</t>
+        <t>If the sending agent accepts this key request, it performs step 1 from <xref target="keyreq-process-accept"/> to generate JWK representation of the SMK:</t>
         <figure>
           <artwork><![CDATA[
 {
+  "kty":"oct",
+  "kid":"835c92a8-94cd-4e96-b3f3-b2e75a438f92",
+  "oct":"xWtdjhYsH4Va_9SfYSefsJfZu03m5RrbXo_UavxxeU8"
+}
+          ]]></artwork>
+        </figure>
+        <t>Then the sending agent performs steps 2 and 3 to generate the protected SMK:</t>
+        <figure>
+          <preamble>JWE Header (before base64url encoding)</preamble>
+          <artwork><![CDATA[
+{
   "alg":"RSA-OAEP",
+  "enc":"A256CBC+HS512",
   "kid":"romeo@montegue.lit/garden"
 }
           ]]></artwork>
         </figure>
-        <t>Then the sending agent performs step 3 to generate the encrypted SMK:</t>
         <figure>
+          <preamble>JWE Content Encryption Key</preamble>
           <artwork><![CDATA[
-DsLfaD3ZPtE4k1wnhsHNsYyFi3spey8NNNMeYQ6L-sdLJrcWIwfOYNPK-Sb
-oLvsSiXB7yw1MLtKhhrAiRovEmMnTgoLvcuzX8PIBcDbSP3ie0aMynXqStb
-Rk-LwijdSY7NqD_WB1tP4dhqo3OwlXf4bSWlBnUDEzGh8giF6KYeRzw181m
-vMIJ6BCjwnvqTKBNlMDUX3cTfXSAFi9j8MkkS3wLbc2MM4RzP4ESyiZZQJn
-z_zkg1enjAbJ_fpwJ-E4a14EyWhwYpCNW3Tb5IhyhhgBsiLB6kulm9RMYwc
-TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
+UeoVeGcZP-VsLu1PVj3NNWkmmEF7H2Nl_mHWscOuT_vYn-4ub2NEnRy4dzyycgx
+ny6jmRPpNiGJB6AfI4TYZvrjig5dubv4uG7phCvKYVI3uaUU58Fc9H_o-BTmNv2
+rUT-RGt6YYLW97ZJp5ZcA2l-KxykcxaRYC4Sv_UOS3Kqo0sVx5u7tolE6SbMnUH
+etg91Gc9pVVa1XX-wz4ZrcA6V8zf8pCtmc4WyDMFx8RYYXR_5Qvax-TzOJUL2eA
+r3OQsf3KNh58WvvzcwAKTmR214QmZCxI_A5mIqoog0H0uV987P9yw1wFfsmg7z-
+Y2Ed7Blp-zLOvXEQKU9FM-vjBnA
+          ]]></artwork>
+        </figure>
+        <figure>
+          <preamble>JWE Initialization Vector</preamble>
+          <artwork><![CDATA[
+eiXTO21DNqFnCTQkLAoAtA
+          ]]></artwork>
+        </figure>
+        <figure>
+          <preamble>JWE Ciphertext</preamble>
+          <artwork><![CDATA[
+e8sZiRvKLPOUjmFwOYhvrZMQYzW1yglg6mTnazJU_rF7mXTBIieNZCd7hDrlrdG
+SxqqUgh6N1O2QBLygf2PtWDmHHjn1aLncx6qlGf0UOxCCXUBfBIhZgFH5YX1i3_
+VSsNUDEoIKTGA21EnamOqa1A
+          ]]></artwork>
+        </figure>
+        <figure>
+          <preamble>JWE Integrity Value</preamble>
+          <artwork><![CDATA[
+WQzHj3j30Qo7VakMM42t-X1omQVGyebd3No9ZFGPQNUwEWONjIcZ89_wFBhZFdd
+kc8i_qtXi-9XPmSVei3A_Jw
           ]]></artwork>
         </figure>
         <t>Then the sending agent performs step 4 to generate the &lt;keyreq/&gt; response:</t>
         <figure>
           <artwork><![CDATA[
-<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
+<keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
         id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
   <header>
-    eyJhbGciOiJSU0EtT0VBUCIsImtpZCI6InJvbWVvQG1vbnRlZ3VlLmxpc3Q
-    vZ2FyZGVuIn0=
+    eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMrSFM1MTIiLCJraWQ
+    iOiJyb21lb0Btb250ZWd1ZS5saXQvZ2FyZGVuIn0
   </header>
-  <smk>
-    DsLfaD3ZPtE4k1wnhsHNsYyFi3spey8NNNMeYQ6L-sdLJrcWIwfOYNPK-Sb
-    oLvsSiXB7yw1MLtKhhrAiRovEmMnTgoLvcuzX8PIBcDbSP3ie0aMynXqStb
-    Rk-LwijdSY7NqD_WB1tP4dhqo3OwlXf4bSWlBnUDEzGh8giF6KYeRzw181m
-    vMIJ6BCjwnvqTKBNlMDUX3cTfXSAFi9j8MkkS3wLbc2MM4RzP4ESyiZZQJn
-    z_zkg1enjAbJ_fpwJ-E4a14EyWhwYpCNW3Tb5IhyhhgBsiLB6kulm9RMYwc
-    TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
-  </smk>
+  <cmk>
+    UeoVeGcZP-VsLu1PVj3NNWkmmEF7H2Nl_mHWscOuT_vYn-4ub2NEnRy4dzy
+    ycgxny6jmRPpNiGJB6AfI4TYZvrjig5dubv4uG7phCvKYVI3uaUU58Fc9H_
+    o-BTmNv2rUT-RGt6YYLW97ZJp5ZcA2l-KxykcxaRYC4Sv_UOS3Kqo0sVx5u
+    7tolE6SbMnUHetg91Gc9pVVa1XX-wz4ZrcA6V8zf8pCtmc4WyDMFx8RYYXR
+    _5Qvax-TzOJUL2eAr3OQsf3KNh58WvvzcwAKTmR214QmZCxI_A5mIqoog0H
+    0uV987P9yw1wFfsmg7z-Y2Ed7Blp-zLOvXEQKU9FM-vjBnA
+  </cmk>
+  <iv>
+    eiXTO21DNqFnCTQkLAoAtA
+  </iv>
+  <data>
+    e8sZiRvKLPOUjmFwOYhvrZMQYzW1yglg6mTnazJU_rF7mXTBIieNZCd7hDr
+    lrdGSxqqUgh6N1O2QBLygf2PtWDmHHjn1aLncx6qlGf0UOxCCXUBfBIhZgF
+    H5YX1i3_VSsNUDEoIKTGA21EnamOqa1A
+  </data>
+  <mac>
+    WQzHj3j30Qo7VakMM42t-X1omQVGyebd3No9ZFGPQNUwEWONjIcZ89_wFBh
+    ZFddkc8i_qtXi-9XPmSVei3A_Jw
+  </mac>
 </keyreq>
           ]]></artwork>
         </figure>
@@ -504,21 +572,32 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
     id='xdJbWMA+'
     to='romeo@montegue.lit/garden'
     type='result'>
-  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
+  <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
           id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>
-      eyJhbGciOiJSU0EtT0VBUCIsImtpZCI6InJvbWVvQG1vbnRlZ3VlLmxpc
-      3QvZ2FyZGVuIn0=
+      eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMrSFM1MTIiLCJraWQ
+      iOiJyb21lb0Btb250ZWd1ZS5saXQvZ2FyZGVuIn0
     </header>
-    <smk>
-      DsLfaD3ZPtE4k1wnhsHNsYyFi3spey8NNNMeYQ6L-sdLJrcWIwfOYNPK-
-      SboLvsSiXB7yw1MLtKhhrAiRovEmMnTgoLvcuzX8PIBcDbSP3ie0aMynX
-      qStbRk-LwijdSY7NqD_WB1tP4dhqo3OwlXf4bSWlBnUDEzGh8giF6KYeR
-      zw181mvMIJ6BCjwnvqTKBNlMDUX3cTfXSAFi9j8MkkS3wLbc2MM4RzP4E
-      SyiZZQJnz_zkg1enjAbJ_fpwJ-E4a14EyWhwYpCNW3Tb5IhyhhgBsiLB6
-      kulm9RMYwcTCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg
-      ==
-    </smk>
+    <cmk>
+      UeoVeGcZP-VsLu1PVj3NNWkmmEF7H2Nl_mHWscOuT_vYn-4ub2NEnRy4dzy
+      ycgxny6jmRPpNiGJB6AfI4TYZvrjig5dubv4uG7phCvKYVI3uaUU58Fc9H_
+      o-BTmNv2rUT-RGt6YYLW97ZJp5ZcA2l-KxykcxaRYC4Sv_UOS3Kqo0sVx5u
+      7tolE6SbMnUHetg91Gc9pVVa1XX-wz4ZrcA6V8zf8pCtmc4WyDMFx8RYYXR
+      _5Qvax-TzOJUL2eAr3OQsf3KNh58WvvzcwAKTmR214QmZCxI_A5mIqoog0H
+      0uV987P9yw1wFfsmg7z-Y2Ed7Blp-zLOvXEQKU9FM-vjBnA
+    </cmk>
+    <iv>
+      eiXTO21DNqFnCTQkLAoAtA
+    </iv>
+    <data>
+      e8sZiRvKLPOUjmFwOYhvrZMQYzW1yglg6mTnazJU_rF7mXTBIieNZCd7hDr
+      lrdGSxqqUgh6N1O2QBLygf2PtWDmHHjn1aLncx6qlGf0UOxCCXUBfBIhZgF
+      H5YX1i3_VSsNUDEoIKTGA21EnamOqa1A
+    </data>
+    <mac>
+      WQzHj3j30Qo7VakMM42t-X1omQVGyebd3No9ZFGPQNUwEWONjIcZ89_wFBh
+      ZFddkc8i_qtXi-9XPmSVei3A_Jw
+    </mac>
   </keyreq>
 </iq>
           ]]></artwork>
@@ -568,7 +647,7 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
         <t>A URN sub-namespace of encrypted content for the Extensible Messaging and Presence Protocol (XMPP) is defined as follows.</t>
         <t>
           <list style="hanging">
-            <t hangText="URI:">urn:ietf:params:xml:ns:xmpp-e2e:4</t>
+            <t hangText="URI:">urn:ietf:params:xml:ns:xmpp-e2e:5</t>
             <t hangText="Specification:">RFC XXXX</t>
             <t hangText="Description:">This is an XML namespace name of encrypted content for the Extensible Messaging and Presence Protocol as defined by RFC XXXX.</t>
             <t hangText="Registrant Contact:">IESG, &lt;iesg@ietf.org&gt;</t>
@@ -647,6 +726,34 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
         <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-key-08"/>
         <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-key-08.txt"/>
       </reference>
+      <reference anchor="JOSE-JPSK">
+        <front>
+          <title>JSON Private and Symmetric Key</title>
+          <author initials="M." surname="Jones" fullname="Michael B. Jones">
+            <organization>Microsoft</organization>
+            <address>
+              <email>mjb@microsoft.com</email>
+            </address>
+          </author>
+          <date year="2012" month="December"/>
+        </front>
+        <seriesInfo name="Internet-Draft" value="draft-jones-jose-json-private-and-symmetric-key-00"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-jones-jose-json-private-and-symmetric-key-00.txt"/>
+      </reference>
+      <reference anchor="JOSE-KEYPROTECT">
+        <front>
+          <title>Using JSON Web Encryption (JWE) for Protecting JSON Web Key (JWK) Objects</title>
+          <author initials="M." surname="Miller" fullname="Matthew Miller">
+            <organization>Cisco Systems, Inc.</organization>
+            <address>
+              <email>mamille2@cisco.com</email>
+            </address>
+          </author>
+          <date year="2013" month="February"/>
+        </front>
+        <seriesInfo name="Internet-Draft" value="draft-miller-jose-jwe-protected-jwk-00"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-miller-jose-jwe-protected-jwk-00.txt"/>
+      </reference>
       <reference anchor="RFC2119">
         <front>
           <title abbrev="RFC Key Words">Key words for use in RFCs to Indicate Requirement Levels</title>
@@ -675,7 +782,7 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
         <seriesInfo name="BCP" value="14"/>
         <seriesInfo name="RFC" value="2119"/>
       </reference>
-      <reference anchor="RFC4684">
+      <reference anchor="RFC4648">
         <front>
           <title>The Base16, Base32, and Base64 Data Encodings</title>
           <author initials="S." surname="Josefsson" fullname="S. Josefsson">
@@ -932,7 +1039,7 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
         <format type="HTML" target="http://xmpp.org/extensions/xep-0203.html"/>
       </reference>
     </references>
-    <section title="Schema for urn:ietf:params:xml:ns:xmpp-e2e:4" anchor="schemas-e2e">
+    <section title="Schema for urn:ietf:params:xml:ns:xmpp-e2e:5" anchor="schemas-e2e">
       <t>The following XML schema is descriptive, not normative.</t>
       <figure>
         <artwork><![CDATA[
@@ -940,8 +1047,8 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
 
 <xs:schema
     xmlns:xs='http://www.w3.org/2001/XMLSchema'
-    targetNamespace='urn:ietf:params:xml:ns:xmpp-e2e:4'
-    xmlns='urn:ietf:params:xml:ns:xmpp-e2e:4'
+    targetNamespace='urn:ietf:params:xml:ns:xmpp-e2e:5'
+    xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
     elementFormDefault='qualified'>
 
   <xs:element name='e2e'>
@@ -961,9 +1068,12 @@ TCGIDCUsfTo5vzDOKX7DBF6KtwSY8bF1AiOiGlsGo2SlrSg==
     <xs:complexType>
       <xs:attribute name='id' type='xs:string' use='required'/>
       <xs:sequence>
-        <xs:element ref='header' minOccurs='0' maxOccurs='1'/>
         <xs:element ref='pkey' minOccurs='0' maxOccurs='1'/>
-        <xs:element ref='smk' minOccurs='0' maxOccurs='1'/>
+        <xs:element ref='header' minOccurs='0' maxOccurs='1'/>
+        <xs:element ref='cmk' minOccurs='1' maxOccurs='1'/>
+        <xs:element ref='iv' minOccurs=1' maxOccurs='1'/>
+        <xs:element ref='data' minOccurs='1' maxOccurs='1'/>
+        <xs:element ref='mac' minOccurs='1' maxOccurs='1'/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
