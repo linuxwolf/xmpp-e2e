@@ -24,8 +24,8 @@
     </author>
     <date month="February" day="18" year="2013"/>
     <area>RAI</area>
+    <workgroup>XMPP</workgroup>
     <keyword>Internet-Draft</keyword>
-    <keyword>XMPP</keyword>
     <keyword>Extensible Messaging and Presence Protocol</keyword>
     <keyword>Jabber</keyword>
     <abstract>
@@ -42,7 +42,7 @@
       <t>The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
     </section>
     <section title="Determining Support" anchor="disco">
-      <t>If an agent supports end-to-end object encryption, it MUST advertiset that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:5".
+      <t>If an agent supports end-to-end object encryption, it MUST advertize that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:5".
         <figure>
           <artwork><![CDATA[
 <iq xmlns='jabber:client'
@@ -75,20 +75,20 @@
       <section title="Process" anchor="encrypt-process">
         <t>For a given plaintext stanza (S), the sending agent performs the following:<vspace blankLines="1"/>
         <list style="numbers">
-          <t>Ensures the plaintext stanza is fully qualified, including the proper namespace declarations (e.g. contains the attribute 'xmlns' set to the value "jabber:client" for 'jabber:client' stanzas defined in <xref target="RFC6120"/>).<vspace blankLines="1"/></t>
-          <t>Notes the current UTC date and time N when this stanza is constructed, formatted as described under <xref target="timestamps"/>.<vspace blankLines="1"/></t>
-          <t>Constructs a forwarding envelope M using a &lt;forwarded/&gt; element qualified by the "urn:xmpp:forward:0" namespace (as defined in <xref target="XEP-0297"/>) as follows:<vspace blankLines="1"/>
+          <t>Ensures the plaintext stanza is fully qualified, including the proper namespace declarations (e.g., contains the attribute 'xmlns' set to the value "jabber:client" for 'jabber:client' stanzas defined in <xref target="RFC6120"/>).<vspace blankLines="1"/></t>
+          <t>Notes the current UTC date and time (N) when this stanza is constructed, formatted as described under <xref target="timestamps"/>.<vspace blankLines="1"/></t>
+          <t>Constructs a forwarding envelope (M) using a &lt;forwarded/&gt; element qualified by the "urn:xmpp:forward:0" namespace (as defined in <xref target="XEP-0297"/>) as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The child element &lt;delay/&gt; qualified by the "urn:xmpp:delay" namespace (as defined in <xref target="XEP-0203"/>) with the attribute 'stamp' set to the UTC date and time value N<vspace blankLines="1"/></t>
             <t>The plaintext stanza S<vspace blankLines="1"/></t>
           </list>
           </t>
-          <t>Convert the forwarding envelope M to a UTF-8 encoded string (M'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. M' = UTF8-encode(M).  We call M' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
+          <t>Converts the forwarding envelope (M) to a UTF-8 encoded string (M'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. M' = UTF8-encode(M).  We call M' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
           <t>Generates a Content Master Key (CMK). The CMK MUST have a length at least equal to that required by the content encryption algorithm in use and MUST be generated randomly. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
-          <t>Generates any additional unprotected block cipher factors (IV); e.g. initialization vector/nonce.  A sending agent MUST ensure that no two sets of factors are used with the same CMK, and SHOULD NOT reuse such factors for other stanzas.<vspace blankLines="1"/></t>
-          <t>Performs the message encryption steps from <xref target='JOSE-JWE'/> to generate the JWE Header H, JWE Encrypted Key E, JWE Ciphertext C, and JWE Integrity Value I; using the following inputs:<vspace blankLines="1"/>
+          <t>Generates any additional unprotected block cipher factors (IV); e.g., initialization vector/nonce.  A sending agent MUST ensure that no two sets of factors are used with the same CMK, and SHOULD NOT reuse such factors for other stanzas.<vspace blankLines="1"/></t>
+          <t>Performs the message encryption steps from <xref target='JOSE-JWE'/> to generate the JWE Header (H), JWE Encrypted Key (E), JWE Ciphertext (C), and JWE Integrity Value (I); using the following inputs:<vspace blankLines="1"/>
             <list style="symbols">
-              <t>The 'alg' property is set to an appropriate key wrapping algorithm (e.g. "A256KW" or "A128KW"); recipients use 'keyreq' in <xref target='keyreq'/> to obtain the SMK.<vspace blankLines="1"/></t>
+              <t>The 'alg' property is set to an appropriate key wrapping algorithm (e.g., "A256KW" or "A128KW"); recipients use 'keyreq' in <xref target='keyreq'/> to obtain the SMK.<vspace blankLines="1"/></t>
               <t>The 'enc' property is set to the intended content encryption algorithm.<vspace blankLines="1"/></t>
               <t>SMK as the key for CMK Encryption.<vspace blankLines="1"/></t>
               <t>CMK as the JWE Content Master Key.<vspace blankLines="1"/></t>
@@ -106,7 +106,7 @@
             <t>The child element &lt;mac/&gt; qualified by the "urn"ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as I, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
-          <t>Sends the &lt;e2e/&gt; element as the payload of a stanza that SHOULD match the stanza from step 1 in kind (e.g., &lt;message/&gt;), type (e.g., "chat"), and addressing (e.g. to="romeo@montague.net" from="juliet@capulet.net/balcony"). If the original stanza (S) has a value for the "id" attribute, this stanza MUST NOT use the same value for its "id" attribute.<vspace blankLines="1"/></t>
+          <t>Sends the &lt;e2e/&gt; element as the payload of a stanza that SHOULD match the stanza from step 1 in kind (e.g., &lt;message/&gt;), type (e.g., "chat"), and addressing (e.g., to="romeo@montague.net" from="juliet@capulet.net/balcony"). If the original stanza (S) has a value for the "id" attribute, this stanza MUST NOT use the same value for its "id" attribute.<vspace blankLines="1"/></t>
         </list>
       </t>
       </section>
@@ -172,7 +172,7 @@
           ]]></artwork>
         </figure>
         <figure>
-          <preamble>JWE Content Encryption Key</preamble>
+          <preamble>JWE Encrypted Key</preamble>
           <artwork><![CDATA[
 4ui5xwE1gEYjuptNgSIaMFlwWrAOxMqBkaplTxeJ6b2iT8kQP2HHy5PYpqqmDxl
 QgT5I5rO9mgAD7AUJ9Lx35fGdi5CMiRww
@@ -264,7 +264,7 @@ DJ751V6YiJ295_3jQUphxmQ
             <t>Performs the message decryption steps from <xref target="JOSE-JWE"/> to generate the plaintext forwarding envelope string M', using the following inputs:<vspace blankLines="1"/>
               <list style="symbols">
                 <t>The JWE Header H from the &lt;header/&gt; element's character data content.<vspace blankLines="1"/></t>
-                <t>The JWE Content Encryption Key from the &lt;cmk/&gt; element's character data content.<vspace blankLines="1"/></t>
+                <t>The JWE Encrypted Key from the &lt;cmk/&gt; element's character data content.<vspace blankLines="1"/></t>
                 <t>The JWE Initialization Vector/Nonce from the &lt;iv/&gt; element's character data content.<vspace blankLines="1"/></t>
                 <t>The JWE Ciphertext C from the &lt;data/&gt; element's character data content.<vspace blankLines="1"/></t>
                 <t>The JWE Integrity Value I from the &lt;mac/&gt; element's character data content.<vspace blankLines="1"/></t>
@@ -288,7 +288,10 @@ DJ751V6YiJ295_3jQUphxmQ
   <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
-    <data>[XML character data]</header>
+    <cmk>[XML character data]</cmk>
+    <iv>[XML character data]</iv>
+    <data>[XML character data]</data>
+    <mac>[XML character data]</mac>
   </e2e>
   <error type='modify'>
     <bad-request
@@ -313,7 +316,10 @@ DJ751V6YiJ295_3jQUphxmQ
   <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
-    <data>[XML character data]</header>
+    <cmk>[XML character data]</cmk>
+    <iv>[XML character data]</iv>
+    <data>[XML character data]</data>
+    <mac>[XML character data]</mac>
   </e2e>
   <error type='modify'>
     <bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
@@ -336,7 +342,10 @@ DJ751V6YiJ295_3jQUphxmQ
   <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <header>[XML character data]</header>
-    <data>[XML character data]</header>
+    <cmk>[XML character data]</cmk>
+    <iv>[XML character data]</iv>
+    <data>[XML character data]</data>
+    <mac>[XML character data]</mac>
   </e2e>
   <error type='modify'>
     <bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
@@ -381,13 +390,13 @@ DJ751V6YiJ295_3jQUphxmQ
             </list>
           </t>
           <t>Chooses a key (PK) from the keys provided via KS, and notes its identifier value 'kid'.<vspace blankLines="1"/></t>
-          <t>Protects the SMK using the process outlined in <xref target="JOSE-KEYPROTECT"/>, using the encryption key PK and the content as SMK (formatted as JSON Web Key (JWK) according to <xref target="JOSE-JPSK"/>). The outputs are a JWE object:<vspace blankLines="1"/>
+          <t>Protects the SMK using the process outlined in <xref target="JOSE-KEYPROTECT"/> to generate the JWE Header (H), JWE Encrypted Key (E), JWE Initialization Vector (IV), JWE Ciphertext (C), and JWE Integrity Value (I); using the following inputs:<vspace blankLines="1"/>
             <list style="symbols">
-              <t>JWE Header (H) apprpriate for the protected SMK.<vspace blankLines="1"/></t>
-              <t>Encoded JWE Encrypted Content Key (E).<vspace blankLines="1"/></t>
-              <t>JWE Initialization Vector (IV).<vspace blankLines="1"/></t>
-              <t>JWE Ciphertext (M).<vspace blankLines="1"/></t>
-              <t>JWE Integrity Value (I).<vspace blankLines="1"/></t>
+              <t>The 'alg' property is set to an algorithm appropriate for the chosen PK (e.g., "RSA-OAEP" for a "RSA" key).<vspace blankLines="1"/></t>
+              <t>The 'enc' property is set to the intended content encryption algorithm.<vspace blankLines="1"/></t>
+              <t>A randomly generated CMK. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
+              <t>A randomly generated initialization vector. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
+              <t>SMK, formatted as a JWK as above.<vspace blankLines="1"/></t>
             </list>
           </t>
           <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace as follows:<vspace blankLines="1"/>
@@ -396,7 +405,7 @@ DJ751V6YiJ295_3jQUphxmQ
             <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
             <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as E, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
             <t>The child element &lt;iv/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as IV, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as M, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as C, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
             <t>The child element &lt;mac/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as I, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
@@ -501,7 +510,7 @@ DJ751V6YiJ295_3jQUphxmQ
           ]]></artwork>
         </figure>
         <figure>
-          <preamble>JWE Content Encryption Key</preamble>
+          <preamble>JWE Encrypted Key</preamble>
           <artwork><![CDATA[
 UeoVeGcZP-VsLu1PVj3NNWkmmEF7H2Nl_mHWscOuT_vYn-4ub2NEnRy4dzyycgx
 ny6jmRPpNiGJB6AfI4TYZvrjig5dubv4uG7phCvKYVI3uaUU58Fc9H_o-BTmNv2
@@ -620,7 +629,7 @@ kc8i_qtXi-9XPmSVei3A_Jw
       <t>
         <list style="symbols">
           <t>Undirected &lt;presence/&gt; stanzas SHOULD NOT be encrypted. Such stanzas are delivered to anyone the sender has authorized, and can generate a large volume of key requests.<vspace blankLines="1"/></t>
-          <t>Stanzas directed to multiplexing services (e.g. multi-user chat) SHOULD NOT be encrypted, unless the sender has established an acceptable trust relationship with the multiplexing service.<vspace blankLines="1"/></t>
+          <t>Stanzas directed to multiplexing services (e.g., multi-user chat) SHOULD NOT be encrypted, unless the sender has established an acceptable trust relationship with the multiplexing service.<vspace blankLines="1"/></t>
         </list>
       </t>
     </section>
