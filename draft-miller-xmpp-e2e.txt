@@ -4,13 +4,13 @@
 
 XMPP                                                           M. Miller
 Internet-Draft                                       Cisco Systems, Inc.
-Intended status: Standards Track                       February 11, 2013
-Expires: August 15, 2013
+Intended status: Standards Track                       February 12, 2013
+Expires: August 16, 2013
 
 
  End-to-End Object Encryption for the Extensible Messaging and Presence
                             Protocol (XMPP)
-                        draft-miller-xmpp-e2e-03
+                        draft-miller-xmpp-e2e-04
 
 Abstract
 
@@ -32,7 +32,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 15, 2013.
+   This Internet-Draft will expire on August 16, 2013.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Table of Contents
 
 
 
-Miller                  Expires August 15, 2013                 [Page 1]
+Miller                  Expires August 16, 2013                 [Page 1]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -109,7 +109,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                 [Page 2]
+Miller                  Expires August 16, 2013                 [Page 2]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -165,7 +165,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                 [Page 3]
+Miller                  Expires August 16, 2013                 [Page 3]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -221,7 +221,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                 [Page 4]
+Miller                  Expires August 16, 2013                 [Page 4]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -277,7 +277,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                 [Page 5]
+Miller                  Expires August 16, 2013                 [Page 5]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -333,7 +333,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                 [Page 6]
+Miller                  Expires August 16, 2013                 [Page 6]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -389,7 +389,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                 [Page 7]
+Miller                  Expires August 16, 2013                 [Page 7]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -445,7 +445,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                 [Page 8]
+Miller                  Expires August 16, 2013                 [Page 8]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -501,7 +501,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                 [Page 9]
+Miller                  Expires August 16, 2013                 [Page 9]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -557,7 +557,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 10]
+Miller                  Expires August 16, 2013                [Page 10]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -613,7 +613,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 11]
+Miller                  Expires August 16, 2013                [Page 11]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -669,7 +669,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 12]
+Miller                  Expires August 16, 2013                [Page 12]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -725,7 +725,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 13]
+Miller                  Expires August 16, 2013                [Page 13]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -781,7 +781,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 14]
+Miller                  Expires August 16, 2013                [Page 14]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -837,7 +837,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 15]
+Miller                  Expires August 16, 2013                [Page 15]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -893,7 +893,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 16]
+Miller                  Expires August 16, 2013                [Page 16]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -949,7 +949,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 17]
+Miller                  Expires August 16, 2013                [Page 17]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -1005,7 +1005,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 18]
+Miller                  Expires August 16, 2013                [Page 18]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -1061,7 +1061,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 19]
+Miller                  Expires August 16, 2013                [Page 19]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -1117,7 +1117,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 20]
+Miller                  Expires August 16, 2013                [Page 20]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -1173,7 +1173,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 21]
+Miller                  Expires August 16, 2013                [Page 21]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -1229,7 +1229,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 22]
+Miller                  Expires August 16, 2013                [Page 22]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -1285,7 +1285,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 23]
+Miller                  Expires August 16, 2013                [Page 23]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -1341,7 +1341,7 @@ Appendix A.  Schema for urn:ietf:params:xml:ns:xmpp-e2e:5
 
 
 
-Miller                  Expires August 15, 2013                [Page 24]
+Miller                  Expires August 16, 2013                [Page 24]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -1397,7 +1397,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 25]
+Miller                  Expires August 16, 2013                [Page 25]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -1453,7 +1453,7 @@ Internet-Draft                  XMPP E2E                   February 2013
 
 
 
-Miller                  Expires August 15, 2013                [Page 26]
+Miller                  Expires August 16, 2013                [Page 26]
 
 Internet-Draft                  XMPP E2E                   February 2013
 
@@ -1508,4 +1508,4 @@ Author's Address
 
 
 
-Miller                  Expires August 15, 2013                [Page 27]
+Miller                  Expires August 16, 2013                [Page 27]
