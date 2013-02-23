@@ -7,7 +7,7 @@
 <?rfc tocdepth="4"?>
 <rfc category="std" docName="draft-miller-xmpp-e2e-04" ipr="trust200902">
   <front>
-    <title abbrev="XMPP E2E">End-to-End Object Encryption for the Extensible Messaging and Presence Protocol (XMPP)</title>
+    <title abbrev="XMPP E2E">End-to-End Object Encryption and Signatures for the Extensible Messaging and Presence Protocol (XMPP)</title>
     <author initials="M." surname="Miller" fullname="Matthew Miller">
       <organization>Cisco Systems, Inc.</organization>
       <address>
@@ -29,88 +29,199 @@
     <keyword>Extensible Messaging and Presence Protocol</keyword>
     <keyword>Jabber</keyword>
     <abstract>
-      <t>This document defines a method of end-to-end object encryption for the Extensible Messaging and Presence Protocol (XMPP).</t>
+      <t>This document defines a method of encrypting and signing objects (often referred to as stanzas) for the Extensible Messaging and Presence Protocol (XMPP).</t>
     </abstract>
   </front>
   <middle>
     <section title="Introduction" anchor="intro">
-      <t>End-to-end encryption of traffic sent over the Extensible Messaging and Presence Protocol <xref target="RFC6120"/> is a desirable goal.  Requirements and a threat analysis for XMPP encryption are provided in <xref target="E2E-REQ"/>.  Many possible approaches to meet those (or similar) requirements have been proposed over the years, including methods based on PGP, S/MIME, SIGMA, and TLS.</t>
-      <t>Most proposals have not been able to support multiple end-points for a given recipient. As more devices support XMPP, it becomes more desirable to allow an entity to communicate with another in a more secure manner, regardless of the number of agents the entity is employing. This document specifies an approach for encrypting communications between two entities which each might have multiple end-points.</t>
+      <t>End-to-end protection and authentication of traffic sent over the Extensible Messaging and Presence Protocol <xref target="RFC6120"/> is a desirable goal.  Many possible approaches to meet those (or similar) requirements have been proposed over the years, including methods based on PGP, S/MIME, SIGMA, and TLS.</t>
+      <t>Most proposals have not been able to support multiple end-points for a given recipient. As more devices support XMPP, it becomes more desirable to allow an entity to communicate with another in a more secure manner, regardless of the number of agents the entity is employing. This document specifies an approach for encrypting and signing communications between two entities which each might have multiple end-points.</t>
     </section>
     <section title="Terminology" anchor="terms">
       <t>This document inherits XMPP-related terminology from <xref target="RFC6120"/>, JSON Web Algorithms (JWA)-related terminology from <xref target="JOSE-JWA"/>, JSON Web Encryption (JWE)-related terminology from <xref target="JOSE-JWE"/>, and JSON Web Key (JWK)-related terminology from <xref target="JOSE-JWK"/>.  Security-related terms are to be understood in the sense defined in <xref target="RFC4949"/>.</t>
       <t>The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
     </section>
-    <section title="Determining Support" anchor="disco">
-      <t>If an agent supports end-to-end object encryption, it MUST advertize that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:5".
-        <figure>
-          <artwork><![CDATA[
+    <section title="Encryption" anchor="encryption">
+      <section title="Determining Support" anchor="encryption-disco">
+        <t>If an agent supports end-to-end object encryption, it MUST advertize that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:5:encryption".
+          <figure>
+            <artwork><![CDATA[
 <iq xmlns='jabber:client'
     id='disco1'
     to='romeo@montegue.lit/garden'
     type='result'>
   <query xmlns='http://jabber.org/protocol/disco#info'>
     ...
-    <feature xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'/>
+    <feature xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5:encryption'/>
     ...
   </query>
 </iq>
-          ]]></artwork>
-        </figure>
-      </t>
-      <t>To help facilitate discovery, an agent SHOULD also include <xref target='XEP-0115'/> information in any directed or broadcast presence updates.</t>
-    </section>
-    <section title="Encrypting XMPP Stanzas" anchor="encrypt">
-      <t>The process that a sending agent follows for securing stanzas is the same regardless of the form of stanza (i.e., &lt;iq/&gt;, &lt;message/&gt;, or &lt;presence/&gt;).</t>
-      <section title="Prerequisites" anchor="encrypt-prereq">
-        <t>First, the sending agent prepares and retains the following:<vspace blankLines="1"/>
-        <list style="symbols">
-          <t>The JID of the sender (i.e. its own JID).  This SHOULD be the bare JID (localpart@domainpart).<vspace blankLines="1"/></t>
-          <t>The JID of the recipient.  This SHOULD be the bare JID (localpart@domainpart).<vspace blankLines="1"/></t>
-          <t>A Session Master Key (SMK).  The SMK MUST have a length at least equal to that required by the key wrapping algorithm in use and MUST be generated randomly. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
-          <t>A SMK identifier (SID). The SID MUST be unique for a given (sender, recipient, SMK) tuple, and MUST NOT be derived from SMK itself.<vspace blankLines="1"/></t>
-        </list>
+            ]]></artwork>
+          </figure>
         </t>
+        <t>To help facilitate discovery, an agent SHOULD also include <xref target='XEP-0115'/> information in any directed or broadcast presence updates.</t>
       </section>
-      <section title="Process" anchor="encrypt-process">
-        <t>For a given plaintext stanza (S), the sending agent performs the following:<vspace blankLines="1"/>
-        <list style="numbers">
-          <t>Ensures the plaintext stanza is fully qualified, including the proper namespace declarations (e.g., contains the attribute 'xmlns' set to the value "jabber:client" for 'jabber:client' stanzas defined in <xref target="RFC6120"/>).<vspace blankLines="1"/></t>
-          <t>Notes the current UTC date and time (N) when this stanza is constructed, formatted as described under <xref target="timestamps"/>.<vspace blankLines="1"/></t>
-          <t>Constructs a forwarding envelope (M) using a &lt;forwarded/&gt; element qualified by the "urn:xmpp:forward:0" namespace (as defined in <xref target="XEP-0297"/>) as follows:<vspace blankLines="1"/>
+      <section title="Encrypting XMPP Stanzas" anchor="encryption-encrypt">
+        <t>The process that a sending agent follows for securing stanzas is the same regardless of the form of stanza (i.e., &lt;iq/&gt;, &lt;message/&gt;, or &lt;presence/&gt;).</t>
+        <section title="Prerequisites" anchor="encrypt-prereq">
+          <t>First, the sending agent prepares and retains the following:<vspace blankLines="1"/>
           <list style="symbols">
-            <t>The child element &lt;delay/&gt; qualified by the "urn:xmpp:delay" namespace (as defined in <xref target="XEP-0203"/>) with the attribute 'stamp' set to the UTC date and time value N<vspace blankLines="1"/></t>
-            <t>The plaintext stanza S<vspace blankLines="1"/></t>
+            <t>The JID of the sender (i.e. its own JID).  This SHOULD be the bare JID (localpart@domainpart).<vspace blankLines="1"/></t>
+            <t>The JID of the recipient.  This SHOULD be the bare JID (localpart@domainpart).<vspace blankLines="1"/></t>
+            <t>A Session Master Key (SMK).  The SMK MUST have a length at least equal to that required by the key wrapping algorithm in use and MUST be generated randomly. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
+            <t>A SMK identifier (SID). The SID MUST be unique for a given (sender, recipient, SMK) tuple, and MUST NOT be derived from SMK itself.<vspace blankLines="1"/></t>
           </list>
           </t>
-          <t>Converts the forwarding envelope (M) to a UTF-8 encoded string (M'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. M' = UTF8-encode(M).  We call M' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
-          <t>Generates a Content Master Key (CMK). The CMK MUST have a length at least equal to that required by the content encryption algorithm in use and MUST be generated randomly. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
-          <t>Generates any additional unprotected block cipher factors (IV); e.g., initialization vector/nonce.  A sending agent MUST ensure that no two sets of factors are used with the same CMK, and SHOULD NOT reuse such factors for other stanzas.<vspace blankLines="1"/></t>
-          <t>Performs the message encryption steps from <xref target='JOSE-JWE'/> to generate the JWE Header (H), JWE Encrypted Key (E), JWE Ciphertext (C), and JWE Integrity Value (I); using the following inputs:<vspace blankLines="1"/>
+        </section>
+        <section title="Process" anchor="encryption-encrypt-process">
+          <t>For a given plaintext stanza (S), the sending agent performs the following:<vspace blankLines="1"/>
+          <list style="numbers">
+            <t>Ensures the plaintext stanza is fully qualified, including the proper namespace declarations (e.g., contains the attribute 'xmlns' set to the value "jabber:client" for 'jabber:client' stanzas defined in <xref target="RFC6120"/>).<vspace blankLines="1"/></t>
+            <t>Notes the current UTC date and time (N) when this stanza is constructed, formatted as described under <xref target="timestamps"/>.<vspace blankLines="1"/></t>
+            <t>Constructs a forwarding envelope (M) using a &lt;forwarded/&gt; element qualified by the "urn:xmpp:forward:0" namespace (as defined in <xref target="XEP-0297"/>) as follows:<vspace blankLines="1"/>
             <list style="symbols">
-              <t>The 'alg' property is set to an appropriate key wrapping algorithm (e.g., "A256KW" or "A128KW"); recipients use 'keyreq' in <xref target='keyreq'/> to obtain the SMK.<vspace blankLines="1"/></t>
-              <t>The 'enc' property is set to the intended content encryption algorithm.<vspace blankLines="1"/></t>
-              <t>SMK as the key for CMK Encryption.<vspace blankLines="1"/></t>
-              <t>CMK as the JWE Content Master Key.<vspace blankLines="1"/></t>
-              <t>IV as the JWE Initialization Vector.<vspace blankLines="1"/></t>
-              <t>M' as the plaintext content to encrypt.<vspace blankLines="1"/></t>  
+              <t>The child element &lt;delay/&gt; qualified by the "urn:xmpp:delay" namespace (as defined in <xref target="XEP-0203"/>) with the attribute 'stamp' set to the UTC date and time value N<vspace blankLines="1"/></t>
+              <t>The plaintext stanza S<vspace blankLines="1"/></t>
+            </list>
+            </t>
+            <t>Converts the forwarding envelope (M) to a UTF-8 encoded string (M'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. M' = UTF8-encode(M).  We call M' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
+            <t>Generates a Content Master Key (CMK). The CMK MUST have a length at least equal to that required by the content encryption algorithm in use and MUST be generated randomly. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
+            <t>Generates any additional unprotected block cipher factors (IV); e.g., initialization vector/nonce.  A sending agent MUST ensure that no two sets of factors are used with the same CMK, and SHOULD NOT reuse such factors for other stanzas.<vspace blankLines="1"/></t>
+            <t>Performs the message encryption steps from <xref target='JOSE-JWE'/> to generate the JWE Header (H), JWE Encrypted Key (E), JWE Ciphertext (C), and JWE Integrity Value (I); using the following inputs:<vspace blankLines="1"/>
+              <list style="symbols">
+                <t>The 'alg' property is set to an appropriate key wrapping algorithm (e.g., "A256KW" or "A128KW"); recipients use 'keyreq' in <xref target='keyreq'/> to obtain the SMK.<vspace blankLines="1"/></t>
+                <t>The 'enc' property is set to the intended content encryption algorithm.<vspace blankLines="1"/></t>
+                <t>SMK as the key for CMK Encryption.<vspace blankLines="1"/></t>
+                <t>CMK as the JWE Content Master Key.<vspace blankLines="1"/></t>
+                <t>IV as the JWE Initialization Vector.<vspace blankLines="1"/></t>
+                <t>M' as the plaintext content to encrypt.<vspace blankLines="1"/></t>  
+              </list>
+            </t>
+            <t>Constructs an &lt;e2e/&gt; element qualified by the  "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace as follows:<vspace blankLines="1"/>
+            <list style="symbols">
+              <t>The attribute 'type' set to the value "enc".<vspace blankLines="1"/></t>
+              <t>The attribute 'id' set to the identifier value SID.<vspace blankLines="1"/></t>
+              <t>The child element &lt;encheader/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+              <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character as E, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+              <t>The child element &lt;iv/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character as IV, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+              <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as C, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+              <t>The child element &lt;mac/&gt; qualified by the "urn"ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as I, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+            </list>
+            </t>
+            <t>Sends the &lt;e2e/&gt; element as the payload of a stanza that SHOULD match the stanza from step 1 in kind (e.g., &lt;message/&gt;), type (e.g., "chat"), and addressing (e.g., to="romeo@montague.net" from="juliet@capulet.net/balcony"). If the original stanza (S) has a value for the 'id' attribute, this stanza MUST NOT use the same value for its 'id' attribute.<vspace blankLines="1"/></t>
+          </list>
+        </t>
+        </section>
+      </section>
+      <section title="Decrypting XMPP Stanzas" anchor="encryption-decrypt">
+        <section title="Protocol Not Understood" anchor="encryption-decrypt-not-understood">
+          <t>If the receiving agent does not understand the protocol, it MUST do one and only one of the following: (1) ignore the &lt;e2e/&gt; extension, (2) ignore the entire stanza, or (3) return a &lt;service-unavailable/&gt; error to the sender, as described in <xref target="RFC6120"/>.</t>
+          <t>NOTE: If the inbound stanza is an &lt;iq/&gt;, the receiving agent MUST return an error to the sending agent, to comply with the exchanging of IQ stanzas in <xref target="RFC6121"/>.</t>
+        </section>
+        <section title="Process" anchor="encryption-decrypt-process">
+          <t>Upon receipt of an encrypted stanza, the receiving agent performs the following:
+            <list style="numbers">
+              <t>Determines if a valid SMK is available, associated with the SID specified by the 'id' attribute value of the &lt;e2e/&gt; element and the sending agent JID specified by the 'from' attribute of the wrapping stanza. If the receiving agent does not already have the CMK, it requests it according to <xref target="keyreq"/>.<vspace blankLines="1"/></t>
+              <t>Performs the message decryption steps from <xref target="JOSE-JWE"/> to generate the plaintext forwarding envelope string M', using the following inputs:<vspace blankLines="1"/>
+                <list style="symbols">
+                  <t>The JWE Header H from the &lt;encheader/&gt; element's character data content.<vspace blankLines="1"/></t>
+                  <t>The JWE Encrypted Key from the &lt;cmk/&gt; element's character data content.<vspace blankLines="1"/></t>
+                  <t>The JWE Initialization Vector/Nonce from the &lt;iv/&gt; element's character data content.<vspace blankLines="1"/></t>
+                  <t>The JWE Ciphertext C from the &lt;data/&gt; element's character data content.<vspace blankLines="1"/></t>
+                  <t>The JWE Integrity Value I from the &lt;mac/&gt; element's character data content.<vspace blankLines="1"/></t>
+                </list>
+              </t>
+              <t>Converts the forwarding envelope UTF-8 ecoded string M' into XML element M.<vspace blankLines="1"/></t>
+              <t>Obtains the UTC date and time N from the &lt;delay/&gt; child element, and verifies it is within the accepted range, as specified in <xref target="timestamps"/>.<vspace blankLines="1"/></t>
+              <t>Obtains the plaintext stanza S, which is a child element node of M; the stanza MUST be fully qualified with proper namespace declarations for XMPP stanzas, to help distinguish it from other content within M.<vspace blankLines="1"/>.</t>
             </list>
           </t>
-          <t>Constructs an &lt;e2e/&gt; element qualified by the  "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace as follows:<vspace blankLines="1"/>
-          <list style="symbols">
-            <t>The attribute 'id' set to the identifier value SID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character as E, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;iv/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character as IV, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as C, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
-            <t>The child element &lt;mac/&gt; qualified by the "urn"ietf:params:xml:ns:xmpp-e2e:4" namespace and with XML character data as I, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
-          </list>
-          </t>
-          <t>Sends the &lt;e2e/&gt; element as the payload of a stanza that SHOULD match the stanza from step 1 in kind (e.g., &lt;message/&gt;), type (e.g., "chat"), and addressing (e.g., to="romeo@montague.net" from="juliet@capulet.net/balcony"). If the original stanza (S) has a value for the "id" attribute, this stanza MUST NOT use the same value for its "id" attribute.<vspace blankLines="1"/></t>
-        </list>
-      </t>
+        </section>
+        <section title="Insufficient Information" anchor="encryption-decrypt-insufficient-info">
+          <t>At step 1, if the receiving agent is unable to obtain the CMK, or the receiving agent could not otherwise determine the additional information, it MAY return a &lt;bad-request/&gt; error to the sending agent (as described in <xref target="RFC6120"/>), optionally supplemented by an application-specific error condition element of &lt;insufficient-information/&gt;:</t>
+          <figure>
+            <artwork><![CDATA[
+<message xmlns='jabber:client'
+         from='juliet@capulet.lit/balcony'
+         id='fJZd9WFIIwNjFctT'
+         to='romeo@montegue.lit/garden'
+         type='chat'>
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
+       id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
+    <encheader>[XML character data]</encheader>
+    <cmk>[XML character data]</cmk>
+    <iv>[XML character data]</iv>
+    <data>[XML character data]</data>
+    <mac>[XML character data]</mac>
+  </e2e>
+  <error type='modify'>
+    <bad-request
+        xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
+    <insufficient-information
+        xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'/>
+  </error>
+</message>
+            ]]></artwork>
+          </figure>
+          <t>In addition to returning an error, the receiving agent SHOULD NOT present the stanza to the intended recipient (human or application) and SHOULD provide some explicit alternate processing of the stanza (which MAY be to display a message informing the recipient that it has received a stanza that cannot be decrypted).</t>
+        </section>
+        <section title="Failed Decryption" anchor="encryption-decrypt-failed">
+          <t>At step 2, if the receiving agent is unable to successfully decrypt the stanza, the receiving agent SHOULD return a &lt;bad-request/&gt; error to the sending agent (as described in <xref target="RFC6120"/>), optionally supplemented by an application-specific error condition element of &lt;decryption-failed/&gt; (previously defined in <xref target="RFC3923"/>):</t>
+          <figure>
+            <artwork><![CDATA[
+<message xmlns='jabber:client'
+         from='juliet@capulet.lit/balcony'
+         id='fJZd9WFIIwNjFctT'
+         to='romeo@montegue.lit/garden'
+         type='chat'>
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
+       id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
+    <encheader>[XML character data]</encheader>
+    <cmk>[XML character data]</cmk>
+    <iv>[XML character data]</iv>
+    <data>[XML character data]</data>
+    <mac>[XML character data]</mac>
+  </e2e>
+  <error type='modify'>
+    <bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
+    <decryption-failed xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'/>
+  </error>
+</message>
+            ]]></artwork>
+          </figure>
+          <t>In addition to returning an error, the receiving agent SHOULD NOT present the stanza to the intended recipient (human or application) and SHOULD provide some explicit alternate processing of the stanza (which MAY be to display a message informing the recipient that it has received a stanza that cannot be decrypted).</t>
+        </section>
+        <section title="Timestamp Not Acceptable" anchor="encryption-decrypt-timestamps">
+          <t>At step 4, if the stanza is successfully decrypted but the timestamp fails the checks outlined in <xref target="timestamps"/>, the receiving agent MAY return a &lt;not-acceptable/&gt; error to the sender (as described in <xref target="RFC6120"/>), optionally supplemented by an application-specific error condition element of &lt;bad-timestamp/&gt; (previously defined in <xref target="RFC3923"/>):</t>
+          <figure>
+            <artwork><![CDATA[
+<message xmlns='jabber:client'
+         from='juliet@capulet.lit/balcony'
+         id='fJZd9WFIIwNjFctT'
+         to='romeo@montegue.lit/garden'
+         type='chat'>
+  <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
+       id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
+    <encheader>[XML character data]</encheader>
+    <cmk>[XML character data]</cmk>
+    <iv>[XML character data]</iv>
+    <data>[XML character data]</data>
+    <mac>[XML character data]</mac>
+  </e2e>
+  <error type='modify'>
+    <bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
+    <bad-timestamp xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'/>
+  </error>
+</message>
+            ]]></artwork>
+          </figure>
+        </section>
+        <section title="Successful Decryption" anchor="encryption-decrypt-success">
+          <t>If the receiving agent successfully decrypted the payload, it MUST NOT return a stanza error.</t>
+          <t>If the payload is an &lt;iq/&gt; of type "get" or "set", and the response to this &lt;iq/&gt; is of type "error", the receiving agent MUST send the encrypted response wrapped in an &lt;iq/&gt; of type "result", to prevent exposing information about the payload.</t>
+        </section>
       </section>
-      <section title="Example - Securing a Message" anchor="encrypt-example-msg">
+      <section title="Example - Securing a Message" anchor="encryption-encrypt-example-msg">
         <t>NOTE: unless otherwise indicated, all line breaks are included for readability.</t>
         <t>The sending agent begins with the plaintext version of the &lt;message/&gt; stanza 'S':</t>
         <figure>
@@ -217,10 +328,10 @@ DJ751V6YiJ295_3jQUphxmQ
          type='chat'>
   <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
        id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
-    <header>
+    <encheader>
       eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDK0hTNTEyIiwia2lkI
       joiODM1YzkyYTgtOTRjZC00ZTk2LWIzZjMtYjJlNzVhNDM4ZjkyIn0
-    </header>
+    </encheader>
     <cmk>
       4ui5xwE1gEYjuptNgSIaMFlwWrAOxMqBkaplTxeJ6b2iT8kQP2HHy5PYp
       qqmDxlQgT5I5rO9mgAD7AUJ9Lx35fGdi5CMiRww
@@ -252,46 +363,92 @@ DJ751V6YiJ295_3jQUphxmQ
         </figure>
       </section>
     </section>
-    <section title="Decrypting XMPP Stanzas" anchor="decrypt">
-      <section title="Protocol Not Understood" anchor="decrypt-not-understood">
-        <t>If the receiving agent does not understand the protocol, it MUST do one and only one of the following: (1) ignore the &lt;e2e/&gt; extension, (2) ignore the entire stanza, or (3) return a &lt;service-unavailable/&gt; error to the sender, as described in <xref target="RFC6120"/>.</t>
-        <t>NOTE: If the inbound stanza is an &lt;iq/&gt;, the receiving agent MUST return an error to the sending agent, to comply with the exchanging of IQ stanzas in <xref target="RFC6121"/>.</t>
-      </section>
-      <section title="Process" anchor="decrypt-process">
-        <t>Upon receipt of an encrypted stanza, the receiving agent performs the following:
-          <list style="numbers">
-            <t>Determines if a valid SMK is available, associated with the SID specified by the 'id' attribute value of the &lt;e2e/&gt; element and the sending agent JID specified by the 'from' attribute of the wrapping stanza. If the receiving agent does not already have the CMK, it requests it according to <xref target="keyreq"/>.<vspace blankLines="1"/></t>
-            <t>Performs the message decryption steps from <xref target="JOSE-JWE"/> to generate the plaintext forwarding envelope string M', using the following inputs:<vspace blankLines="1"/>
-              <list style="symbols">
-                <t>The JWE Header H from the &lt;header/&gt; element's character data content.<vspace blankLines="1"/></t>
-                <t>The JWE Encrypted Key from the &lt;cmk/&gt; element's character data content.<vspace blankLines="1"/></t>
-                <t>The JWE Initialization Vector/Nonce from the &lt;iv/&gt; element's character data content.<vspace blankLines="1"/></t>
-                <t>The JWE Ciphertext C from the &lt;data/&gt; element's character data content.<vspace blankLines="1"/></t>
-                <t>The JWE Integrity Value I from the &lt;mac/&gt; element's character data content.<vspace blankLines="1"/></t>
-              </list>
-            </t>
-            <t>Converts the forwarding envelope UTF-8 ecoded string M' into XML element M.<vspace blankLines="1"/></t>
-            <t>Obtains the UTC date and time N from the &lt;delay/&gt; child element, and verifies it is within the accepted range, as specified in <xref target="timestamps"/>.<vspace blankLines="1"/></t>
-            <t>Obtains the plaintext stanza S, which is a child element node of M; the stanza MUST be fully qualified with proper namespace declarations for XMPP stanzas, to help distinguish it from other content within M.<vspace blankLines="1"/>.</t>
-          </list>
+    <section title="Signatures" anchor="signatures">
+      <section title="Determining Support" anchor="signatures-disco">
+        <t>If an agent supports end-to-end object signatures, it MUST advertize that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:5:signatures".
+          <figure>
+            <artwork><![CDATA[
+<iq xmlns='jabber:client'
+    id='disco1'
+    to='romeo@montegue.lit/garden'
+    type='result'>
+  <query xmlns='http://jabber.org/protocol/disco#info'>
+    ...
+    <feature xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5:signatures'/>
+    ...
+  </query>
+</iq>
+            ]]></artwork>
+          </figure>
         </t>
+        <t>To help facilitate discovery, an agent SHOULD also include <xref target='XEP-0115'/> information in any directed or broadcast presence updates.</t>
       </section>
-      <section title="Insufficient Information" anchor="decrypt-insufficient-info">
-        <t>At step 1, if the receiving agent is unable to obtain the CMK, or the receiving agent could not otherwise determine the additional information, it MAY return a &lt;bad-request/&gt; error to the sending agent (as described in <xref target="RFC6120"/>), optionally supplemented by an application-specific error condition element of &lt;insufficient-information/&gt;:</t>
-        <figure>
-          <artwork><![CDATA[
+      <section title="Signing XMPP Stanzas" anchor="signatures-sign">
+        <t>The basic process that a sending agent follows for authenticating stanzas is the same regardless of the kind of stanza (i.e., &lt;iq/&gt;, &lt;message/&gt;, or &lt;presence/&gt;).</t>
+        <section title="Process" anchor="signatures-sign-process">
+          <t>For a given plaintext stanza (S), the sending agent performs the following:
+            <list style="numbers">
+              <t>Ensures the plaintext stanza is fully qualified, including the proper namespace declarations (e.g., contains the attribute 'xmlns' set to the value "jabber:client" for 'jabber:client' stanzas defined in <xref target="RFC6120"/>).<vspace blankLines="1"/></t>
+              <t>Notes the current UTC date and time (N) when this stanza is constructed, formatted as described under <xref target="timestamps"/>.<vspace blankLines="1"/></t>
+              <t>Constructs a forwarding envelope (M) using a &lt;forwarded/&gt; element qualified by the "urn:xmpp:forward:0" namespace (as defined in <xref target="XEP-0297"/>) as follows:<vspace blankLines="1"/>
+                <list style="symbols">
+                  <t>The child element &lt;delay/&gt; qualified by the "urn:xmpp:delay" namespace (as defined in <xref target="XEP-0203"/>) with the attribute 'stamp' set to the UTC date and time value N<vspace blankLines="1"/></t>
+                  <t>The plaintext stanza S<vspace blankLines="1"/></t>
+                </list>
+              </t>
+              <t>Converts the forwarding envelope (M) to a UTF-8 encoded string (M'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. M' = UTF8-encode(M).  We call M' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
+              <t>Chooses a private asymmetric key PK for which the sending agent has the public key. Alternatively, generates a symmetric message authentication code (MAC) key.<vspace blankLines="1"/></t>
+              <t>Performs the message signatures steps from <xref target="JOSE-JWS"/> to generate the JWS Header (H) and JWS Signature (I); using the following inputs:<vspace blankLines="1"/>
+                <list style="symbols">
+                  <t>The 'alg' property is set to an appropriate signature algorithm for PK (e.g., "R256").</t>
+                  <t>M' as the JWS Payload.</t>
+                </list>
+              </t>
+              <t>Constructs an &lt;e2e/&gt; elmeent qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace as follows:<vspace blankLines="1"/>
+                <list style="symbols">
+                  <t>The attribute 'type' set to the value "sig"</t>
+                  <t>The child element &lt;sigheader/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as H, encoded base64url as per <xref target="RFC4648"/>.<vspace blankLines="1"/></t>
+                  <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as M', encoded base64url as per <xref target="RFC4648"/>.<vspace blankLines="1"/></t>
+                  <t>The child element &lt;sig/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as I, encoded base64url as per <xref target="RFC4648"/>.<vspace blankLines="1"/></t>
+                </list>
+              </t>
+              <t>Sends the &lt;e2e/&gt; element as the payload of a stanza that SHOULD match the stanza from step 1 in kind (e.g., &lt;message/&gt;), type (e.g., "chat"), and addressing (e.g., to="romeo@montegue.lit" from="juliet@capulet.lit/balcony"). If the original stanza (S) has a value for the 'id' attribute, this stanza SHOULD NOT use the same value for its "id" attribute<!-- ; the 'id' attribute MAY match if the sending agent is using the optimistic signing method <xref target="signature-optimistic"/> -->.</t>
+            </list>
+          </t>
+        </section>
+      </section>
+      <section title="Verifying Signed XMPP Stanzas" anchor="signatures-verify">
+        <section title="Process" anchor="signatures-verify-process">
+          <t>Upon receipt of a signed stanza, the receiving agent performs the following:<vspace blankLines="1"/>
+            <list style="numbers">
+              <t>Ensures it has appropriate materials to verify the signature, which generally means ensuring that it possesses one or more public keys for the sending agent (if one is not provided as part of the JWS Header).</t>
+              <t>Performs the message validation steps from <xref target="JOSE-JWS"/>, with the following inputs:<vspace blankLines="1"/>
+                <list style="symbols">
+                  <t>The JWS Header H from the &lt;sigheader/&gt; element's character data content.<vspace blankLines="1"/></t>
+                  <t>The JWS Playload M' from the &lt;data/&gt; element's character data content.<vspace blankLines="1"/></t>
+                  <t>The JWS Signature from the &lt;sig/&gt; element's character data content.<vspace blankLines="1"/></t>
+                </list>
+              </t>
+              <t>Converts the forwarding envelope UTF-encoded string M' into XML element M.<vspace blankLines="1"/></t>
+              <t>Obtains the UTC date and time N from the &lt;delay/&gt; child element, and verifies it is within the accepted range, as specified in <xref target="timestamps"/>.<vspace blankLines="1"/></t>
+              <t>Obtains the plaintext stanza S, which is a child element node of M; the stanza MUST be fully qualified with the proper namespace declrations from XMPP stanzas, to help distinguish it from other content within M.</t>
+            </list>
+          </t>
+        </section>
+        <section title="Insufficient Information" anchor="signatures-verify-insufficient-info">
+          <t>At step 1, if the receiving agent does not have the key used to sign the stanza, or the receiving agent could not otherwise determine it, it MAY return a &lt;bad-request/gt; error to the sending agent (as described in <xref target="RFC6120"/>), optionally supplemented by an application-specific error condition element of &lt;insufficient-information/&gt;:</t>
+          <figure>
+            <artwork><![CDATA[
 <message xmlns='jabber:client'
          from='juliet@capulet.lit/balcony'
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
   <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
-       id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
-    <header>[XML character data]</header>
-    <cmk>[XML character data]</cmk>
-    <iv>[XML character data]</iv>
+       type='sig'>
+    <sigheader>[XML character data]</sigheader>
     <data>[XML character data]</data>
-    <mac>[XML character data]</mac>
+    <sig>[XML character data]</sig>
   </e2e>
   <error type='modify'>
     <bad-request
@@ -300,64 +457,65 @@ DJ751V6YiJ295_3jQUphxmQ
         xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'/>
   </error>
 </message>
-          ]]></artwork>
-        </figure>
-        <t>In addition to returning an error, the receiving agent SHOULD NOT present the stanza to the intended recipient (human or application) and SHOULD provide some explicit alternate processing of the stanza (which MAY be to display a message informing the recipient that it has received a stanza that cannot be decrypted).</t>
-      </section>
-      <section title="Failed Decryption" anchor="decrypt-failed">
-        <t>At step 2, if the receiving agent is unable to successfully decrypt the stanza, the receiving agent SHOULD return a &lt;bad-request/&gt; error to the sending agent (as described in <xref target="RFC6120"/>), optionally supplemented by an application-specific error condition element of &lt;decryption-failed/&gt; (previously defined in <xref target="RFC3923"/>):</t>
-        <figure>
-          <artwork><![CDATA[
+            ]]></artwork>
+          </figure>
+          <t>In addition to returning an error, the receiving agent SHOULD NOT present the stanza to the intended recipient (human or application) and SHOULD provide some explicit alternate processing of the stanza (which MAY be to display a message informing the recipient that it has received a stanza that cannot be verified).</t>
+        </section>
+        <section title="Failed Verification" anchor="signatures-verify-failed">
+          <t>At step 2, if the receiving agent is unable to successfully verify the stanza, the receiving agent SHOULD return a &lt;bad-request/&gt; error to the sending agent (as described in <xref target="RFC6120"/>), optionally supplemented by an application-specific error condition element of &lt;verification-failed/&gt;:</t>
+          <figure>
+            <artwork><![CDATA[
 <message xmlns='jabber:client'
          from='juliet@capulet.lit/balcony'
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
   <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
-       id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
-    <header>[XML character data]</header>
-    <cmk>[XML character data]</cmk>
-    <iv>[XML character data]</iv>
+       type='sig'>
+    <sigheader>[XML character data]</sigheader>
     <data>[XML character data]</data>
-    <mac>[XML character data]</mac>
+    <sig>[XML character data]</sig>
   </e2e>
   <error type='modify'>
-    <bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
-    <decryption-failed xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'/>
+    <bad-request
+        xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
+    <verification-failed
+        xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'/>
   </error>
 </message>
-          ]]></artwork>
-        </figure>
-        <t>In addition to returning an error, the receiving agent SHOULD NOT present the stanza to the intended recipient (human or application) and SHOULD provide some explicit alternate processing of the stanza (which MAY be to display a message informing the recipient that it has received a stanza that cannot be decrypted).</t>
-      </section>
-      <section title="Timestamp Not Acceptable" anchor="decrypt-timestamps">
-        <t>At step 4, if the stanza is successfully decrypted but the timestamp fails the checks outlined in <xref target="timestamps"/>, the receiving agent MAY return a &lt;not-acceptable/&gt; error to the sender (as described in <xref target="RFC6120"/>), optionally supplemented by an application-specific error condition element of &lt;bad-timestamp/&gt; (previously defined in <xref target="RFC3923"/>):</t>
-        <figure>
-          <artwork><![CDATA[
+            ]]></artwork>
+          </figure>
+          <t>In addition to returning an error, the receiving agent SHOULD NOT present the stanza to the intended recipient (human or application) and SHOULD provide some explicit alternate processing of the stanza (which MAY be to display a message informing the recipient that it has received a stanza that cannot be verified).</t>
+        </section>
+        <section title="Timestamp Not Acceptable" anchor="siguatures-verify-timestamps">
+          <t>At step 4, if the stanza is successfully verified but the timestamp fails the checks outlined in <xref target="timestamps"/>, the receiving agent MAY return a &lt;not-acceptable/&gt; error to the sender (as described in <xref target="RFC6120"/>), optionally supplemented by an application-specific error condition element of &lt;bad-timestamp/&gt; (previously defined in <xref target="RFC3923"/>):</t>
+          <figure>
+            <artwork><![CDATA[
 <message xmlns='jabber:client'
          from='juliet@capulet.lit/balcony'
          id='fJZd9WFIIwNjFctT'
          to='romeo@montegue.lit/garden'
          type='chat'>
   <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
-       id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
-    <header>[XML character data]</header>
-    <cmk>[XML character data]</cmk>
-    <iv>[XML character data]</iv>
+       type='sig'>
+    <sigheader>[XML character data]</sigheader>
     <data>[XML character data]</data>
-    <mac>[XML character data]</mac>
+    <sig>[XML character data]</sig>
   </e2e>
   <error type='modify'>
-    <bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
-    <bad-timestamp xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'/>
+    <not-acceptable
+        xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
+    <bad-timestamp
+        xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'/>
   </error>
 </message>
-          ]]></artwork>
-        </figure>
-      </section>
-      <section title="Successful Decryption" anchor="decrypt-success">
-        <t>If the receiving agent successfully decrypted the payload, it MUST NOT return a stanza error.</t>
-        <t>If the payload is an &lt;iq/&gt; of type "get" or "set", and the response to this &lt;iq/&gt; is of type "error", the receiving agent MUST send the encrypted response wrapped in an &lt;iq/&gt; of type "result", to prevent exposing information about the payload.</t>
+            ]]></artwork>
+          </figure>
+        </section>
+        <section title="Successful Verification" anchor="signatures-verify-success">
+          <t>If the receiving agent successfully verified the payload, it SHOULD NOT return a stanza error. However, if the signed stanza is an &lt;iq/&gt; of type "get" or "set", the response MAY be sent unsigned if the receiving agent does not have an appropriate public-private key-pair.</t>
+          <t>Otherwise, the receiving agent SHOULD send the &lt;iq/&gt; response signed as per <xref target="signatures-sign-process"/>, with the 'type' attribute set to the value "result", even if the response to the signed &lt;iq/&gt; stanza is of type "error". The error applies to the signed stanza, not the wrapping stanza.</t>
+        </section>
       </section>
     </section>
     <section title="Requesting Session Keys" anchor="keyreq">
@@ -385,7 +543,7 @@ DJ751V6YiJ295_3jQUphxmQ
               <t>The "kty" parameter MUST be "oct".<vspace blankLines="1"/></t>
               <t>The "kid" parameter MUST be the SID.<vspace blankLines="1"/></t>
               <t>The "k" parameter MUST be the SMK, encoded as base64url.<vspace blankLines="1"/></t>
-              <t>The "use" parameter, if present, MUST be set to the algorithm in use for encrypting messages from <xref target="encrypt"/>.<vspace blankLines="1"/></t>
+              <t>The "use" parameter, if present, MUST be set to the algorithm in use for encrypting messages from <xref target="encryption-encrypt"/>.<vspace blankLines="1"/></t>
               <t>The "use" parameter, if present, MUST be set to "enc".<vspace blankLines="1"/></t>
             </list>
           </t>
@@ -402,7 +560,7 @@ DJ751V6YiJ295_3jQUphxmQ
           <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the SMK identifier SID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;header/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;encheader/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
             <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as E, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
             <t>The child element &lt;iv/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as IV, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
             <t>The child element &lt;data/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:5" namespace and with XML character data as C, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
@@ -546,10 +704,10 @@ kc8i_qtXi-9XPmSVei3A_Jw
           <artwork><![CDATA[
 <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
         id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
-  <header>
+  <encheader>
     eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMrSFM1MTIiLCJraWQ
     iOiJyb21lb0Btb250ZWd1ZS5saXQvZ2FyZGVuIn0
-  </header>
+  </encheader>
   <cmk>
     UeoVeGcZP-VsLu1PVj3NNWkmmEF7H2Nl_mHWscOuT_vYn-4ub2NEnRy4dzy
     ycgxny6jmRPpNiGJB6AfI4TYZvrjig5dubv4uG7phCvKYVI3uaUU58Fc9H_
@@ -583,10 +741,10 @@ kc8i_qtXi-9XPmSVei3A_Jw
     type='result'>
   <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:5'
           id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
-    <header>
+    <encheader>
       eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMrSFM1MTIiLCJraWQ
       iOiJyb21lb0Btb250ZWd1ZS5saXQvZ2FyZGVuIn0
-    </header>
+    </encheader>
     <cmk>
       UeoVeGcZP-VsLu1PVj3NNWkmmEF7H2Nl_mHWscOuT_vYn-4ub2NEnRy4dzy
       ycgxny6jmRPpNiGJB6AfI4TYZvrjig5dubv4uG7phCvKYVI3uaUU58Fc9H_
@@ -622,19 +780,20 @@ kc8i_qtXi-9XPmSVei3A_Jw
           <t>If any of the foregoing checks fails, the timestamp SHOULD be presented to the receiving entity (human or application) marked as "old timestamp", "future timestamp", or "decreasing timestamp", and the receiving entity MAY return a stanza error to the sender.</t>
         </list>
       </t>
-      <t>The foregoing timestamp checks assume that the recipient is online when the message is received.  However, if the recipient is offline then the server might store the message for delivery when the recipient is next online (offline storage does not apply to &lt;iq/&gt; or &lt;presence/&gt; stanzas, only &lt;message/&gt; stanzas).  As described in <xref target="XEP-0160"/>, when sending an offline message to the recipient, the server SHOULD include delayed delivery data as specified in <xref target="XEP-0203"/> so that the recipient knows that this is an offline message and also knows the original time of receipt at the server.  In this case, the recipient SHOULD verify that the timestamp received in the encrypted message is within five minutes of the time stamped by the recipient's server in the &lt;delay/&gt; element.</t>
+      <t>The foregoing timestamp checks assume that the recipient is online when the message is received.  However, if the recipient is offline then the server might store the message for delivery when the recipient is next online (offline storage does not apply to &lt;iq/&gt; or &lt;presence/&gt; stanzas, only &lt;message/&gt; stanzas).  As described in <xref target="XEP-0160"/>, when sending an offline message to the recipient, the server SHOULD include delayed delivery data as specified in <xref target="XEP-0203"/> so that the recipient knows that this is an offline message and also knows the original time of receipt at the server.  In this case, the recipient SHOULD verify that the timestamp received in the encrypted or signed message is within five minutes of the time stamped by the recipient's server in the &lt;delay/&gt; element.</t>
     </section>
     <section title="Interaction with Stanza Semantics" anchor="interact">
       <t>The following limitations and caveats apply:</t>
       <t>
         <list style="symbols">
           <t>Undirected &lt;presence/&gt; stanzas SHOULD NOT be encrypted. Such stanzas are delivered to anyone the sender has authorized, and can generate a large volume of key requests.<vspace blankLines="1"/></t>
+          <t>Undirected &lt;presence/&gt; stanzas MAY be signed, however note that signatures significantly increase the size of a stanza kind that will likely be multiplexed across the XMPP network.</t>
           <t>Stanzas directed to multiplexing services (e.g., multi-user chat) SHOULD NOT be encrypted, unless the sender has established an acceptable trust relationship with the multiplexing service.<vspace blankLines="1"/></t>
         </list>
       </t>
     </section>
     <section title="Mandatory-to-Implement Cryptographic Algorithms" anchor="mti">
-      <t>All algorithms that MUST be implemented for <xref target="JOSE-JWE"/> also MUST be implemented for this specification.</t>
+      <t>All algorithms that MUST be implemented for <xref target="JOSE-JWE"/> and <xref target="JOSE-JWS"/> also MUST be implemented for this specification. However, this specification further mandates the use of asymmetric keys for signatures and key requests, specifically "RSA1_5" for encryption and "RS256" for signatures.</t>
     </section>
     <!--
     <section title="Certificates" anchor="certs">
@@ -748,6 +907,32 @@ kc8i_qtXi-9XPmSVei3A_Jw
         </front>
         <seriesInfo name="Internet-Draft" value="draft-jones-jose-json-private-and-symmetric-key-00"/>
         <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-jones-jose-json-private-and-symmetric-key-00.txt"/>
+      </reference>
+      <reference anchor="JOSE-JWS">
+        <front>
+          <title>JSON Web Signature (JWS)</title>
+          <author initials="M." surname="Jones" fullname="Michael B. Jones">
+            <organization>Microsoft</organization>
+            <address>
+              <email>mjb@microsoft.com</email>
+            </address>
+          </author>
+          <author initials="J." surname="Bradley" fullname="John Bradley">
+            <organization>Ping Identity</organization>
+            <address>
+              <email>ve7jtb@ve7jtb.com</email>
+            </address>
+          </author>
+          <author initials="N." surname="Sakimura" fullname="Nat Sakimura">
+            <organization>Nomura Research Institute</organization>
+            <address>
+              <email>n-sakimura@nri.co.jp</email>
+            </address>
+          </author>
+          <date year="2012" month="December"/>
+        </front>
+        <seriesInfo name="Internet-Draft" value="draft-ietf-jose-json-web-signature-08"/>
+        <format type="TXT" target="http://www.ietf.org/internet-drafts/draft-ietf-jose-json-web-signature-08.txt"/>
       </reference>
       <reference anchor="JOSE-KEYPROTECT">
         <front>
@@ -1062,7 +1247,15 @@ kc8i_qtXi-9XPmSVei3A_Jw
 
   <xs:element name='e2e'>
     <xs:complexType>
-      <xs:attribute name='id' type='xs:string' use='required'/>
+      <xs:attribute name='id' type='xs:string' use='optional'/>
+      <xs:attribute name='type'use='required'>
+        <xs:simpleType>
+          <xs:restriction base='xs:NMTOKEN'>
+            <xs:enumeration value='enc'/>
+            <xs:enumeration value='sig'/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
       <xs:sequence>
         <xs:element ref='header' minOccurs='1' maxOccurs='1'/>
         <xs:element ref='cmk' minOccurs='1' maxOccurs='1'/>
@@ -1114,7 +1307,7 @@ kc8i_qtXi-9XPmSVei3A_Jw
     </xs:complexType>
   </xs:element>
 
-  <xs:element name='header'>
+  <xs:element name='encheader'>
     <xs:complexType>
       <xs:simpleType>
         <xs:extension base='xs:string'>
@@ -1141,7 +1334,7 @@ kc8i_qtXi-9XPmSVei3A_Jw
     </xs:complexType>
   </xs:element>
 
-  <xs:element name='smk'>
+  <xs:element name='sigheader'>
     <xs:complexType>
       <xs:simpleType>
         <xs:extension base='xs:string'>
@@ -1153,6 +1346,7 @@ kc8i_qtXi-9XPmSVei3A_Jw
   <xs:element name='bad-timestamp' type='empty'/>
   <xs:element name='decryption-failed' type='empty'/>
   <xs:element name='insufficient-information' type='empty'/>
+  <xs:element name='verification-failed' type='empty'/>
 
   <xs:simpleType name='empty'>
     <xs:restriction base='xs:string'>
