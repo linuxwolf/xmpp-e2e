@@ -34,7 +34,7 @@
   </front>
   <middle>
     <section title="Introduction" anchor="intro">
-      <t>End-to-end protection and authentication of traffic sent over the Extensible Messaging and Presence Protocol <xref target="RFC6120"/> is a desirable goal.  Many possible approaches to meet those (or similar) requirements have been proposed over the years, including methods based on PGP, S/MIME, SIGMA, and TLS.</t>
+      <t>End-to-end protection and authentication of traffic sent over the Extensible Messaging and Presence Protocol <xref target="RFC6120"/> is a desirable goal.  Requirements and a threat analysis for XMPP encryption are provided in <xref target="E2E-REQ"/>. Many possible approaches to meet those (or similar) requirements have been proposed over the years, including methods based on PGP, S/MIME, SIGMA, and TLS.</t>
       <t>Most proposals have not been able to support multiple end-points for a given recipient. As more devices support XMPP, it becomes more desirable to allow an entity to communicate with another in a more secure manner, regardless of the number of agents the entity is employing. This document specifies an approach for encrypting and signing communications between two entities which each might have multiple end-points.</t>
     </section>
     <section title="Terminology" anchor="terms">
@@ -43,7 +43,7 @@
     </section>
     <section title="Encryption" anchor="encryption">
       <section title="Determining Support" anchor="encryption-disco">
-        <t>If an agent supports receiving end-to-end object encryption, it MUST advertize that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:6:encryption".</t>
+        <t>If an agent supports receiving end-to-end object encryption, it MUST advertise that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:6:encryption".</t>
         <figure>
           <artwork><![CDATA[
 <iq xmlns='jabber:client'
@@ -58,7 +58,7 @@
 </iq>
           ]]></artwork>
         </figure>
-        <t>To help facilitate discovery, an agent SHOULD also include <xref target='XEP-0115'/> information in any directed or broadcast presence updates.</t>
+        <t>To facilitate discovery, an agent SHOULD also include <xref target='XEP-0115'/> information in any directed or broadcast presence updates.</t>
       </section>
       <section title="Encrypting XMPP Stanzas" anchor="encryption-encrypt">
         <t>The process that a sending agent follows for securing stanzas is the same regardless of the form of stanza (i.e., &lt;iq/&gt;, &lt;message/&gt;, or &lt;presence/&gt;).</t>
@@ -120,7 +120,7 @@
         <section title="Process" anchor="encryption-decrypt-process">
           <t>Upon receipt of an encrypted stanza, the receiving agent performs the following:
             <list style="numbers">
-              <t>Determines if a valid SMK is available, associated with the SID specified by the 'id' attribute value of the &lt;e2e/&gt; element and the sending agent JID specified by the 'from' attribute of the wrapping stanza. If the receiving agent does not already have the CMK, it requests it according to <xref target="keyreq"/>.<vspace blankLines="1"/></t>
+              <t>Determines if a valid SMK is available, associated with the SID specified by the 'id' attribute value of the &lt;e2e/&gt; element and the sending agent JID specified by the 'from' attribute of the wrapping stanza. If the receiving agent does not already have the SMK, it requests it according to <xref target="keyreq"/>.<vspace blankLines="1"/></t>
               <t>Performs the message decryption steps from <xref target="JOSE-JWE"/> to generate the plaintext forwarding envelope string M', using the following inputs:<vspace blankLines="1"/>
                 <list style="symbols">
                   <t>The JWE Header H from the &lt;encheader/&gt; element's character data content.<vspace blankLines="1"/></t>
@@ -130,7 +130,7 @@
                   <t>The JWE Integrity Value I from the &lt;mac/&gt; element's character data content.<vspace blankLines="1"/></t>
                 </list>
               </t>
-              <t>Converts the forwarding envelope UTF-8 ecoded string M' into XML element M.<vspace blankLines="1"/></t>
+              <t>Converts the forwarding envelope UTF-8 encoded string M' into XML element M.<vspace blankLines="1"/></t>
               <t>Obtains the UTC date and time N from the &lt;delay/&gt; child element, and verifies it is within the accepted range, as specified in <xref target="timestamps"/>.<vspace blankLines="1"/></t>
               <t>Obtains the plaintext stanza S, which is a child element node of M; the stanza MUST be fully qualified with proper namespace declarations for XMPP stanzas, to help distinguish it from other content within M.<vspace blankLines="1"/>.</t>
             </list>
@@ -365,7 +365,7 @@ DJ751V6YiJ295_3jQUphxmQ
     </section>
     <section title="Signatures" anchor="signatures">
       <section title="Determining Support" anchor="signatures-disco">
-        <t>If an agent supports receiving end-to-end object signatures, it MUST advertize that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:6:signatures".</t>
+        <t>If an agent supports receiving end-to-end object signatures, it MUST advertise that fact in its responses to <xref target="XEP-0030"/> information ("disco#info") requests by returning a feature of "urn:ietf:params:xml:ns:xmpp-e2e:6:signatures".</t>
         <figure>
           <artwork><![CDATA[
 <iq xmlns='jabber:client'
@@ -380,7 +380,7 @@ DJ751V6YiJ295_3jQUphxmQ
 </iq>
           ]]></artwork>
         </figure>
-        <t>To help facilitate discovery, an agent SHOULD also include <xref target='XEP-0115'/> information in any directed or broadcast presence updates.</t>
+        <t>To facilitate discovery, an agent SHOULD also include <xref target='XEP-0115'/> information in any directed or broadcast presence updates.</t>
       </section>
       <section title="Signing XMPP Stanzas" anchor="signatures-sign">
         <t>The basic process that a sending agent follows for authenticating stanzas is the same regardless of the kind of stanza (i.e., &lt;iq/&gt;, &lt;message/&gt;, or &lt;presence/&gt;).</t>
@@ -396,14 +396,14 @@ DJ751V6YiJ295_3jQUphxmQ
                 </list>
               </t>
               <t>Converts the forwarding envelope (M) to a UTF-8 encoded string (M'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. M' = UTF8-encode(M).  We call M' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
-              <t>Chooses a private asymmetric key PK for which the sending agent has the public key.<vspace blankLines="1"/></t>
+              <t>Chooses a private asymmetric key PK for which the sending agent has published the corresponding public key to the intended recipients.<vspace blankLines="1"/></t>
               <t>Performs the message signatures steps from <xref target="JOSE-JWS"/> to generate the JWS Header (H) and JWS Signature (I); using the following inputs:<vspace blankLines="1"/>
                 <list style="symbols">
                   <t>The 'alg' property is set to an appropriate signature algorithm for PK (e.g., "R256").</t>
                   <t>M' as the JWS Payload.</t>
                 </list>
               </t>
-              <t>Constructs an &lt;e2e/&gt; elmeent qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:6" namespace as follows:<vspace blankLines="1"/>
+              <t>Constructs an &lt;e2e/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:6" namespace as follows:<vspace blankLines="1"/>
                 <list style="symbols">
                   <t>The attribute 'type' set to the value "sig"</t>
                   <t>The child element &lt;sigheader/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:6" namespace and with XML character data as H, encoded base64url as per <xref target="RFC4648"/>.<vspace blankLines="1"/></t>
@@ -663,7 +663,7 @@ e8JQZp-TRgH1y3pEHCuaLce6zpA
     <section title="Requesting Session Keys" anchor="keyreq">
       <t>Because of the dynamic nature of XMPP stanza routing, the protocol does not exchange session keys as part of the encrypted stanza. Instead, a separate protocol is used by receiving agents to request a particular session key from the sending agent.</t>
       <section title="Request Process" anchor="keyreq-process-request">
-        <t>Before a SMK can be requested, the receiving agent MUST have at least one public key for which it also has the private key.</t>
+        <t>Before a SMK can be requested, the receiving agent MUST have at least one public key for which it also has the private key. The public key(s) are provided to the sending agent as part of this process.</t>
         <t>To request a SMK, the receiving agent performs the following:<vspace blankLines="1"/>
         <list style="numbers">
           <t>Constructs a <xref target="JOSE-JWK"/> JWK Set (KS), containing information about each public key the requesting agent wishes to use.  Each key SHOULD include a value for the property 'kid' which uniquely identifies it within the context of all provided keys.  Each key MUST include a value for the property 'kid' if any two keys use the same algorithm.<vspace blankLines="1"/></t>
@@ -945,7 +945,12 @@ kc8i_qtXi-9XPmSVei3A_Jw
       </t>
     </section>
     <section title="Mandatory-to-Implement Cryptographic Algorithms" anchor="mti">
-      <t>All algorithms that MUST be implemented for <xref target="JOSE-JWE"/> and <xref target="JOSE-JWS"/> also MUST be implemented for this specification. However, this specification further mandates the use of asymmetric keys for signatures and key requests, specifically "RSA1_5" for encryption and "RS256" for signatures.</t>
+      <t>All algorithms that MUST be implemented for <xref target="JOSE-JWE"/> and <xref target="JOSE-JWS"/> also MUST be implemented for this specification. However, this specification further mandates the use of the following:
+        <list style="symbols">
+          <t>MUST implement the "RSA1_5" JWE algorithm.<vspace blankLines="1"/></t>
+          <t>MUST implement the "RS256" JWS algorithm.<vspace blankLines="1"/></t>
+        </list>
+      </t>
     </section>
     <!--
     <section title="Certificates" anchor="certs">
@@ -1509,6 +1514,9 @@ kc8i_qtXi-9XPmSVei3A_Jw
 </xs:schema>
         ]]></artwork>
       </figure>
+    </section>
+    <section title="Acknowledgements" anchor="acknowledgements">
+      <t>Thanks to Richard Barnes, Andrew Biggs, and Ben Schumacher for their feedback.</t>
     </section>
   </back>
 </rfc>
