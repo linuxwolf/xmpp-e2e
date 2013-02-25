@@ -439,7 +439,7 @@ DJ751V6YiJ295_3jQUphxmQ
           </t>
         </section>
         <section title="Insufficient Information" anchor="signatures-verify-insufficient-info">
-          <t>At step 1, if the receiving agent does not have the key used to sign the stanza, or the receiving agent could not otherwise determine it, it MAY return a &lt;bad-request/gt; error to the sending agent (as described in <xref target="RFC6120"/>), optionally supplemented by an application-specific error condition element of &lt;insufficient-information/&gt;:</t>
+          <t>At step 1, if the receiving agent does not have the key used to sign the stanza, or the receiving agent could not otherwise determine it, it MAY return a &lt;bad-request/&gt; error to the sending agent (as described in <xref target="RFC6120"/>), optionally supplemented by an application-specific error condition element of &lt;insufficient-information/&gt;:</t>
           <figure>
             <artwork><![CDATA[
 <message xmlns='jabber:client'
