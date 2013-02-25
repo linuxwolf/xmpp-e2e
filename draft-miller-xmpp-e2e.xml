@@ -5,7 +5,7 @@
 <?rfc symrefs="yes"?>
 <?rfc toc="yes"?>
 <?rfc tocdepth="4"?>
-<rfc category="std" docName="draft-miller-xmpp-e2e-04" ipr="trust200902">
+<rfc category="std" docName="draft-miller-xmpp-e2e-05" ipr="trust200902">
   <front>
     <title abbrev="XMPP E2E">End-to-End Object Encryption and Signatures for the Extensible Messaging and Presence Protocol (XMPP)</title>
     <author initials="M." surname="Miller" fullname="Matthew Miller">
@@ -22,7 +22,7 @@
         <email>mamille2@cisco.com</email>
       </address>
     </author>
-    <date month="February" day="12" year="2013"/>
+    <date month="February" day="25" year="2013"/>
     <area>RAI</area>
     <workgroup>XMPP</workgroup>
     <keyword>Internet-Draft</keyword>

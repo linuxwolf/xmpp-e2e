@@ -10,7 +10,7 @@ Expires: August 29, 2013
 
 End-to-End Object Encryption and Signatures for the Extensible Messaging
                       and Presence Protocol (XMPP)
-                        draft-miller-xmpp-e2e-04
+                        draft-miller-xmpp-e2e-05
 
 Abstract
 
