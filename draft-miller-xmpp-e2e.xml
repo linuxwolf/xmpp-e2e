@@ -88,7 +88,7 @@
             <t>Generates any additional unprotected block cipher factors (IV); e.g., initialization vector/nonce.  A sending agent MUST ensure that no two sets of factors are used with the same CMK, and SHOULD NOT reuse such factors for other stanzas.<vspace blankLines="1"/></t>
             <t>Performs the message encryption steps from <xref target='JOSE-JWE'/> to generate the JWE Header (H), JWE Encrypted Key (E), JWE Ciphertext (C), and JWE Integrity Value (I); using the following inputs:<vspace blankLines="1"/>
               <list style="symbols">
-                <t>The 'alg' property is set to an appropriate key wrapping algorithm (e.g., "A256KW" or "A128KW"); recipients use 'keyreq' in <xref target='keyreq'/> to obtain the SMK.<vspace blankLines="1"/></t>
+                <t>The 'alg' property is set to an appropriate key wrapping algorithm (e.g., "A256KW" or "A128KW"); recipients use the key request process in <xref target='keyreq'/> to obtain the SMK.<vspace blankLines="1"/></t>
                 <t>The 'enc' property is set to the intended content encryption algorithm.<vspace blankLines="1"/></t>
                 <t>SMK as the key for CMK Encryption.<vspace blankLines="1"/></t>
                 <t>CMK as the JWE Content Master Key.<vspace blankLines="1"/></t>
@@ -123,16 +123,16 @@
               <t>Determines if a valid SMK is available, associated with the SID specified by the 'id' attribute value of the &lt;e2e/&gt; element and the sending agent JID specified by the 'from' attribute of the wrapping stanza. If the receiving agent does not already have the SMK, it requests it according to <xref target="keyreq"/>.<vspace blankLines="1"/></t>
               <t>Performs the message decryption steps from <xref target="JOSE-JWE"/> to generate the plaintext forwarding envelope string M', using the following inputs:<vspace blankLines="1"/>
                 <list style="symbols">
-                  <t>The JWE Header H from the &lt;encheader/&gt; element's character data content.<vspace blankLines="1"/></t>
-                  <t>The JWE Encrypted Key from the &lt;cmk/&gt; element's character data content.<vspace blankLines="1"/></t>
-                  <t>The JWE Initialization Vector/Nonce from the &lt;iv/&gt; element's character data content.<vspace blankLines="1"/></t>
-                  <t>The JWE Ciphertext C from the &lt;data/&gt; element's character data content.<vspace blankLines="1"/></t>
-                  <t>The JWE Integrity Value I from the &lt;mac/&gt; element's character data content.<vspace blankLines="1"/></t>
+                  <t>The JWE Header (H) from the &lt;encheader/&gt; element's character data content.<vspace blankLines="1"/></t>
+                  <t>The JWE Encrypted Key (E) from the &lt;cmk/&gt; element's character data content.<vspace blankLines="1"/></t>
+                  <t>The JWE Initialization Vector/Nonce (I) from the &lt;iv/&gt; element's character data content.<vspace blankLines="1"/></t>
+                  <t>The JWE Ciphertext (C) from the &lt;data/&gt; element's character data content.<vspace blankLines="1"/></t>
+                  <t>The JWE Integrity Value (I) from the &lt;mac/&gt; element's character data content.<vspace blankLines="1"/></t>
                 </list>
               </t>
-              <t>Converts the forwarding envelope UTF-8 encoded string M' into XML element M.<vspace blankLines="1"/></t>
-              <t>Obtains the UTC date and time N from the &lt;delay/&gt; child element, and verifies it is within the accepted range, as specified in <xref target="timestamps"/>.<vspace blankLines="1"/></t>
-              <t>Obtains the plaintext stanza S, which is a child element node of M; the stanza MUST be fully qualified with proper namespace declarations for XMPP stanzas, to help distinguish it from other content within M.<vspace blankLines="1"/>.</t>
+              <t>Converts the forwarding envelope UTF-8 encoded string M' into XML element (M).<vspace blankLines="1"/></t>
+              <t>Obtains the UTC date and time (N) from the &lt;delay/&gt; child element, and verifies it is within the accepted range, as specified in <xref target="timestamps"/>.<vspace blankLines="1"/></t>
+              <t>Obtains the plaintext stanza (S), which is a child element node of M; the stanza MUST be fully qualified with proper namespace declarations for XMPP stanzas, to help distinguish it from other content within M.<vspace blankLines="1"/>.</t>
             </list>
           </t>
         </section>
@@ -244,8 +244,8 @@
           <list style="symbols">
             <t>Sender JID as "juliet@capulet.lit/balcony"<vspace blankLines="1"/></t>
             <t>Recipient JID as "romeo@montegue.lit"<vspace blankLines="1"/></t>
-            <t>Session Master Key 'SMK' as (base64 encoded) "xWtdjhYsH4Va_9SfYSefsJfZu03m5RrbXo_UavxxeU8"<vspace blankLines="1"/></t>
-            <t>SMK identifier SID as "835c92a8-94cd-4e96-b3f3-b2e75a438f92"<vspace blankLines="1"/></t>
+            <t>Session Master Key (SMK) as (base64 encoded) "xWtdjhYsH4Va_9SfYSefsJfZu03m5RrbXo_UavxxeU8"<vspace blankLines="1"/></t>
+            <t>SMK identifier (SID) as "835c92a8-94cd-4e96-b3f3-b2e75a438f92"<vspace blankLines="1"/></t>
           </list>
         </t>
         <t>The sending agent performs steps 1, 2, and 3 from <xref target="encryption-encrypt-process"/> to generate the envelope:</t>
@@ -396,7 +396,7 @@ DJ751V6YiJ295_3jQUphxmQ
                 </list>
               </t>
               <t>Converts the forwarding envelope (M) to a UTF-8 encoded string (M'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. M' = UTF8-encode(M).  We call M' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
-              <t>Chooses a private asymmetric key PK for which the sending agent has published the corresponding public key to the intended recipients.<vspace blankLines="1"/></t>
+              <t>Chooses a private asymmetric key (PK) for which the sending agent has published the corresponding public key to the intended recipients.<vspace blankLines="1"/></t>
               <t>Performs the message signatures steps from <xref target="JOSE-JWS"/> to generate the JWS Header (H) and JWS Signature (I); using the following inputs:<vspace blankLines="1"/>
                 <list style="symbols">
                   <t>The 'alg' property is set to an appropriate signature algorithm for PK (e.g., "R256").</t>
@@ -568,18 +568,7 @@ DJ751V6YiJ295_3jQUphxmQ
           <artwork><![CDATA[
 {
   "alg":"RS512",
-  "jwk":"{
-    "kty":"RSA",
-    "kid":"juliet@capulet.lit",
-    "n":"t6Q8PWSi1dkJj9hTP8hNYFlvadM7DflW9mWepOJhJ66w7nyoK1gPNq
-         FMSQRyO125Gp-TEkodhWr0iujjHVx7BcV0llS4w5ACGgPrcAd6ZcSR
-         0-Iqom-QFcNP8Sjg086MwoqQU_LYywlAGZ21WSdS_PERyGFiNnj3QQ
-         lO8Yns5jCtLCRwLHL0Pb1fEv45AuRIuUfVcPySBWYnDyGxvjYGDSM-
-         AqWS9zIQ2ZilgT-GqUmipg0XOC0Cc20rgLe2ymLHjpHciCKVAbY5-L
-         32-lSeZO-Os6U15_aXrk9Gw8cPUaX1_I8sLGuSiVdt3C_Fn2PZ3Z8i
-         744FPFGGcG1qs2Wz-Q",
-    "e":"AQAB"
-  }
+  "kid":"juliet@capulet.lit"
 }
           ]]></artwork>
         </figure>
@@ -602,12 +591,12 @@ Vzc2FnZT48L2ZvcndhcmRlZD4
         <figure>
           <preamble>JWS Signature</preamble>
           <artwork><![CDATA[
-eNNykjiv3eUhKhB6d9zJX3XiM7kJiU2s1EYvYBHIENrU31TYIkwDva2j9-VOJFP
-Im1kVsebZS0tAai7aSklX8lEiGTbQNLmksz0TghkyJjoFbrmxNMDv-p1_KMrGvL
-Jq97A94jPRJiKqK54KIzJstMWGmb9PV1n3DfleCcSnDX0ty5SWa76wUoLsyWoht
-1EoFBfqZZ625wBllfSt_o5IYH3LCxJpJmCf1QfpZg5hziNYGhUNr8_ZfOnRKBLz
-htd8TJxk7plbqLaotymgg_Pz4NuqVD6zO1V9UP057nNFJlvmpvUlJJvZ3rkZePm
-e8JQZp-TRgH1y3pEHCuaLce6zpA
+Mq4m-7qP05rxyvHinQ4GGvApKKmjGJaCbQHO1I_5P4gmIcn1gAan_4l2nIHXHyU
+FPpT3OLpLwEaaAbuo6jPRYdC3J4VjpOWoBy1usAtjHgzgZvs4QLzynCkZ_NQoqE
+OwXWe-Wl8KF11w0J2DePcORcELl5L4E6cdBVHxwJ36lmsPWSNiBcT9n2F41kZR0
+-xs0SniHT8LBu9zE0zuerVvlI-FqE1yTAC49v-f3vahrcyaJHVvb-I4SAMm76Sz
+dcCPCGEU8mKD1USDtuuWM84GwYLxYuhHOvZVtf_qMHY6ajfr9Fz3Hvc1r7WQLV8
+wi79H3eDoOEqXf_epTeCldOfIrA
           ]]></artwork>
         </figure>
         <t>Then the sending agent performs steps 7 and 8 and sends the following:</t>
@@ -621,16 +610,7 @@ e8JQZp-TRgH1y3pEHCuaLce6zpA
   <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6'
        type='sig'>
     <sigheader>
-      eyJhbGciOiJSUzUxMiIsImp3ayI6eyJrdHkiOiJSU0EiLCJraWQiOiJqd
-      WxpZXRAY2FwdWxldC5saXQiLCJuIjoidDZROFBXU2kxZGtKajloVFA4aE
-      5ZRmx2YWRNN0RmbFc5bVdlcE9KaEo2Nnc3bnlvSzFnUE5xRk1TUVJ5TzE
-      yNUdwLVRFa29kaFdyMGl1ampIVng3QmNWMGxsUzR3NUFDR2dQcmNBZDZa
-      Y1NSMC1JcW9tLVFGY05QOFNqZzA4Nk13b3FRVV9MWXl3bEFHWjIxV1NkU
-      19QRVJ5R0ZpTm5qM1FRbE84WW5zNWpDdExDUndMSEwwUGIxZkV2NDVBdV
-      JJdVVmVmNQeVNCV1luRHlHeHZqWUdEU00tQXFXUzl6SVEyWmlsZ1QtR3F
-      VbWlwZzBYT0MwQ2MyMHJnTGUyeW1MSGpwSGNpQ0tWQWJZNS1MMzItbFNl
-      Wk8tT3M2VTE1X2FYcms5R3c4Y1BVYVgxX0k4c0xHdVNpVmR0M0NfRm4yU
-      FozWjhpNzQ0RlBGR0djRzFxczJXei1RIiwiZSI6IkFRQUIifX0
+      eyJhbGciOiJSUzUxMiIsImtpZCI6Imp1bGlldEBjYXB1bGV0LmxpdCJ9
     </sigheader>
     <data>
       PGZvcndhcmRlZCB4bWxucz0idXJuOnhtcHA6Zm9yd2FyZDowIj48ZGVsY
@@ -647,12 +627,12 @@ e8JQZp-TRgH1y3pEHCuaLce6zpA
       vbWVzc2FnZT48L2ZvcndhcmRlZD4
     </data>
     <sig>
-      eNNykjiv3eUhKhB6d9zJX3XiM7kJiU2s1EYvYBHIENrU31TYIkwDva2j9
-      -VOJFPIm1kVsebZS0tAai7aSklX8lEiGTbQNLmksz0TghkyJjoFbrmxNM
-      Dv-p1_KMrGvLJq97A94jPRJiKqK54KIzJstMWGmb9PV1n3DfleCcSnDX0
-      ty5SWa76wUoLsyWoht1EoFBfqZZ625wBllfSt_o5IYH3LCxJpJmCf1Qfp
-      Zg5hziNYGhUNr8_ZfOnRKBLzhtd8TJxk7plbqLaotymgg_Pz4NuqVD6zO
-      1V9UP057nNFJlvmpvUlJJvZ3rkZePme8JQZp-TRgH1y3pEHCuaLce6zpA
+      Mq4m-7qP05rxyvHinQ4GGvApKKmjGJaCbQHO1I_5P4gmIcn1gAan_4l2n
+      IHXHyUFPpT3OLpLwEaaAbuo6jPRYdC3J4VjpOWoBy1usAtjHgzgZvs4QL
+      zynCkZ_NQoqEOwXWe-Wl8KF11w0J2DePcORcELl5L4E6cdBVHxwJ36lms
+      PWSNiBcT9n2F41kZR0-xs0SniHT8LBu9zE0zuerVvlI-FqE1yTAC49v-f
+      3vahrcyaJHVvb-I4SAMm76SzdcCPCGEU8mKD1USDtuuWM84GwYLxYuhHO
+      vZVtf_qMHY6ajfr9Fz3Hvc1r7WQLV8wi79H3eDoOEqXf_epTeCldOfIrA
     </sig>
   </e2e>
 </message>
@@ -670,7 +650,7 @@ e8JQZp-TRgH1y3pEHCuaLce6zpA
           <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:6" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
             <t>The attribute 'id' set to the SMK identifier value SID.<vspace blankLines="1"/></t>
-            <t>The child element &lt;pkey/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:6" namespace and with XML character data as KS, encoded base64url as pre <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
+            <t>The child element &lt;pkey/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:6" namespace and with XML character data as KS, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
           </list>
           </t>
           <t>Sends the &lt;keyreq/&gt; element as the payload of an &lt;iq/&gt; stanza with the attribute 'type' set to "get", the attribute 'to' set to the full JID of the original encrypted stanza's sender, and the attribute 'id' set to an opaque string value the receiving agent uses to track the &lt;iq/&gt; response.<vspace blankLines="1"/></t>
@@ -701,7 +681,7 @@ e8JQZp-TRgH1y3pEHCuaLce6zpA
           </t>
           <t>Constructs a &lt;keyreq/&gt; element qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:6" namespace as follows:<vspace blankLines="1"/>
           <list style="symbols">
-            <t>The attribute 'id' set to the SMK identifier SID.<vspace blankLines="1"/></t>
+            <t>The attribute 'id' set to the SMK Identifier (SID).<vspace blankLines="1"/></t>
             <t>The child element &lt;encheader/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:6" namespace and with XML character data as H, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
             <t>The child element &lt;cmk/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:6" namespace and with XML character data as E, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
             <t>The child element &lt;iv/&gt; qualified by the "urn:ietf:params:xml:ns:xmpp-e2e:6" namespace and with XML character data as IV, encoded base64url as per <xref target='RFC4648'/>.<vspace blankLines="1"/></t>
@@ -931,13 +911,13 @@ kc8i_qtXi-9XPmSVei3A_Jw
       <t>The following limitations and caveats apply:
         <list style="symbols">
           <t>Undirected &lt;presence/&gt; stanzas SHOULD NOT be encrypted. Such stanzas are delivered to anyone the sender has authorized, and can generate a large volume of key requests.<vspace blankLines="1"/></t>
-          <t>Undirected &lt;presence/&gt; stanzas MAY be signed, however note that signatures significantly increase the size of a stanza kind that will likely be multiplexed across the XMPP network.<vspace blankLines="1"/></t>
+          <t>Undirected &lt;presence/&gt; stanzas MAY be signed. However, note that signatures significantly increase the size of a stanza kind that is often multiplexed across to many XMPP entities; this could have large impacts on bandwidth and latency.<vspace blankLines="1"/></t>
           <t>Stanzas directed to multiplexing services (e.g., multi-user chat) SHOULD NOT be encrypted, unless the sender has established an acceptable trust relationship with the multiplexing service.<vspace blankLines="1"/></t>
         </list>
       </t>
     </section>
     <section title="Interaction with Offline Storage" anchor="interact-offline">
-      <t>The server makes its best effort to deliver stanzas. When the receiving agent is offline at the time of delivery, the server might store the message for deliery when the recipient is next offline (offline storage does not apply to &lt;iq/&gt; or &lt;presence/&gt; stanzas, only &lt;message/&gt; stanzas). The following need to be considered:
+      <t>The server makes its best effort to deliver stanzas. When the receiving agent is offline at the time of delivery, the server might store the message until the recipient is next online (offline storage does not apply to &lt;iq/&gt; or &lt;presence/&gt; stanzas, only &lt;message/&gt; stanzas). The following need to be considered:
         <list style="symbols">
           <t>If the sending agent is not also online when the message is delivered to the receiving agent from offline storage, then the decryption process fails for insufficient information as described in <xref target="encryption-decrypt-insufficient-info"/>.<vspace blankLines="1"/></t>
           <t>When performing the timestamp checks in <xref target="timestamps"/>, if the server includes delayed delivery data as specified in <xref target="XEP-0203"/> for when the server received the message, then the receiving agent SHOULD use the delayed delivery timestmap rather than the current time.<vspace blankLines="1"/></t>
@@ -963,18 +943,34 @@ kc8i_qtXi-9XPmSVei3A_Jw
       </section>
       <section title="Re-use of Session Master Keys" anchor="security-smk">
         <t>A sender SHOULD NOT use the same SMK for stanzas intended for different recipients, as determined by the localpart and domainpart of the recipient's JID.</t>
-        <t>A sender MAY re-use a SMK for several stanzas to the same recipient.  In this case, the SID remains the same, but the sending agent MUST generate a new CMK and IV for each encrypted stanza.  The sender SHOULD periodically generate a new SMK; however, this specification does not mandate any specific algorithms or processes.</t>
+        <t>A sender MAY re-use a SMK for several stanzas to the same recipient.  In this case, the SID remains the same, but the sending agent MUST generate a new CMK and IV for each encrypted stanza.  The sender SHOULD periodically generate a new SMK (and its associated SID); however, this specification does not mandate any specific algorithms or processes.</t>
         <t>In the case of &lt;message/&gt; stanzas, a sending agent might generate a new SMK each time it generates a new ThreadID, as outlined in <xref target="XEP-0201"/>.</t>
       </section>
     </section>
     <section title="IANA Considerations" anchor="iana">
       <section title="XML Namespaces Name for e2e Data in XMPP" anchor="iana-ns-e2e">
-        <t>A URN sub-namespace of encrypted content for the Extensible Messaging and Presence Protocol (XMPP) is defined as follows.</t>
+        <t>A number of URN sub-namespaces of encrypted and/or signed content for the Extensible Messaging and Presence Protocol (XMPP) is defined as follows.</t>
         <t>
           <list style="hanging">
             <t hangText="URI:">urn:ietf:params:xml:ns:xmpp-e2e:6</t>
             <t hangText="Specification:">RFC XXXX</t>
-            <t hangText="Description:">This is an XML namespace name of encrypted content for the Extensible Messaging and Presence Protocol as defined [[ this document ]].</t>
+            <t hangText="Description:">This is an XML namespace name of encrypted and/or signed content for the Extensible Messaging and Presence Protocol as defined [[ this document ]].</t>
+            <t hangText="Registrant Contact:">IESG, &lt;iesg@ietf.org&gt;</t>
+          </list>
+        </t>
+        <t>
+          <list style="hanging">
+            <t hangText="URI:">urn:ietf:params:xml:ns:xmpp-e2e:6:encryption</t>
+            <t hangText="Specification:">RFC XXXX</t>
+            <t hangText="Description:">This is an XML namespace name signalling support for encrypted content for the Extensible Messaging and Presence Protocol as defined [[ this document ]].</t>
+            <t hangText="Registrant Contact:">IESG, &lt;iesg@ietf.org&gt;</t>
+          </list>
+        </t>
+        <t>
+          <list style="hanging">
+            <t hangText="URI:">urn:ietf:params:xml:ns:xmpp-e2e:6:signatures</t>
+            <t hangText="Specification:">RFC XXXX</t>
+            <t hangText="Description:">This is an XML namespace name signalling support for signed content for the Extensible Messaging and Presence Protocol as defined [[ this document ]].</t>
             <t hangText="Registrant Contact:">IESG, &lt;iesg@ietf.org&gt;</t>
           </list>
         </t>
