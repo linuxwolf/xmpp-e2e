@@ -29,13 +29,14 @@
     <keyword>Extensible Messaging and Presence Protocol</keyword>
     <keyword>Jabber</keyword>
     <abstract>
-      <t>This document defines a method of encrypting and signing objects (often referred to as stanzas) for the Extensible Messaging and Presence Protocol (XMPP).</t>
+      <t>This document defines two methods for securing objects (often referred to as stanzas) for the Extensible Messaging and Presence Protocol (XMPP), which allows for efficient asynchronous communication between two entities, each with might have multiple devices operating simultaneously. One is a method to encrypt stanzas to provide confidentiality protection; another is a method to sign stanzas to provide authentication and integrity protection. This document also defines a related protocol for entities to request the ephemeral session keys in use.</t>
     </abstract>
   </front>
   <middle>
     <section title="Introduction" anchor="intro">
       <t>End-to-end protection and authentication of traffic sent over the Extensible Messaging and Presence Protocol <xref target="RFC6120"/> is a desirable goal.  Requirements and a threat analysis for XMPP encryption are provided in <xref target="E2E-REQ"/>. Many possible approaches to meet those (or similar) requirements have been proposed over the years, including methods based on PGP, S/MIME, SIGMA, and TLS.</t>
       <t>Most proposals have not been able to support multiple end-points for a given recipient. As more devices support XMPP, it becomes more desirable to allow an entity to communicate with another in a more secure manner, regardless of the number of agents the entity is employing. This document specifies an approach for encrypting and signing communications between two entities which each might have multiple end-points.</t>
+      <t>Comments are solicited and should be addressed to </t>
     </section>
     <section title="Terminology" anchor="terms">
       <t>This document inherits XMPP-related terminology from <xref target="RFC6120"/>, JSON Web Algorithms (JWA)-related terminology from <xref target="JOSE-JWA"/>, JSON Web Encryption (JWE)-related terminology from <xref target="JOSE-JWE"/>, and JSON Web Key (JWK)-related terminology from <xref target="JOSE-JWK"/>.  Security-related terms are to be understood in the sense defined in <xref target="RFC4949"/>.</t>
@@ -574,27 +575,27 @@ Aj8lKdPMDE4U82UAhDJBaRrl3USmuzS2hfFOe_OBEv8
           <preamble>JWS Payload</preamble>
           <artwork><![CDATA[
 PGZvcndhcmRlZCB4bWxucz0idXJuOnhtcHA6Zm9yd2FyZDowIj48ZGVsYXkgeG1
-sbnM9InVybjp4bXBwOmRlbGF5IiBzdGFtcD0iMTQ5Mi0wNTEyVDIwOjA3OjM3Lj
-AxMloiLz48bWVzc2FnZSB4bWxucz0iamFiYmVyOmNsaWVudCIgZnJvbT0ianVsa
-WV0QGNhcHVsZXQubGl0L2JhbGNvbnkiIHRvPSJyb21lb0Btb250ZWd1ZS5saXQi
-IHR5cGU9ImNoYXQiPjx0aHJlYWQ-MzU3NDBiZTUtYjVhNC00YzRlLTk2MmEtYTA
-zYjE0ZWQ5MmY0PC90aHJlYWQ-PGJvZHk-QnV0IHRvIGJlIGZyYW5rLCBhbmQgZ2
-l2ZSBpdCB0aGVlIGFnYWluLiBBbmQgeWV0IEkgd2lzaCBidXQgZm9yIHRoZSB0a
-GluZyBJIGhhdmUuIE15IGJvdW50eSBpcyBhcyBib3VuZGxlc3MgYXMgdGhlIHNl
-YSwgTXkgbG92ZSBhcyBkZWVwOyB0aGUgbW9yZSBJIGdpdmUgdG8gdGhlZSwgVGh
-lIG1vcmUgSSBoYXZlLCBmb3IgYm90aCBhcmUgaW5maW5pdGUuPC9ib2R5PjwvbW
-Vzc2FnZT48L2ZvcndhcmRlZD4
+sbnM9InVybjp4bXBwOmRlbGF5IiBzdGFtcD0iMTQ5Mi0wNS0xMlQyMDowNzozNy
+4wMTJaIi8-PG1lc3NhZ2UgeG1sbnM9ImphYmJlcjpjbGllbnQiIGZyb209Imp1b
+GlldEBjYXB1bGV0LmxpdC9iYWxjb255IiB0bz0icm9tZW9AbW9udGVndWUubGl0
+IiB0eXBlPSJjaGF0Ij48dGhyZWFkPjM1NzQwYmU1LWI1YTQtNGM0ZS05NjJhLWE
+wM2IxNGVkOTJmNDwvdGhyZWFkPjxib2R5PkJ1dCB0byBiZSBmcmFuaywgYW5kIG
+dpdmUgaXQgdGhlZSBhZ2Fpbi4gQW5kIHlldCBJIHdpc2ggYnV0IGZvciB0aGUgd
+GhpbmcgSSBoYXZlLiBNeSBib3VudHkgaXMgYXMgYm91bmRsZXNzIGFzIHRoZSBz
+ZWEsIE15IGxvdmUgYXMgZGVlcDsgdGhlIG1vcmUgSSBnaXZlIHRvIHRoZWUsIFR
+oZSBtb3JlIEkgaGF2ZSwgZm9yIGJvdGggYXJlIGluZmluaXRlLjwvYm9keT48L2
+1lc3NhZ2U-PC9mb3J3YXJkZWQ-
           ]]></artwork>
         </figure>
         <figure>
           <preamble>JWS Signature</preamble>
           <artwork><![CDATA[
-Mq4m-7qP05rxyvHinQ4GGvApKKmjGJaCbQHO1I_5P4gmIcn1gAan_4l2nIHXHyU
-FPpT3OLpLwEaaAbuo6jPRYdC3J4VjpOWoBy1usAtjHgzgZvs4QLzynCkZ_NQoqE
-OwXWe-Wl8KF11w0J2DePcORcELl5L4E6cdBVHxwJ36lmsPWSNiBcT9n2F41kZR0
--xs0SniHT8LBu9zE0zuerVvlI-FqE1yTAC49v-f3vahrcyaJHVvb-I4SAMm76Sz
-dcCPCGEU8mKD1USDtuuWM84GwYLxYuhHOvZVtf_qMHY6ajfr9Fz3Hvc1r7WQLV8
-wi79H3eDoOEqXf_epTeCldOfIrA
+YPfGouD50j0C_C-RneawG0jxXWDXgBkN3FJz6eaBFIPCh3hopiwtwKir7Yamvgt
+OrqhXx2pcu-70caGi6mKKLWvpdwdJ3nEnhdjPOd3CmLdaK_PBAMtIt8d3155hdl
+qNxSMsJN7PxmNLNwJhbksAsI-2TcCQsuxdIPXh6hcqBm44BpVio6AoRPqwF06XZ
+MMBMOMnEFcV6Ht20wCK1BEGgOmN3KYPbwKeTctG8HKPAh25_K66aEXT66lI19uW
+j1fGFJ79QQHUhc5y9pSKmpK7HKruPMRyrvpzBSfUhcb62nLXhM-LzY5taaDECzi
+fCi-IxySBtJJtPCqYAYW_IbrRFg
           ]]></artwork>
         </figure>
         <t>Then the sending agent performs steps 7 and 8 and sends the following:</t>
@@ -612,25 +613,25 @@ wi79H3eDoOEqXf_epTeCldOfIrA
     </sigheader>
     <data>
       PGZvcndhcmRlZCB4bWxucz0idXJuOnhtcHA6Zm9yd2FyZDowIj48ZGVsY
-      XkgeG1sbnM9InVybjp4bXBwOmRlbGF5IiBzdGFtcD0iMTQ5Mi0wNTEyVD
-      IwOjA3OjM3LjAxMloiLz48bWVzc2FnZSB4bWxucz0iamFiYmVyOmNsaWV
-      udCIgZnJvbT0ianVsaWV0QGNhcHVsZXQubGl0L2JhbGNvbnkiIHRvPSJy
-      b21lb0Btb250ZWd1ZS5saXQiIHR5cGU9ImNoYXQiPjx0aHJlYWQ-MzU3N
-      DBiZTUtYjVhNC00YzRlLTk2MmEtYTAzYjE0ZWQ5MmY0PC90aHJlYWQ-PG
-      JvZHk-QnV0IHRvIGJlIGZyYW5rLCBhbmQgZ2l2ZSBpdCB0aGVlIGFnYWl
-      uLiBBbmQgeWV0IEkgd2lzaCBidXQgZm9yIHRoZSB0aGluZyBJIGhhdmUu
-      IE15IGJvdW50eSBpcyBhcyBib3VuZGxlc3MgYXMgdGhlIHNlYSwgTXkgb
-      G92ZSBhcyBkZWVwOyB0aGUgbW9yZSBJIGdpdmUgdG8gdGhlZSwgVGhlIG
-      1vcmUgSSBoYXZlLCBmb3IgYm90aCBhcmUgaW5maW5pdGUuPC9ib2R5Pjw
-      vbWVzc2FnZT48L2ZvcndhcmRlZD4
+      XkgeG1sbnM9InVybjp4bXBwOmRlbGF5IiBzdGFtcD0iMTQ5Mi0wNS0xMl
+      QyMDowNzozNy4wMTJaIi8-PG1lc3NhZ2UgeG1sbnM9ImphYmJlcjpjbGl
+      lbnQiIGZyb209Imp1bGlldEBjYXB1bGV0LmxpdC9iYWxjb255IiB0bz0i
+      cm9tZW9AbW9udGVndWUubGl0IiB0eXBlPSJjaGF0Ij48dGhyZWFkPjM1N
+      zQwYmU1LWI1YTQtNGM0ZS05NjJhLWEwM2IxNGVkOTJmNDwvdGhyZWFkPj
+      xib2R5PkJ1dCB0byBiZSBmcmFuaywgYW5kIGdpdmUgaXQgdGhlZSBhZ2F
+      pbi4gQW5kIHlldCBJIHdpc2ggYnV0IGZvciB0aGUgdGhpbmcgSSBoYXZl
+      LiBNeSBib3VudHkgaXMgYXMgYm91bmRsZXNzIGFzIHRoZSBzZWEsIE15I
+      GxvdmUgYXMgZGVlcDsgdGhlIG1vcmUgSSBnaXZlIHRvIHRoZWUsIFRoZS
+      Btb3JlIEkgaGF2ZSwgZm9yIGJvdGggYXJlIGluZmluaXRlLjwvYm9keT4
+      8L21lc3NhZ2U-PC9mb3J3YXJkZWQ-
     </data>
     <sig>
-      Mq4m-7qP05rxyvHinQ4GGvApKKmjGJaCbQHO1I_5P4gmIcn1gAan_4l2n
-      IHXHyUFPpT3OLpLwEaaAbuo6jPRYdC3J4VjpOWoBy1usAtjHgzgZvs4QL
-      zynCkZ_NQoqEOwXWe-Wl8KF11w0J2DePcORcELl5L4E6cdBVHxwJ36lms
-      PWSNiBcT9n2F41kZR0-xs0SniHT8LBu9zE0zuerVvlI-FqE1yTAC49v-f
-      3vahrcyaJHVvb-I4SAMm76SzdcCPCGEU8mKD1USDtuuWM84GwYLxYuhHO
-      vZVtf_qMHY6ajfr9Fz3Hvc1r7WQLV8wi79H3eDoOEqXf_epTeCldOfIrA
+      YPfGouD50j0C_C-RneawG0jxXWDXgBkN3FJz6eaBFIPCh3hopiwtwKir7
+      YamvgtOrqhXx2pcu-70caGi6mKKLWvpdwdJ3nEnhdjPOd3CmLdaK_PBAM
+      tIt8d3155hdlqNxSMsJN7PxmNLNwJhbksAsI-2TcCQsuxdIPXh6hcqBm4
+      4BpVio6AoRPqwF06XZMMBMOMnEFcV6Ht20wCK1BEGgOmN3KYPbwKeTctG
+      8HKPAh25_K66aEXT66lI19uWj1fGFJ79QQHUhc5y9pSKmpK7HKruPMRyr
+      vpzBSfUhcb62nLXhM-LzY5taaDECzifCi-IxySBtJJtPCqYAYW_IbrRFg
     </sig>
   </e2e>
 </message>
@@ -772,7 +773,7 @@ wi79H3eDoOEqXf_epTeCldOfIrA
 {
   "kty":"oct",
   "kid":"835c92a8-94cd-4e96-b3f3-b2e75a438f92",
-  "oct":"xWtdjhYsH4Va_9SfYSefsJfZu03m5RrbXo_UavxxeU8"
+  "k":"xWtdjhYsH4Va_9SfYSefsJfZu03m5RrbXo_UavxxeU8"
 }
           ]]></artwork>
         </figure>
@@ -782,41 +783,41 @@ wi79H3eDoOEqXf_epTeCldOfIrA
           <artwork><![CDATA[
 {
   "alg":"RSA-OAEP",
+  "kid":"romeo@montegue.lit/garden",
   "enc":"A256CBC+HS512",
-  "kid":"romeo@montegue.lit/garden"
+  "cty":"application/jwk+json"
 }
           ]]></artwork>
         </figure>
         <figure>
           <preamble>JWE Encrypted Key</preamble>
           <artwork><![CDATA[
-UeoVeGcZP-VsLu1PVj3NNWkmmEF7H2Nl_mHWscOuT_vYn-4ub2NEnRy4dzyycgx
-ny6jmRPpNiGJB6AfI4TYZvrjig5dubv4uG7phCvKYVI3uaUU58Fc9H_o-BTmNv2
-rUT-RGt6YYLW97ZJp5ZcA2l-KxykcxaRYC4Sv_UOS3Kqo0sVx5u7tolE6SbMnUH
-etg91Gc9pVVa1XX-wz4ZrcA6V8zf8pCtmc4WyDMFx8RYYXR_5Qvax-TzOJUL2eA
-r3OQsf3KNh58WvvzcwAKTmR214QmZCxI_A5mIqoog0H0uV987P9yw1wFfsmg7z-
-Y2Ed7Blp-zLOvXEQKU9FM-vjBnA
+hKUOpAif76c-hmRwEphVB9wXjloLpwu75x98MSWyCBtfUgmopk93ttUXoZ4AAIk
+rZJOtrPUqPZwYHjay3ggfgjVljJ_KGhgqI5cScIzaAQs0Pxep6FnrsnUrw09Sjv
+2VRXOay4guMQnbQo0ibpifBxeuL9MJ_vdeb_BdSE8YZ4iTfMb7GT35gZC9NgweX
+3fiTEo2LjY8hEV3DHud5LlNZzYp9kLmAUZNIwGu7LtYyI4F7NnOv9oLx1HtmfE3
+_skkYtQoKMvMewLkIO88h325qCpWFdrLwPp63betCmewDJPaBdrp91rLchkXVo-
+d2ueKkb59TxWjMx7esBdaxCAcDQ
           ]]></artwork>
         </figure>
         <figure>
           <preamble>JWE Initialization Vector</preamble>
           <artwork><![CDATA[
-eiXTO21DNqFnCTQkLAoAtA
+Ggiego8UiSsj7GgY94qOng
           ]]></artwork>
         </figure>
         <figure>
           <preamble>JWE Ciphertext</preamble>
           <artwork><![CDATA[
-e8sZiRvKLPOUjmFwOYhvrZMQYzW1yglg6mTnazJU_rF7mXTBIieNZCd7hDrlrdG
-SxqqUgh6N1O2QBLygf2PtWDmHHjn1aLncx6qlGf0UOxCCXUBfBIhZgFH5YX1i3_
-VSsNUDEoIKTGA21EnamOqa1A
+4vIGDz9Hm6X4lSo9JoA6ZzS0KitztLGAiMUs3RTviFO09choPhxJNlOj8KX8QIL
+u4zZ-ytCnG-yzNx5SsT8KEQJhIf6_9yWplxpX173k6ZJV-sXGd4Mj9u7N0IqWQL
+K5DMytv7XopsZsR9QFCDNGew
           ]]></artwork>
         </figure>
         <figure>
           <preamble>JWE Integrity Value</preamble>
           <artwork><![CDATA[
-WQzHj3j30Qo7VakMM42t-X1omQVGyebd3No9ZFGPQNUwEWONjIcZ89_wFBhZFdd
-kc8i_qtXi-9XPmSVei3A_Jw
+3GuaasWV0XGTBbRtNP6OQ14_cHL-ZJC1naDtU6EIecw
           ]]></artwork>
         </figure>
         <t>Then the sending agent performs step 4 to generate the &lt;keyreq/&gt; response:</t>
@@ -825,28 +826,28 @@ kc8i_qtXi-9XPmSVei3A_Jw
 <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6'
         id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
   <encheader>
-    eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMrSFM1MTIiLCJraWQ
-    iOiJyb21lb0Btb250ZWd1ZS5saXQvZ2FyZGVuIn0
+    eyJhbGciOiJSU0EtT0FFUCIsImtpZCI6InJvbWVvQG1vbnRlZ3VlLmxpdC9
+    nYXJkZW4iLCJlbmMiOiJBMjU2Q0JDK0hTNTEyIiwiY3R5IjoiYXBwbGljYX
+    Rpb24vandrK2pzb24ifQ
   </encheader>
   <cmk>
-    UeoVeGcZP-VsLu1PVj3NNWkmmEF7H2Nl_mHWscOuT_vYn-4ub2NEnRy4dzy
-    ycgxny6jmRPpNiGJB6AfI4TYZvrjig5dubv4uG7phCvKYVI3uaUU58Fc9H_
-    o-BTmNv2rUT-RGt6YYLW97ZJp5ZcA2l-KxykcxaRYC4Sv_UOS3Kqo0sVx5u
-    7tolE6SbMnUHetg91Gc9pVVa1XX-wz4ZrcA6V8zf8pCtmc4WyDMFx8RYYXR
-    _5Qvax-TzOJUL2eAr3OQsf3KNh58WvvzcwAKTmR214QmZCxI_A5mIqoog0H
-    0uV987P9yw1wFfsmg7z-Y2Ed7Blp-zLOvXEQKU9FM-vjBnA
+    hKUOpAif76c-hmRwEphVB9wXjloLpwu75x98MSWyCBtfUgmopk93ttUXoZ4
+    AAIkrZJOtrPUqPZwYHjay3ggfgjVljJ_KGhgqI5cScIzaAQs0Pxep6Fnrsn
+    Urw09Sjv2VRXOay4guMQnbQo0ibpifBxeuL9MJ_vdeb_BdSE8YZ4iTfMb7G
+    T35gZC9NgweX3fiTEo2LjY8hEV3DHud5LlNZzYp9kLmAUZNIwGu7LtYyI4F
+    7NnOv9oLx1HtmfE3_skkYtQoKMvMewLkIO88h325qCpWFdrLwPp63betCme
+    wDJPaBdrp91rLchkXVo-d2ueKkb59TxWjMx7esBdaxCAcDQ
   </cmk>
   <iv>
-    eiXTO21DNqFnCTQkLAoAtA
+    Ggiego8UiSsj7GgY94qOng
   </iv>
   <data>
-    e8sZiRvKLPOUjmFwOYhvrZMQYzW1yglg6mTnazJU_rF7mXTBIieNZCd7hDr
-    lrdGSxqqUgh6N1O2QBLygf2PtWDmHHjn1aLncx6qlGf0UOxCCXUBfBIhZgF
-    H5YX1i3_VSsNUDEoIKTGA21EnamOqa1A
+    4vIGDz9Hm6X4lSo9JoA6ZzS0KitztLGAiMUs3RTviFO09choPhxJNlOj8KX
+    8QILu4zZ-ytCnG-yzNx5SsT8KEQJhIf6_9yWplxpX173k6ZJV-sXGd4Mj9u
+    7N0IqWQLK5DMytv7XopsZsR9QFCDNGew
   </data>
   <mac>
-    WQzHj3j30Qo7VakMM42t-X1omQVGyebd3No9ZFGPQNUwEWONjIcZ89_wFBh
-    ZFddkc8i_qtXi-9XPmSVei3A_Jw
+    3GuaasWV0XGTBbRtNP6OQ14_cHL-ZJC1naDtU6EIecw
   </mac>
 </keyreq>
           ]]></artwork>
@@ -862,28 +863,28 @@ kc8i_qtXi-9XPmSVei3A_Jw
   <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6'
           id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
     <encheader>
-      eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMrSFM1MTIiLCJraWQ
-      iOiJyb21lb0Btb250ZWd1ZS5saXQvZ2FyZGVuIn0
+      eyJhbGciOiJSU0EtT0FFUCIsImtpZCI6InJvbWVvQG1vbnRlZ3VlLmxpdC9
+      nYXJkZW4iLCJlbmMiOiJBMjU2Q0JDK0hTNTEyIiwiY3R5IjoiYXBwbGljYX
+      Rpb24vandrK2pzb24ifQ
     </encheader>
     <cmk>
-      UeoVeGcZP-VsLu1PVj3NNWkmmEF7H2Nl_mHWscOuT_vYn-4ub2NEnRy4dzy
-      ycgxny6jmRPpNiGJB6AfI4TYZvrjig5dubv4uG7phCvKYVI3uaUU58Fc9H_
-      o-BTmNv2rUT-RGt6YYLW97ZJp5ZcA2l-KxykcxaRYC4Sv_UOS3Kqo0sVx5u
-      7tolE6SbMnUHetg91Gc9pVVa1XX-wz4ZrcA6V8zf8pCtmc4WyDMFx8RYYXR
-      _5Qvax-TzOJUL2eAr3OQsf3KNh58WvvzcwAKTmR214QmZCxI_A5mIqoog0H
-      0uV987P9yw1wFfsmg7z-Y2Ed7Blp-zLOvXEQKU9FM-vjBnA
+      hKUOpAif76c-hmRwEphVB9wXjloLpwu75x98MSWyCBtfUgmopk93ttUXoZ4
+      AAIkrZJOtrPUqPZwYHjay3ggfgjVljJ_KGhgqI5cScIzaAQs0Pxep6Fnrsn
+      Urw09Sjv2VRXOay4guMQnbQo0ibpifBxeuL9MJ_vdeb_BdSE8YZ4iTfMb7G
+      T35gZC9NgweX3fiTEo2LjY8hEV3DHud5LlNZzYp9kLmAUZNIwGu7LtYyI4F
+      7NnOv9oLx1HtmfE3_skkYtQoKMvMewLkIO88h325qCpWFdrLwPp63betCme
+      wDJPaBdrp91rLchkXVo-d2ueKkb59TxWjMx7esBdaxCAcDQ
     </cmk>
     <iv>
-      eiXTO21DNqFnCTQkLAoAtA
+      Ggiego8UiSsj7GgY94qOng
     </iv>
     <data>
-      e8sZiRvKLPOUjmFwOYhvrZMQYzW1yglg6mTnazJU_rF7mXTBIieNZCd7hDr
-      lrdGSxqqUgh6N1O2QBLygf2PtWDmHHjn1aLncx6qlGf0UOxCCXUBfBIhZgF
-      H5YX1i3_VSsNUDEoIKTGA21EnamOqa1A
+      4vIGDz9Hm6X4lSo9JoA6ZzS0KitztLGAiMUs3RTviFO09choPhxJNlOj8KX
+      8QILu4zZ-ytCnG-yzNx5SsT8KEQJhIf6_9yWplxpX173k6ZJV-sXGd4Mj9u
+      7N0IqWQLK5DMytv7XopsZsR9QFCDNGew
     </data>
     <mac>
-      WQzHj3j30Qo7VakMM42t-X1omQVGyebd3No9ZFGPQNUwEWONjIcZ89_wFBh
-      ZFddkc8i_qtXi-9XPmSVei3A_Jw
+      3GuaasWV0XGTBbRtNP6OQ14_cHL-ZJC1naDtU6EIecw
     </mac>
   </keyreq>
 </iq>

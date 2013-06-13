@@ -4,19 +4,25 @@
 
 XMPP                                                           M. Miller
 Internet-Draft                                       Cisco Systems, Inc.
-Intended status: Standards Track                           June 04, 2013
-Expires: December 06, 2013
+Intended status: Standards Track                           June 13, 2013
+Expires: December 15, 2013
 
 
 End-to-End Object Encryption and Signatures for the Extensible Messaging
                       and Presence Protocol (XMPP)
-                        draft-miller-xmpp-e2e-05
+                        draft-miller-xmpp-e2e-06
 
 Abstract
 
-   This document defines a method of encrypting and signing objects
-   (often referred to as stanzas) for the Extensible Messaging and
-   Presence Protocol (XMPP).
+   This document defines two methods for securing objects (often
+   referred to as stanzas) for the Extensible Messaging and Presence
+   Protocol (XMPP), which allows for efficient asynchronous
+   communication between two entities, each with might have multiple
+   devices operating simultaneously.  One is a method to encrypt stanzas
+   to provide confidentiality protection; another is a method to sign
+   stanzas to provide authentication and integrity protection.  This
+   document also defines a related protocol for entities to request the
+   ephemeral session keys in use.
 
 Status of This Memo
 
@@ -33,7 +39,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on December 06, 2013.
+   This Internet-Draft will expire on December 15, 2013.
 
 Copyright Notice
 
@@ -44,78 +50,78 @@ Copyright Notice
    Provisions Relating to IETF Documents
    (http://trustee.ietf.org/license-info) in effect on the date of
    publication of this document.  Please review these documents
+
+
+
+Miller                 Expires December 15, 2013                [Page 1]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
    carefully, as they describe your rights and restrictions with respect
    to this document.  Code Components extracted from this document must
    include Simplified BSD License text as described in Section 4.e of
    the Trust Legal Provisions and are provided without warranty as
    described in the Simplified BSD License.
 
-
-
-
-Miller                 Expires December 06, 2013                [Page 1]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
 Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
    3.  Encryption  . . . . . . . . . . . . . . . . . . . . . . . . .   3
-     3.1.  Determining Support . . . . . . . . . . . . . . . . . . .   3
+     3.1.  Determining Support . . . . . . . . . . . . . . . . . . .   4
      3.2.  Encrypting XMPP Stanzas . . . . . . . . . . . . . . . . .   4
        3.2.1.  Prerequisites . . . . . . . . . . . . . . . . . . . .   4
-       3.2.2.  Process . . . . . . . . . . . . . . . . . . . . . . .   4
+       3.2.2.  Process . . . . . . . . . . . . . . . . . . . . . . .   5
      3.3.  Decrypting XMPP Stanzas . . . . . . . . . . . . . . . . .   7
        3.3.1.  Protocol Not Understood . . . . . . . . . . . . . . .   7
        3.3.2.  Process . . . . . . . . . . . . . . . . . . . . . . .   7
        3.3.3.  Insufficient Information  . . . . . . . . . . . . . .   8
        3.3.4.  Failed Decryption . . . . . . . . . . . . . . . . . .   9
        3.3.5.  Timestamp Not Acceptable  . . . . . . . . . . . . . .  10
-       3.3.6.  Successful Decryption . . . . . . . . . . . . . . . .  10
+       3.3.6.  Successful Decryption . . . . . . . . . . . . . . . .  11
      3.4.  Example - Securing a Message  . . . . . . . . . . . . . .  11
    4.  Signatures  . . . . . . . . . . . . . . . . . . . . . . . . .  14
      4.1.  Determining Support . . . . . . . . . . . . . . . . . . .  14
-     4.2.  Signing XMPP Stanzas  . . . . . . . . . . . . . . . . . .  14
+     4.2.  Signing XMPP Stanzas  . . . . . . . . . . . . . . . . . .  15
        4.2.1.  Process . . . . . . . . . . . . . . . . . . . . . . .  15
-     4.3.  Verifying Signed XMPP Stanzas . . . . . . . . . . . . . .  16
-       4.3.1.  Protocol Not Understood . . . . . . . . . . . . . . .  16
-       4.3.2.  Process . . . . . . . . . . . . . . . . . . . . . . .  16
-       4.3.3.  Insufficient Information  . . . . . . . . . . . . . .  17
+     4.3.  Verifying Signed XMPP Stanzas . . . . . . . . . . . . . .  17
+       4.3.1.  Protocol Not Understood . . . . . . . . . . . . . . .  17
+       4.3.2.  Process . . . . . . . . . . . . . . . . . . . . . . .  17
+       4.3.3.  Insufficient Information  . . . . . . . . . . . . . .  18
        4.3.4.  Failed Verification . . . . . . . . . . . . . . . . .  18
        4.3.5.  Timestamp Not Acceptable  . . . . . . . . . . . . . .  19
-       4.3.6.  Successful Verification . . . . . . . . . . . . . . .  19
+       4.3.6.  Successful Verification . . . . . . . . . . . . . . .  20
      4.4.  Example - Signing a Message . . . . . . . . . . . . . . .  20
-   5.  Requesting Session Keys . . . . . . . . . . . . . . . . . . .  22
-     5.1.  Request Process . . . . . . . . . . . . . . . . . . . . .  22
-     5.2.  Accept Process  . . . . . . . . . . . . . . . . . . . . .  23
+   5.  Requesting Session Keys . . . . . . . . . . . . . . . . . . .  23
+     5.1.  Request Process . . . . . . . . . . . . . . . . . . . . .  23
+     5.2.  Accept Process  . . . . . . . . . . . . . . . . . . . . .  24
      5.3.  Error Conditions  . . . . . . . . . . . . . . . . . . . .  25
-     5.4.  Example of Successful Key Request . . . . . . . . . . . .  25
-   6.  Mulitple Operations . . . . . . . . . . . . . . . . . . . . .  29
-   7.  Inclusion and Checking of Timestamps  . . . . . . . . . . . .  29
-   8.  Interaction with Stanza Semantics . . . . . . . . . . . . . .  30
+     5.4.  Example of Successful Key Request . . . . . . . . . . . .  26
+   6.  Mulitple Operations . . . . . . . . . . . . . . . . . . . . .  30
+   7.  Inclusion and Checking of Timestamps  . . . . . . . . . . . .  30
+   8.  Interaction with Stanza Semantics . . . . . . . . . . . . . .  31
    9.  Interaction with Offline Storage  . . . . . . . . . . . . . .  31
-   10. Mandatory-to-Implement Cryptographic Algorithms . . . . . . .  31
-   11. Security Considerations . . . . . . . . . . . . . . . . . . .  31
-     11.1.  Storage of Encrypted Stanzas . . . . . . . . . . . . . .  31
-     11.2.  Re-use of Session Master Keys  . . . . . . . . . . . . .  31
+   10. Mandatory-to-Implement Cryptographic Algorithms . . . . . . .  32
+   11. Security Considerations . . . . . . . . . . . . . . . . . . .  32
+     11.1.  Storage of Encrypted Stanzas . . . . . . . . . . . . . .  32
+     11.2.  Re-use of Session Master Keys  . . . . . . . . . . . . .  32
+
+
+
+Miller                 Expires December 15, 2013                [Page 2]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
    12. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  32
      12.1.  XML Namespaces Name for e2e Data in XMPP . . . . . . . .  32
    13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  33
      13.1.  Normative References . . . . . . . . . . . . . . . . . .  33
      13.2.  Informative References . . . . . . . . . . . . . . . . .  34
-   Appendix A.  Schema for urn:ietf:params:xml:ns:xmpp-e2e:6 . . . .  34
-
-
-
-Miller                 Expires December 06, 2013                [Page 2]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
-   Appendix B.  Acknowledgements . . . . . . . . . . . . . . . . . .  37
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  37
+   Appendix A.  Schema for urn:ietf:params:xml:ns:xmpp-e2e:6 . . . .  35
+   Appendix B.  Acknowledgements . . . . . . . . . . . . . . . . . .  38
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  38
 
 1.  Introduction
 
@@ -134,6 +140,8 @@ Internet-Draft                  XMPP E2E                       June 2013
    signing communications between two entities which each might have
    multiple end-points.
 
+   Comments are solicited and should be addressed to
+
 2.  Terminology
 
    This document inherits XMPP-related terminology from [RFC6120], JSON
@@ -149,6 +157,19 @@ Internet-Draft                  XMPP E2E                       June 2013
 
 3.  Encryption
 
+
+
+
+
+
+
+
+
+Miller                 Expires December 15, 2013                [Page 3]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
 3.1.  Determining Support
 
    If an agent supports receiving end-to-end object encryption, it MUST
@@ -162,14 +183,6 @@ Internet-Draft                  XMPP E2E                       June 2013
        type='result'>
      <query xmlns='http://jabber.org/protocol/disco#info'>
        ...
-
-
-
-Miller                 Expires December 06, 2013                [Page 3]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
        <feature xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6:encryption'/>
        ...
      </query>
@@ -204,6 +217,15 @@ Internet-Draft                  XMPP E2E                       June 2013
       generating random values.
 
 
+
+
+
+
+Miller                 Expires December 15, 2013                [Page 4]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
    o  A SMK identifier (SID).  The SID MUST be unique for a given
       (sender, recipient, SMK) tuple, and MUST NOT be derived from SMK
       itself.
@@ -213,17 +235,6 @@ Internet-Draft                  XMPP E2E                       June 2013
 
    For a given plaintext stanza (S), the sending agent performs the
    following:
-
-
-
-
-
-
-
-
-Miller                 Expires December 06, 2013                [Page 4]
-
-Internet-Draft                  XMPP E2E                       June 2013
 
 
    1.  Ensures the plaintext stanza is fully qualified, including the
@@ -264,6 +275,13 @@ Internet-Draft                  XMPP E2E                       June 2013
        for considerations on generating random values.
 
 
+
+
+Miller                 Expires December 15, 2013                [Page 5]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
    6.  Generates any additional unprotected block cipher factors (IV);
        e.g., initialization vector/nonce.  A sending agent MUST ensure
        that no two sets of factors are used with the same CMK, and
@@ -273,13 +291,6 @@ Internet-Draft                  XMPP E2E                       June 2013
    7.  Performs the message encryption steps from [JOSE-JWE] to generate
        the JWE Header (H), JWE Encrypted Key (E), JWE Ciphertext (C),
        and JWE Integrity Value (I); using the following inputs:
-
-
-
-
-Miller                 Expires December 06, 2013                [Page 5]
-
-Internet-Draft                  XMPP E2E                       June 2013
 
 
        *  The 'alg' property is set to an appropriate key wrapping
@@ -318,6 +329,15 @@ Internet-Draft                  XMPP E2E                       June 2013
           character data as H, encoded base64url as per [RFC4648].
 
 
+
+
+
+
+Miller                 Expires December 15, 2013                [Page 6]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
        *  The child element <cmk/> qualified by the
           "urn:ietf:params:xml:ns:xmpp-e2e:6" namespace and with XML
           character as E, encoded base64url as per [RFC4648].
@@ -326,16 +346,6 @@ Internet-Draft                  XMPP E2E                       June 2013
        *  The child element <iv/> qualified by the
           "urn:ietf:params:xml:ns:xmpp-e2e:6" namespace and with XML
           character as IV, encoded base64url as per [RFC4648].
-
-
-
-
-
-
-
-Miller                 Expires December 06, 2013                [Page 6]
-
-Internet-Draft                  XMPP E2E                       June 2013
 
 
        *  The child element <data/> qualified by the
@@ -376,6 +386,14 @@ Internet-Draft                  XMPP E2E                       June 2013
 
    1.  Determines if a valid SMK is available, associated with the SID
        specified by the 'id' attribute value of the <e2e/> element and
+
+
+
+Miller                 Expires December 15, 2013                [Page 7]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
        the sending agent JID specified by the 'from' attribute of the
        wrapping stanza.  If the receiving agent does not already have
        the SMK, it requests it according to Section 5.
@@ -384,14 +402,6 @@ Internet-Draft                  XMPP E2E                       June 2013
    2.  Performs the message decryption steps from [JOSE-JWE] to generate
        the plaintext forwarding envelope string M', using the following
        inputs:
-
-
-
-
-
-Miller                 Expires December 06, 2013                [Page 7]
-
-Internet-Draft                  XMPP E2E                       June 2013
 
 
        *  The JWE Header (H) from the <encheader/> element's character
@@ -432,6 +442,14 @@ Internet-Draft                  XMPP E2E                       June 2013
 
 3.3.3.  Insufficient Information
 
+
+
+
+Miller                 Expires December 15, 2013                [Page 8]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
    At step 1, if the receiving agent is unable to obtain the CMK, or the
    receiving agent could not otherwise determine the additional
    information, it MAY return a <bad-request/> error to the sending
@@ -442,14 +460,6 @@ Internet-Draft                  XMPP E2E                       June 2013
    <message xmlns='jabber:client'
             from='juliet@capulet.lit/balcony'
             id='fJZd9WFIIwNjFctT'
-
-
-
-Miller                 Expires December 06, 2013                [Page 8]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
             to='romeo@montegue.lit/garden'
             type='chat'>
      <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6'
@@ -488,6 +498,14 @@ Internet-Draft                  XMPP E2E                       June 2013
             id='fJZd9WFIIwNjFctT'
             to='romeo@montegue.lit/garden'
             type='chat'>
+
+
+
+Miller                 Expires December 15, 2013                [Page 9]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
      <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6'
           id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
        <encheader>[XML character data]</encheader>
@@ -498,14 +516,6 @@ Internet-Draft                  XMPP E2E                       June 2013
      </e2e>
      <error type='modify'>
        <bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
-
-
-
-Miller                 Expires December 06, 2013                [Page 9]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
        <decryption-failed xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6'/>
      </error>
    </message>
@@ -525,6 +535,32 @@ Internet-Draft                  XMPP E2E                       June 2013
    [RFC6120]), optionally supplemented by an application-specific error
    condition element of <bad-timestamp/> (previously defined in
    [RFC3923]):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Miller                 Expires December 15, 2013               [Page 10]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
 
    <message xmlns='jabber:client'
             from='juliet@capulet.lit/balcony'
@@ -551,17 +587,6 @@ Internet-Draft                  XMPP E2E                       June 2013
    If the receiving agent successfully decrypted the payload, it MUST
    NOT return a stanza error.
 
-
-
-
-
-
-
-Miller                 Expires December 06, 2013               [Page 10]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
    If the payload is an <iq/> of type "get" or "set", and the response
    to this <iq/> is of type "error", the receiving agent MUST send the
    encrypted response wrapped in an <iq/> of type "result", to prevent
@@ -585,6 +610,14 @@ Internet-Draft                  XMPP E2E                       June 2013
        And yet I wish but for the thing I have.
        My bounty is as boundless as the sea,
        My love as deep; the more I give to thee,
+
+
+
+Miller                 Expires December 15, 2013               [Page 11]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
        The more I have, for both are infinite.
      </body>
    </message>
@@ -610,14 +643,6 @@ Internet-Draft                  XMPP E2E                       June 2013
 
    <forwarded xmlns='urn:xmpp:forward:0'>
      <delay xmlns='urn:xmpp:delay'
-
-
-
-Miller                 Expires December 06, 2013               [Page 11]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
             stamp='1492-05-12T20:07:37.012Z'/>
      <message xmlns='jabber:client'
               from='juliet@capulet.lit/balcony'
@@ -640,6 +665,15 @@ Internet-Draft                  XMPP E2E                       June 2013
    77zI3ieIUh7Wb1S3kXmNily0_FZoIG7A", base64url encoded) to generate the
    [JOSE-JWE] outputs:
 
+
+
+
+
+Miller                 Expires December 15, 2013               [Page 12]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
    JWE Header
 
    {
@@ -661,18 +695,6 @@ Internet-Draft                  XMPP E2E                       June 2013
 
 
    JWE Ciphertext
-
-
-
-
-
-
-
-
-Miller                 Expires December 06, 2013               [Page 12]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
 
    FkFc4xGTVkjn7ojtS0SUY8IWfqsQKEIAlvLaBKieqVX1PAlq1ZjPp4TZC2I2eh7
    01Lef3iRuNZd1nlgP2aREyHYCpE3FAelUoVG90B1FrJMnDUKAka7eb6GImamWPf
@@ -700,6 +722,14 @@ Internet-Draft                  XMPP E2E                       June 2013
             id='fJZd9WFIIwNjFctT'
             to='romeo@montegue.lit'
             type='chat'>
+
+
+
+Miller                 Expires December 15, 2013               [Page 13]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
      <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6'
           type='enc'
           id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
@@ -722,14 +752,6 @@ Internet-Draft                  XMPP E2E                       June 2013
          OB84YrfvkgUjMItqQPg2H6QBNqGUspLI634lM8R-mhGciDZX2Jh_nKoXL
          Af5GCnvL9PlI7OdFqocPBIIPpjNrgX_Z4PFjeq7ILx98GhVkryLYU9HVO
          FPCYci-lF9nfw1geliLfkoj5QZyi4J2SOtYaO_zPmQvCXaUREqPf5UDAl
-
-
-
-Miller                 Expires December 06, 2013               [Page 13]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
          gvc50a4ByYnNbkWSbhZ5Z388s8ELzPSE9XypdgP-1cSyRke7V8iGe4eHN
          sm01TgWILYOFK4mYAM52OTitJxmQtmRp6izY5ZFdH9f_WdoB1RXmGEZyd
          vL-estcjx5ghsV3gktedIl0HA4R_M_N5TFIwv7hiisyRLi2aQtyFbE7pZ
@@ -756,6 +778,14 @@ Internet-Draft                  XMPP E2E                       June 2013
        id='disco1'
        to='romeo@montegue.lit/garden'
        type='result'>
+
+
+
+Miller                 Expires December 15, 2013               [Page 14]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
      <query xmlns='http://jabber.org/protocol/disco#info'>
        ...
        <feature xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6:signatures'/>
@@ -772,19 +802,6 @@ Internet-Draft                  XMPP E2E                       June 2013
    The basic process that a sending agent follows for authenticating
    stanzas is the same regardless of the kind of stanza (i.e., <iq/>,
    <message/>, or <presence/>).
-
-
-
-
-
-
-
-
-
-Miller                 Expires December 06, 2013               [Page 14]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
 
 4.2.1.  Process
 
@@ -817,6 +834,14 @@ Internet-Draft                  XMPP E2E                       June 2013
    4.  Converts the forwarding envelope (M) to a UTF-8 encoded string
        (M'), optionallly removing line breaks and other insignificant
        whitespace between elements and attributes, i.e.  M' =
+
+
+
+Miller                 Expires December 15, 2013               [Page 15]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
        UTF8-encode(M).  We call M' a "stanza-string" because for
        purposes of encryption and decryption it is treated not as XML
        but as an opaque string (this avoids the need for complex
@@ -831,15 +856,6 @@ Internet-Draft                  XMPP E2E                       June 2013
    6.  Performs the message signatures steps from [JOSE-JWS] to generate
        the JWS Header (H) and JWS Signature (I); using the following
        inputs:
-
-
-
-
-
-
-Miller                 Expires December 06, 2013               [Page 15]
-
-Internet-Draft                  XMPP E2E                       June 2013
 
 
        *  The 'alg' property is set to an appropriate signature
@@ -875,6 +891,13 @@ Internet-Draft                  XMPP E2E                       June 2013
        has a value for the 'id' attribute, this stanza SHOULD NOT use
        the same value for its "id" attribute.
 
+
+
+Miller                 Expires December 15, 2013               [Page 16]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
 4.3.  Verifying Signed XMPP Stanzas
 
 4.3.1.  Protocol Not Understood
@@ -889,14 +912,6 @@ Internet-Draft                  XMPP E2E                       June 2013
    of IQ stanzas in [RFC6121].
 
 4.3.2.  Process
-
-
-
-
-Miller                 Expires December 06, 2013               [Page 16]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
 
    Upon receipt of a signed stanza, the receiving agent performs the
    following:
@@ -932,6 +947,13 @@ Internet-Draft                  XMPP E2E                       June 2013
        Section 7.
 
 
+
+
+Miller                 Expires December 15, 2013               [Page 17]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
    5.  Obtains the plaintext stanza S, which is a child element node of
        M; the stanza MUST be fully qualified with the proper namespace
        declrations from XMPP stanzas, to help distinguish it from other
@@ -944,15 +966,6 @@ Internet-Draft                  XMPP E2E                       June 2013
    it MAY return a <bad-request/> error to the sending agent (as
    described in [RFC6120]), optionally supplemented by an application-
    specific error condition element of <insufficient-information/>:
-
-
-
-
-
-Miller                 Expires December 06, 2013               [Page 17]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
 
    <message xmlns='jabber:client'
             from='juliet@capulet.lit/balcony'
@@ -988,6 +1001,15 @@ Internet-Draft                  XMPP E2E                       June 2013
    supplemented by an application-specific error condition element of
    <verification-failed/>:
 
+
+
+
+
+Miller                 Expires December 15, 2013               [Page 18]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
    <message xmlns='jabber:client'
             from='juliet@capulet.lit/balcony'
             id='fJZd9WFIIwNjFctT'
@@ -1002,14 +1024,6 @@ Internet-Draft                  XMPP E2E                       June 2013
      <error type='modify'>
        <bad-request
            xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
-
-
-
-Miller                 Expires December 06, 2013               [Page 18]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
        <verification-failed
            xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6'/>
      </error>
@@ -1044,6 +1058,14 @@ Internet-Draft                  XMPP E2E                       June 2013
      </e2e>
      <error type='modify'>
        <not-acceptable
+
+
+
+Miller                 Expires December 15, 2013               [Page 19]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
            xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
        <bad-timestamp
            xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6'/>
@@ -1057,14 +1079,6 @@ Internet-Draft                  XMPP E2E                       June 2013
    NOT return a stanza error.  However, if the signed stanza is an <iq/>
    of type "get" or "set", the response MAY be sent unsigned if the
    receiving agent does not have an appropriate public-private key-pair.
-
-
-
-
-Miller                 Expires December 06, 2013               [Page 19]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
 
    Otherwise, the receiving agent SHOULD send the <iq/> response signed
    as per Section 4.2.1, with the 'type' attribute set to the value
@@ -1100,6 +1114,14 @@ Internet-Draft                  XMPP E2E                       June 2013
 
    <forwarded xmlns='urn:xmpp:forward:0'>
      <delay xmlns='urn:xmpp:delay'
+
+
+
+Miller                 Expires December 15, 2013               [Page 20]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
             stamp='1492-05-12T20:07:37.012Z'/>
      <message xmlns='jabber:client'
               from='juliet@capulet.lit/balcony'
@@ -1114,14 +1136,6 @@ Internet-Draft                  XMPP E2E                       June 2013
          The more I have, for both are infinite.
        </body>
      </message>
-
-
-
-Miller                 Expires December 06, 2013               [Page 20]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
    </forwarded>
 
 
@@ -1139,26 +1153,37 @@ Internet-Draft                  XMPP E2E                       June 2013
    JWS Payload
 
    PGZvcndhcmRlZCB4bWxucz0idXJuOnhtcHA6Zm9yd2FyZDowIj48ZGVsYXkgeG1
-   sbnM9InVybjp4bXBwOmRlbGF5IiBzdGFtcD0iMTQ5Mi0wNTEyVDIwOjA3OjM3Lj
-   AxMloiLz48bWVzc2FnZSB4bWxucz0iamFiYmVyOmNsaWVudCIgZnJvbT0ianVsa
-   WV0QGNhcHVsZXQubGl0L2JhbGNvbnkiIHRvPSJyb21lb0Btb250ZWd1ZS5saXQi
-   IHR5cGU9ImNoYXQiPjx0aHJlYWQ-MzU3NDBiZTUtYjVhNC00YzRlLTk2MmEtYTA
-   zYjE0ZWQ5MmY0PC90aHJlYWQ-PGJvZHk-QnV0IHRvIGJlIGZyYW5rLCBhbmQgZ2
-   l2ZSBpdCB0aGVlIGFnYWluLiBBbmQgeWV0IEkgd2lzaCBidXQgZm9yIHRoZSB0a
-   GluZyBJIGhhdmUuIE15IGJvdW50eSBpcyBhcyBib3VuZGxlc3MgYXMgdGhlIHNl
-   YSwgTXkgbG92ZSBhcyBkZWVwOyB0aGUgbW9yZSBJIGdpdmUgdG8gdGhlZSwgVGh
-   lIG1vcmUgSSBoYXZlLCBmb3IgYm90aCBhcmUgaW5maW5pdGUuPC9ib2R5PjwvbW
-   Vzc2FnZT48L2ZvcndhcmRlZD4
+   sbnM9InVybjp4bXBwOmRlbGF5IiBzdGFtcD0iMTQ5Mi0wNS0xMlQyMDowNzozNy
+   4wMTJaIi8-PG1lc3NhZ2UgeG1sbnM9ImphYmJlcjpjbGllbnQiIGZyb209Imp1b
+   GlldEBjYXB1bGV0LmxpdC9iYWxjb255IiB0bz0icm9tZW9AbW9udGVndWUubGl0
+   IiB0eXBlPSJjaGF0Ij48dGhyZWFkPjM1NzQwYmU1LWI1YTQtNGM0ZS05NjJhLWE
+   wM2IxNGVkOTJmNDwvdGhyZWFkPjxib2R5PkJ1dCB0byBiZSBmcmFuaywgYW5kIG
+   dpdmUgaXQgdGhlZSBhZ2Fpbi4gQW5kIHlldCBJIHdpc2ggYnV0IGZvciB0aGUgd
+   GhpbmcgSSBoYXZlLiBNeSBib3VudHkgaXMgYXMgYm91bmRsZXNzIGFzIHRoZSBz
+   ZWEsIE15IGxvdmUgYXMgZGVlcDsgdGhlIG1vcmUgSSBnaXZlIHRvIHRoZWUsIFR
+   oZSBtb3JlIEkgaGF2ZSwgZm9yIGJvdGggYXJlIGluZmluaXRlLjwvYm9keT48L2
+   1lc3NhZ2U-PC9mb3J3YXJkZWQ-
 
 
    JWS Signature
 
-   Mq4m-7qP05rxyvHinQ4GGvApKKmjGJaCbQHO1I_5P4gmIcn1gAan_4l2nIHXHyU
-   FPpT3OLpLwEaaAbuo6jPRYdC3J4VjpOWoBy1usAtjHgzgZvs4QLzynCkZ_NQoqE
-   OwXWe-Wl8KF11w0J2DePcORcELl5L4E6cdBVHxwJ36lmsPWSNiBcT9n2F41kZR0
-   -xs0SniHT8LBu9zE0zuerVvlI-FqE1yTAC49v-f3vahrcyaJHVvb-I4SAMm76Sz
-   dcCPCGEU8mKD1USDtuuWM84GwYLxYuhHOvZVtf_qMHY6ajfr9Fz3Hvc1r7WQLV8
-   wi79H3eDoOEqXf_epTeCldOfIrA
+
+
+
+
+
+
+Miller                 Expires December 15, 2013               [Page 21]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
+   YPfGouD50j0C_C-RneawG0jxXWDXgBkN3FJz6eaBFIPCh3hopiwtwKir7Yamvgt
+   OrqhXx2pcu-70caGi6mKKLWvpdwdJ3nEnhdjPOd3CmLdaK_PBAMtIt8d3155hdl
+   qNxSMsJN7PxmNLNwJhbksAsI-2TcCQsuxdIPXh6hcqBm44BpVio6AoRPqwF06XZ
+   MMBMOMnEFcV6Ht20wCK1BEGgOmN3KYPbwKeTctG8HKPAh25_K66aEXT66lI19uW
+   j1fGFJ79QQHUhc5y9pSKmpK7HKruPMRyrvpzBSfUhcb62nLXhM-LzY5taaDECzi
+   fCi-IxySBtJJtPCqYAYW_IbrRFg
 
 
    Then the sending agent performs steps 7 and 8 and sends the
@@ -1170,42 +1195,43 @@ Internet-Draft                  XMPP E2E                       June 2013
             to='romeo@montegue.lit'
             type='cat'>
      <e2e xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6'
-
-
-
-Miller                 Expires December 06, 2013               [Page 21]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
           type='sig'>
        <sigheader>
          eyJhbGciOiJSUzUxMiIsImtpZCI6Imp1bGlldEBjYXB1bGV0LmxpdCJ9
        </sigheader>
        <data>
          PGZvcndhcmRlZCB4bWxucz0idXJuOnhtcHA6Zm9yd2FyZDowIj48ZGVsY
-         XkgeG1sbnM9InVybjp4bXBwOmRlbGF5IiBzdGFtcD0iMTQ5Mi0wNTEyVD
-         IwOjA3OjM3LjAxMloiLz48bWVzc2FnZSB4bWxucz0iamFiYmVyOmNsaWV
-         udCIgZnJvbT0ianVsaWV0QGNhcHVsZXQubGl0L2JhbGNvbnkiIHRvPSJy
-         b21lb0Btb250ZWd1ZS5saXQiIHR5cGU9ImNoYXQiPjx0aHJlYWQ-MzU3N
-         DBiZTUtYjVhNC00YzRlLTk2MmEtYTAzYjE0ZWQ5MmY0PC90aHJlYWQ-PG
-         JvZHk-QnV0IHRvIGJlIGZyYW5rLCBhbmQgZ2l2ZSBpdCB0aGVlIGFnYWl
-         uLiBBbmQgeWV0IEkgd2lzaCBidXQgZm9yIHRoZSB0aGluZyBJIGhhdmUu
-         IE15IGJvdW50eSBpcyBhcyBib3VuZGxlc3MgYXMgdGhlIHNlYSwgTXkgb
-         G92ZSBhcyBkZWVwOyB0aGUgbW9yZSBJIGdpdmUgdG8gdGhlZSwgVGhlIG
-         1vcmUgSSBoYXZlLCBmb3IgYm90aCBhcmUgaW5maW5pdGUuPC9ib2R5Pjw
-         vbWVzc2FnZT48L2ZvcndhcmRlZD4
+         XkgeG1sbnM9InVybjp4bXBwOmRlbGF5IiBzdGFtcD0iMTQ5Mi0wNS0xMl
+         QyMDowNzozNy4wMTJaIi8-PG1lc3NhZ2UgeG1sbnM9ImphYmJlcjpjbGl
+         lbnQiIGZyb209Imp1bGlldEBjYXB1bGV0LmxpdC9iYWxjb255IiB0bz0i
+         cm9tZW9AbW9udGVndWUubGl0IiB0eXBlPSJjaGF0Ij48dGhyZWFkPjM1N
+         zQwYmU1LWI1YTQtNGM0ZS05NjJhLWEwM2IxNGVkOTJmNDwvdGhyZWFkPj
+         xib2R5PkJ1dCB0byBiZSBmcmFuaywgYW5kIGdpdmUgaXQgdGhlZSBhZ2F
+         pbi4gQW5kIHlldCBJIHdpc2ggYnV0IGZvciB0aGUgdGhpbmcgSSBoYXZl
+         LiBNeSBib3VudHkgaXMgYXMgYm91bmRsZXNzIGFzIHRoZSBzZWEsIE15I
+         GxvdmUgYXMgZGVlcDsgdGhlIG1vcmUgSSBnaXZlIHRvIHRoZWUsIFRoZS
+         Btb3JlIEkgaGF2ZSwgZm9yIGJvdGggYXJlIGluZmluaXRlLjwvYm9keT4
+         8L21lc3NhZ2U-PC9mb3J3YXJkZWQ-
        </data>
        <sig>
-         Mq4m-7qP05rxyvHinQ4GGvApKKmjGJaCbQHO1I_5P4gmIcn1gAan_4l2n
-         IHXHyUFPpT3OLpLwEaaAbuo6jPRYdC3J4VjpOWoBy1usAtjHgzgZvs4QL
-         zynCkZ_NQoqEOwXWe-Wl8KF11w0J2DePcORcELl5L4E6cdBVHxwJ36lms
-         PWSNiBcT9n2F41kZR0-xs0SniHT8LBu9zE0zuerVvlI-FqE1yTAC49v-f
-         3vahrcyaJHVvb-I4SAMm76SzdcCPCGEU8mKD1USDtuuWM84GwYLxYuhHO
-         vZVtf_qMHY6ajfr9Fz3Hvc1r7WQLV8wi79H3eDoOEqXf_epTeCldOfIrA
+         YPfGouD50j0C_C-RneawG0jxXWDXgBkN3FJz6eaBFIPCh3hopiwtwKir7
+         YamvgtOrqhXx2pcu-70caGi6mKKLWvpdwdJ3nEnhdjPOd3CmLdaK_PBAM
+         tIt8d3155hdlqNxSMsJN7PxmNLNwJhbksAsI-2TcCQsuxdIPXh6hcqBm4
+         4BpVio6AoRPqwF06XZMMBMOMnEFcV6Ht20wCK1BEGgOmN3KYPbwKeTctG
+         8HKPAh25_K66aEXT66lI19uWj1fGFJ79QQHUhc5y9pSKmpK7HKruPMRyr
+         vpzBSfUhcb62nLXhM-LzY5taaDECzifCi-IxySBtJJtPCqYAYW_IbrRFg
        </sig>
      </e2e>
    </message>
+
+
+
+
+
+
+Miller                 Expires December 15, 2013               [Page 22]
+
+Internet-Draft                  XMPP E2E                       June 2013
 
 
 5.  Requesting Session Keys
@@ -1226,14 +1252,6 @@ Internet-Draft                  XMPP E2E                       June 2013
 
    1.  Constructs a [JOSE-JWK] JWK Set (KS), containing information
        about each public key the requesting agent wishes to use.  Each
-
-
-
-Miller                 Expires December 06, 2013               [Page 22]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
        key SHOULD include a value for the property 'kid' which uniquely
        identifies it within the context of all provided keys.  Each key
        MUST include a value for the property 'kid' if any two keys use
@@ -1259,6 +1277,19 @@ Internet-Draft                  XMPP E2E                       June 2013
        uses to track the <iq/> response.
 
 
+
+
+
+
+
+
+
+
+Miller                 Expires December 15, 2013               [Page 23]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
 5.2.  Accept Process
 
    If the sending agent approves the request, it performs the following
@@ -1280,14 +1311,6 @@ Internet-Draft                  XMPP E2E                       June 2013
 
        *  The "use" parameter, if present, MUST be set to the algorithm
           in use for encrypting messages from Section 3.2.
-
-
-
-
-
-Miller                 Expires December 06, 2013               [Page 23]
-
-Internet-Draft                  XMPP E2E                       June 2013
 
 
        *  The "use" parameter, if present, MUST be set to "enc".
@@ -1315,6 +1338,14 @@ Internet-Draft                  XMPP E2E                       June 2013
           generating random values.
 
 
+
+
+
+Miller                 Expires December 15, 2013               [Page 24]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
        *  A randomly generated initialization vector.  See [RFC4086] for
           considerations on generating random values.
 
@@ -1337,13 +1368,6 @@ Internet-Draft                  XMPP E2E                       June 2013
        *  The child element <cmk/> qualified by the
           "urn:ietf:params:xml:ns:xmpp-e2e:6" namespace and with XML
           character data as E, encoded base64url as per [RFC4648].
-
-
-
-
-Miller                 Expires December 06, 2013               [Page 24]
-
-Internet-Draft                  XMPP E2E                       June 2013
 
 
        *  The child element <iv/> qualified by the
@@ -1370,6 +1394,14 @@ Internet-Draft                  XMPP E2E                       June 2013
 
 5.3.  Error Conditions
 
+
+
+
+Miller                 Expires December 15, 2013               [Page 25]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
    If the sending agent does not approve the request, it sends an <iq/>
    stanza of type "error" and containing the reason for denying the
    request:
@@ -1395,13 +1427,6 @@ Internet-Draft                  XMPP E2E                       June 2013
    To begin a key request, the receiving agent performs step 1 from
    Section 5.1 to generate the [JOSE-JWK]:
 
-
-
-Miller                 Expires December 06, 2013               [Page 25]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
    {
      "keys": [{
        "kty":"RSA",
@@ -1425,6 +1450,14 @@ Internet-Draft                  XMPP E2E                       June 2013
        eyJrZXlzIjpbeyJrdHkiOiJSU0EiLCJraWQiOiJyb21lb0Btb250ZWd1ZS5
        saXQvZ2FyZGVuIiwibiI6InZ0cWVqa01GMDFoOG9LRWFIZkhFWU8wQzJqTT
        dlSVNiYlN2TnMwU05JdFlXTzZHYmpwSmZONGxkWHcydnBWUmR5c253VTN6a
+
+
+
+Miller                 Expires December 15, 2013               [Page 26]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
        zZvMl9TRDBZQ0gxV2dldUkwUUsxa25NVERkTlNYeDUyZTFjNEJUd2hsQThp
        SHV1dFRXbXBCcWVzbjFHTlptcUIzallzSk9rVkJZd0NKdGtCOUFQYUJ2azB
        pdGxSdGl6akNmMUhIbmF1N25HU3R5c2hndTgtc3J4aV9kOHJDNVRUTFNCX3
@@ -1450,14 +1483,6 @@ Internet-Draft                  XMPP E2E                       June 2013
          S5saXQvZ2FyZGVuIiwibiI6InZ0cWVqa01GMDFoOG9LRWFIZkhFWU8wQz
          JqTTdlSVNiYlN2TnMwU05JdFlXTzZHYmpwSmZONGxkWHcydnBWUmR5c25
          3VTN6azZvMl9TRDBZQ0gxV2dldUkwUUsxa25NVERkTlNYeDUyZTFjNEJU
-
-
-
-Miller                 Expires December 06, 2013               [Page 26]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
          d2hsQThpSHV1dFRXbXBCcWVzbjFHTlptcUIzallzSk9rVkJZd0NKdGtCO
          UFQYUJ2azBpdGxSdGl6akNmMUhIbmF1N25HU3R5c2hndTgtc3J4aV9kOH
          JDNVRUTFNCX3pUMWk2ZlA4ZndEbG9lbVhPdEMwVTY1Ynk1UC0xWkh4YWZ
@@ -1475,56 +1500,55 @@ Internet-Draft                  XMPP E2E                       June 2013
    {
      "kty":"oct",
      "kid":"835c92a8-94cd-4e96-b3f3-b2e75a438f92",
-     "oct":"xWtdjhYsH4Va_9SfYSefsJfZu03m5RrbXo_UavxxeU8"
+     "k":"xWtdjhYsH4Va_9SfYSefsJfZu03m5RrbXo_UavxxeU8"
    }
 
 
    Then the sending agent performs steps 2 and 3 to generate the
    protected SMK:
 
+
+
+Miller                 Expires December 15, 2013               [Page 27]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
    JWE Header (before base64url encoding)
 
    {
      "alg":"RSA-OAEP",
+     "kid":"romeo@montegue.lit/garden",
      "enc":"A256CBC+HS512",
-     "kid":"romeo@montegue.lit/garden"
+     "cty":"application/jwk+json"
    }
 
 
    JWE Encrypted Key
 
-   UeoVeGcZP-VsLu1PVj3NNWkmmEF7H2Nl_mHWscOuT_vYn-4ub2NEnRy4dzyycgx
-   ny6jmRPpNiGJB6AfI4TYZvrjig5dubv4uG7phCvKYVI3uaUU58Fc9H_o-BTmNv2
-   rUT-RGt6YYLW97ZJp5ZcA2l-KxykcxaRYC4Sv_UOS3Kqo0sVx5u7tolE6SbMnUH
-   etg91Gc9pVVa1XX-wz4ZrcA6V8zf8pCtmc4WyDMFx8RYYXR_5Qvax-TzOJUL2eA
-   r3OQsf3KNh58WvvzcwAKTmR214QmZCxI_A5mIqoog0H0uV987P9yw1wFfsmg7z-
-   Y2Ed7Blp-zLOvXEQKU9FM-vjBnA
+   hKUOpAif76c-hmRwEphVB9wXjloLpwu75x98MSWyCBtfUgmopk93ttUXoZ4AAIk
+   rZJOtrPUqPZwYHjay3ggfgjVljJ_KGhgqI5cScIzaAQs0Pxep6FnrsnUrw09Sjv
+   2VRXOay4guMQnbQo0ibpifBxeuL9MJ_vdeb_BdSE8YZ4iTfMb7GT35gZC9NgweX
+   3fiTEo2LjY8hEV3DHud5LlNZzYp9kLmAUZNIwGu7LtYyI4F7NnOv9oLx1HtmfE3
+   _skkYtQoKMvMewLkIO88h325qCpWFdrLwPp63betCmewDJPaBdrp91rLchkXVo-
+   d2ueKkb59TxWjMx7esBdaxCAcDQ
 
 
    JWE Initialization Vector
 
-   eiXTO21DNqFnCTQkLAoAtA
-
-
-
-
-
-Miller                 Expires December 06, 2013               [Page 27]
-
-Internet-Draft                  XMPP E2E                       June 2013
+   Ggiego8UiSsj7GgY94qOng
 
 
    JWE Ciphertext
 
-   e8sZiRvKLPOUjmFwOYhvrZMQYzW1yglg6mTnazJU_rF7mXTBIieNZCd7hDrlrdG
-   SxqqUgh6N1O2QBLygf2PtWDmHHjn1aLncx6qlGf0UOxCCXUBfBIhZgFH5YX1i3_
-   VSsNUDEoIKTGA21EnamOqa1A
+   4vIGDz9Hm6X4lSo9JoA6ZzS0KitztLGAiMUs3RTviFO09choPhxJNlOj8KX8QIL
+   u4zZ-ytCnG-yzNx5SsT8KEQJhIf6_9yWplxpX173k6ZJV-sXGd4Mj9u7N0IqWQL
+   K5DMytv7XopsZsR9QFCDNGew
 
 
    JWE Integrity Value
 
-   WQzHj3j30Qo7VakMM42t-X1omQVGyebd3No9ZFGPQNUwEWONjIcZ89_wFBhZFdd
-   kc8i_qtXi-9XPmSVei3A_Jw
+   3GuaasWV0XGTBbRtNP6OQ14_cHL-ZJC1naDtU6EIecw
 
 
    Then the sending agent performs step 4 to generate the <keyreq/>
@@ -1533,42 +1557,41 @@ Internet-Draft                  XMPP E2E                       June 2013
    <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6'
            id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
      <encheader>
-       eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMrSFM1MTIiLCJraWQ
-       iOiJyb21lb0Btb250ZWd1ZS5saXQvZ2FyZGVuIn0
+       eyJhbGciOiJSU0EtT0FFUCIsImtpZCI6InJvbWVvQG1vbnRlZ3VlLmxpdC9
+       nYXJkZW4iLCJlbmMiOiJBMjU2Q0JDK0hTNTEyIiwiY3R5IjoiYXBwbGljYX
+       Rpb24vandrK2pzb24ifQ
      </encheader>
      <cmk>
-       UeoVeGcZP-VsLu1PVj3NNWkmmEF7H2Nl_mHWscOuT_vYn-4ub2NEnRy4dzy
-       ycgxny6jmRPpNiGJB6AfI4TYZvrjig5dubv4uG7phCvKYVI3uaUU58Fc9H_
-       o-BTmNv2rUT-RGt6YYLW97ZJp5ZcA2l-KxykcxaRYC4Sv_UOS3Kqo0sVx5u
-       7tolE6SbMnUHetg91Gc9pVVa1XX-wz4ZrcA6V8zf8pCtmc4WyDMFx8RYYXR
-       _5Qvax-TzOJUL2eAr3OQsf3KNh58WvvzcwAKTmR214QmZCxI_A5mIqoog0H
-       0uV987P9yw1wFfsmg7z-Y2Ed7Blp-zLOvXEQKU9FM-vjBnA
+
+
+
+Miller                 Expires December 15, 2013               [Page 28]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
+       hKUOpAif76c-hmRwEphVB9wXjloLpwu75x98MSWyCBtfUgmopk93ttUXoZ4
+       AAIkrZJOtrPUqPZwYHjay3ggfgjVljJ_KGhgqI5cScIzaAQs0Pxep6Fnrsn
+       Urw09Sjv2VRXOay4guMQnbQo0ibpifBxeuL9MJ_vdeb_BdSE8YZ4iTfMb7G
+       T35gZC9NgweX3fiTEo2LjY8hEV3DHud5LlNZzYp9kLmAUZNIwGu7LtYyI4F
+       7NnOv9oLx1HtmfE3_skkYtQoKMvMewLkIO88h325qCpWFdrLwPp63betCme
+       wDJPaBdrp91rLchkXVo-d2ueKkb59TxWjMx7esBdaxCAcDQ
      </cmk>
      <iv>
-       eiXTO21DNqFnCTQkLAoAtA
+       Ggiego8UiSsj7GgY94qOng
      </iv>
      <data>
-       e8sZiRvKLPOUjmFwOYhvrZMQYzW1yglg6mTnazJU_rF7mXTBIieNZCd7hDr
-       lrdGSxqqUgh6N1O2QBLygf2PtWDmHHjn1aLncx6qlGf0UOxCCXUBfBIhZgF
-       H5YX1i3_VSsNUDEoIKTGA21EnamOqa1A
+       4vIGDz9Hm6X4lSo9JoA6ZzS0KitztLGAiMUs3RTviFO09choPhxJNlOj8KX
+       8QILu4zZ-ytCnG-yzNx5SsT8KEQJhIf6_9yWplxpX173k6ZJV-sXGd4Mj9u
+       7N0IqWQLK5DMytv7XopsZsR9QFCDNGew
      </data>
      <mac>
-       WQzHj3j30Qo7VakMM42t-X1omQVGyebd3No9ZFGPQNUwEWONjIcZ89_wFBh
-       ZFddkc8i_qtXi-9XPmSVei3A_Jw
+       3GuaasWV0XGTBbRtNP6OQ14_cHL-ZJC1naDtU6EIecw
      </mac>
    </keyreq>
 
 
    Then the sending agent performs step 5 and sends the following:
-
-
-
-
-
-Miller                 Expires December 06, 2013               [Page 28]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
 
    <iq xmlns='jabber:client'
        from='juliet@capulet.lit/balcony'
@@ -1578,28 +1601,36 @@ Internet-Draft                  XMPP E2E                       June 2013
      <keyreq xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6'
              id='835c92a8-94cd-4e96-b3f3-b2e75a438f92'>
        <encheader>
-         eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMrSFM1MTIiLCJraWQ
-         iOiJyb21lb0Btb250ZWd1ZS5saXQvZ2FyZGVuIn0
+         eyJhbGciOiJSU0EtT0FFUCIsImtpZCI6InJvbWVvQG1vbnRlZ3VlLmxpdC9
+         nYXJkZW4iLCJlbmMiOiJBMjU2Q0JDK0hTNTEyIiwiY3R5IjoiYXBwbGljYX
+         Rpb24vandrK2pzb24ifQ
        </encheader>
        <cmk>
-         UeoVeGcZP-VsLu1PVj3NNWkmmEF7H2Nl_mHWscOuT_vYn-4ub2NEnRy4dzy
-         ycgxny6jmRPpNiGJB6AfI4TYZvrjig5dubv4uG7phCvKYVI3uaUU58Fc9H_
-         o-BTmNv2rUT-RGt6YYLW97ZJp5ZcA2l-KxykcxaRYC4Sv_UOS3Kqo0sVx5u
-         7tolE6SbMnUHetg91Gc9pVVa1XX-wz4ZrcA6V8zf8pCtmc4WyDMFx8RYYXR
-         _5Qvax-TzOJUL2eAr3OQsf3KNh58WvvzcwAKTmR214QmZCxI_A5mIqoog0H
-         0uV987P9yw1wFfsmg7z-Y2Ed7Blp-zLOvXEQKU9FM-vjBnA
+         hKUOpAif76c-hmRwEphVB9wXjloLpwu75x98MSWyCBtfUgmopk93ttUXoZ4
+         AAIkrZJOtrPUqPZwYHjay3ggfgjVljJ_KGhgqI5cScIzaAQs0Pxep6Fnrsn
+         Urw09Sjv2VRXOay4guMQnbQo0ibpifBxeuL9MJ_vdeb_BdSE8YZ4iTfMb7G
+         T35gZC9NgweX3fiTEo2LjY8hEV3DHud5LlNZzYp9kLmAUZNIwGu7LtYyI4F
+         7NnOv9oLx1HtmfE3_skkYtQoKMvMewLkIO88h325qCpWFdrLwPp63betCme
+         wDJPaBdrp91rLchkXVo-d2ueKkb59TxWjMx7esBdaxCAcDQ
        </cmk>
        <iv>
-         eiXTO21DNqFnCTQkLAoAtA
+         Ggiego8UiSsj7GgY94qOng
        </iv>
        <data>
-         e8sZiRvKLPOUjmFwOYhvrZMQYzW1yglg6mTnazJU_rF7mXTBIieNZCd7hDr
-         lrdGSxqqUgh6N1O2QBLygf2PtWDmHHjn1aLncx6qlGf0UOxCCXUBfBIhZgF
-         H5YX1i3_VSsNUDEoIKTGA21EnamOqa1A
+         4vIGDz9Hm6X4lSo9JoA6ZzS0KitztLGAiMUs3RTviFO09choPhxJNlOj8KX
+
+
+
+Miller                 Expires December 15, 2013               [Page 29]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
+         8QILu4zZ-ytCnG-yzNx5SsT8KEQJhIf6_9yWplxpX173k6ZJV-sXGd4Mj9u
+         7N0IqWQLK5DMytv7XopsZsR9QFCDNGew
        </data>
        <mac>
-         WQzHj3j30Qo7VakMM42t-X1omQVGyebd3No9ZFGPQNUwEWONjIcZ89_wFBh
-         ZFddkc8i_qtXi-9XPmSVei3A_Jw
+         3GuaasWV0XGTBbRtNP6OQ14_cHL-ZJC1naDtU6EIecw
        </mac>
      </keyreq>
    </iq>
@@ -1618,14 +1649,6 @@ Internet-Draft                  XMPP E2E                       June 2013
 
    Timestamps are included to help prevent replay attacks.  All
    timestamps MUST conform to [XEP-0082] and be presented as UTC with no
-
-
-
-Miller                 Expires December 06, 2013               [Page 29]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
    offset, and SHOULD include the seconds and fractions of a second to
    three digits.  Absent a local adjustment to the sending agent's
    perceived time or the underlying clock time, the sending agent MUST
@@ -1650,6 +1673,15 @@ Internet-Draft                  XMPP E2E                       June 2013
       "old timestamp", "future timestamp", or "decreasing timestamp",
       and the receiving entity MAY return a stanza error to the sender.
 
+
+
+
+
+Miller                 Expires December 15, 2013               [Page 30]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
    Note the foregoing assumes the stanza is received while the receiving
    agent is online; see Section 9 for offline storage considerations.
 
@@ -1673,15 +1705,6 @@ Internet-Draft                  XMPP E2E                       June 2013
       acceptable trust relationship with the multiplexing service.
 
 
-
-
-
-
-Miller                 Expires December 06, 2013               [Page 30]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
 9.  Interaction with Offline Storage
 
    The server makes its best effort to deliver stanzas.  When the
@@ -1700,6 +1723,19 @@ Internet-Draft                  XMPP E2E                       June 2013
       includes delayed delivery data as specified in [XEP-0203] for when
       the server received the message, then the receiving agent SHOULD
       use the delayed delivery timestmap rather than the current time.
+
+
+
+
+
+
+
+
+
+
+Miller                 Expires December 15, 2013               [Page 31]
+
+Internet-Draft                  XMPP E2E                       June 2013
 
 
 10.  Mandatory-to-Implement Cryptographic Algorithms
@@ -1730,14 +1766,6 @@ Internet-Draft                  XMPP E2E                       June 2013
 
    A sender MAY re-use a SMK for several stanzas to the same recipient.
    In this case, the SID remains the same, but the sending agent MUST
-
-
-
-Miller                 Expires December 06, 2013               [Page 31]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
    generate a new CMK and IV for each encrypted stanza.  The sender
    SHOULD periodically generate a new SMK (and its associated SID);
    however, this specification does not mandate any specific algorithms
@@ -1758,6 +1786,13 @@ Internet-Draft                  XMPP E2E                       June 2013
    URI:  urn:ietf:params:xml:ns:xmpp-e2e:6
 
    Specification:  RFC XXXX
+
+
+
+Miller                 Expires December 15, 2013               [Page 32]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
 
    Description:  This is an XML namespace name of encrypted and/or
       signed content for the Extensible Messaging and Presence Protocol
@@ -1785,15 +1820,6 @@ Internet-Draft                  XMPP E2E                       June 2013
 
    Registrant Contact:  IESG, <iesg@ietf.org>
 
-
-
-
-
-Miller                 Expires December 06, 2013               [Page 32]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
 13.  References
 
 13.1.  Normative References
@@ -1815,6 +1841,14 @@ Internet-Draft                  XMPP E2E                       June 2013
    [JOSE-JWK]
               Jones, M., "JSON Web Key (JWK)", draft-ietf-jose-json-web-
               key-11 (work in progress), December 2012.
+
+
+
+
+Miller                 Expires December 15, 2013               [Page 33]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
 
    [JOSE-JWS]
               Jones, M., Bradley, J., and N. Sakimura, "JSON Web
@@ -1842,14 +1876,6 @@ Internet-Draft                  XMPP E2E                       June 2013
               Protocol (XMPP): Instant Messaging and Presence", RFC
               6121, March 2011.
 
-
-
-
-Miller                 Expires December 06, 2013               [Page 33]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
    [XEP-0030]
               Eatmon, R., Hildebrand, J., Millard, P., and P. Saint-
               Andre, "Service Discovery", XSF XEP 0030, June 2006.
@@ -1871,6 +1897,14 @@ Internet-Draft                  XMPP E2E                       June 2013
               July 2012.
 
 13.2.  Informative References
+
+
+
+
+Miller                 Expires December 15, 2013               [Page 34]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
 
    [RFC3610]  Whiting, D., Housley, R., and N. Ferguson, "Counter with
               CBC-MAC (CCM)", RFC 3923, September 2003.
@@ -1898,14 +1932,6 @@ Appendix A.  Schema for urn:ietf:params:xml:ns:xmpp-e2e:6
    <?xml version='1.0' encoding='UTF-8'?>
 
    <xs:schema
-
-
-
-Miller                 Expires December 06, 2013               [Page 34]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
        xmlns:xs='http://www.w3.org/2001/XMLSchema'
        targetNamespace='urn:ietf:params:xml:ns:xmpp-e2e:6'
        xmlns='urn:ietf:params:xml:ns:xmpp-e2e:6'
@@ -1928,6 +1954,14 @@ Internet-Draft                  XMPP E2E                       June 2013
            <xs:element ref='iv' minOccurs=1' maxOccurs='1'/>
            <xs:element ref='data' minOccurs='1' maxOccurs='1'/>
            <xs:element ref='mac' minOccurs='1' maxOccurs='1'/>
+
+
+
+Miller                 Expires December 15, 2013               [Page 35]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
          </xs:sequence>
        </xs:complexType>
      </xs:element>
@@ -1955,13 +1989,6 @@ Internet-Draft                  XMPP E2E                       June 2013
        </xs:complexType>
      </xs:element>
 
-
-
-Miller                 Expires December 06, 2013               [Page 35]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
      <xs:element name='iv'>
        <xs:complexType>
          <xs:simpleType>
@@ -1983,6 +2010,14 @@ Internet-Draft                  XMPP E2E                       June 2013
      <xs:element name='encheader'>
        <xs:complexType>
          <xs:simpleType>
+
+
+
+Miller                 Expires December 15, 2013               [Page 36]
+
+Internet-Draft                  XMPP E2E                       June 2013
+
+
            <xs:extension base='xs:string'>
            </xs:extension>
          </xs:simpleType>
@@ -2010,14 +2045,6 @@ Internet-Draft                  XMPP E2E                       June 2013
      <xs:element name='sigheader'>
        <xs:complexType>
          <xs:simpleType>
-
-
-
-Miller                 Expires December 06, 2013               [Page 36]
-
-Internet-Draft                  XMPP E2E                       June 2013
-
-
            <xs:extension base='xs:string'>
            </xs:extension>
          </xs:simpleType>
@@ -2036,6 +2063,15 @@ Internet-Draft                  XMPP E2E                       June 2013
      </xs:simpleType>
 
    </xs:schema>
+
+
+
+
+
+
+Miller                 Expires December 15, 2013               [Page 37]
+
+Internet-Draft                  XMPP E2E                       June 2013
 
 
 Appendix B.  Acknowledgements
@@ -2068,4 +2104,24 @@ Author's Address
 
 
 
-Miller                 Expires December 06, 2013               [Page 37]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Miller                 Expires December 15, 2013               [Page 38]
