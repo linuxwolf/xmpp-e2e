@@ -1,0 +1,425 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE xep SYSTEM 'xep.dtd' [
+  <!ENTITY % ents SYSTEM 'xep.ent'>
+%ents;
+<!ENTITY p2p_sec "<span class='ref'><link url='p2p-sec.html'>Securing Data Channels ({p2p-sec})</link></span> <note>{p2p-sec}: Securing Data Channels &lt;<link url='p2p-sec.html'>./p2p-sec.html</link>&gt;.</note>" >
+<!ENTITY id-xmpp-e2e "<span class='ref'><link url='http://tools.ietf.org/html/draft-miller-xmpp-e2e'>XMPP-E2E</link></span> <note>End-to-End Object Encryption and Signatures for the Extensible Messaging and Presence Protocol (XMPP) &lt;<link url='http://tools.ietf.org/html/draft-miller-xmpp-e2e'>http://tools.ietf.org/html/draft-miller-xmpp-e2e</link>&gt;.</note>" >
+]>
+<?xml-stylesheet type='text/xsl' href='xep.xsl'?>
+<xep>
+<header>
+  <title>Using Transport Layer Security (TLS) to Secure Data Channels</title>
+  <abstract>This specification defines a protocol for applying Transport Layer Security (TLS) as a security method for data channels established with Stream Initiation or Jingle.</abstract>
+  <legal>
+    <copyright>This XMPP Extension Protocol is copyright (c) 1999 - 2013 by the XMPP Standards Foundation (XSF).</copyright>
+    <permissions>Permission is hereby granted, free of charge, to any person obtaining a copy of this specification (the &quot;Specification&quot;), to make use of the Specification without restriction, including without limitation the rights to implement the Specification in a software program, deploy the Specification in a network service, and copy, modify, merge, publish, translate, distribute, sublicense, or sell copies of the Specification, and to permit persons to whom the Specification is furnished to do so, subject to the condition that the foregoing copyright notice and this permission notice shall be included in all copies or substantial portions of the Specification. Unless separate permission is granted, modified works that are redistributed shall not contain misleading information regarding the authors, title, number, or publisher of the Specification, and shall not claim endorsement of the modified works by the authors, any organization or project to which the authors belong, or the XMPP Standards Foundation.</permissions>
+    <warranty>## NOTE WELL: This Specification is provided on an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE. In no event shall the XMPP Standards Foundation or the authors of this Specification be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the Specification or the implementation, deployment, or other use of the Specification. ##</warranty>
+    <liability>In no event and under no legal theory, whether in tort (including negligence), contract, or otherwise, unless required by applicable law (such as deliberate and grossly negligent acts) or agreed to in writing, shall the XMPP Standards Foundation or any author of this Specification be liable for damages, including any direct, indirect, special, incidental, or consequential damages of any character arising out of the use or inability to use the Specification (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses), even if the XMPP Standards Foundation or such author has been advised of the possibility of such damages.</liability>
+    <conformance>This XMPP Extension Protocol has been contributed in full conformance with the XSF's Intellectual Property Rights Policy (a copy of which may be found at &lt;<link url='http://www.xmpp.org/extensions/ipr-policy.shtml'>http://www.xmpp.org/extensions/ipr-policy.shtml</link>&gt; or obtained by writing to XSF, P.O. Box 1641, Denver, CO 80201 USA).</conformance>
+  </legal>
+  <number>xxxx</number>
+  <status>ProtoXEP</status>
+  <type>Standards Track</type>
+  <sig>Standards</sig>
+  <approver>Council</approver>
+  <dependencies>
+    <spec>XMPP Core</spec>
+    <spec>TLS</spec>
+    <spec>XEP-0001</spec>
+    <spec>XEP-0030</spec>
+    <spec>p2p-sec</spec>
+  </dependencies>
+  <supersedes/>
+  <supersededby/>
+  <shortname>NOT_YET_ASSIGNED</shortname>
+  &linuxwolf;
+  <revision>
+    <version>0.0.1</version>
+    <date>20013-09-23</date>
+    <initials>mam</initials>
+    <remark><p>First draft.</p></remark>
+  </revision>
+</header>
+<section1 topic='Introduction' anchor='intro'>
+  <p>&rfc5246; Transport Layer Security (TLS) provides communications security over a reliable transport protocol (such as TCP). This document defines a protocol for establishing a TLS session between two XMPP endpoints atop a data channel established via &xep0095; or &xep0166;, following the framework outlined in &p2p_sec;.</p>
+</section1>
+<section1 topic='Requirements' anchor='reqs'>
+  <p>This specification has the following requirements:</p>
+  <p>TBD</p>
+</section1>
+<section1 topic='Glossary' anchor='glossary'>
+  <p>This document reuses the terms and conventions from <span class='ref'>XEP-0166</span> and from <span class='ref'>{p2p-sec}</span>.</p>
+</section1>
+<section1 topic='Determining Support' anchor='disco'>
+  <p>If an entity supports this protocol, it MUST advertise that fact in its responses to &xep0030; information requests ("disco#info") by returning a feature of "urn:xmpp:p2p-sec:tls:0", in addition to those mandated by <span class='ref'>{p2p-sec}</span>:</p>
+  <example caption='Initiator Sends Service Discovery Request to Responder'><![CDATA[
+<iq from='minas-tirith@gondor.example/library'
+    id='hOgdP2Oo'
+    to='gandalf@middle-earth.example/2SSrSj0CjMyGi0ekwcuxJa0Ttul38hLn'
+    type='get'>
+  <query xmlns='http://jabber.org/protocol/disco#info'/>
+</iq>
+  ]]></example>
+  <example caption='Responder Replies to Service Discovery Request'><![CDATA[
+<iq from='minas-tirith@gondor.example/library'
+    id='hOgdP2Oo'
+    to='gandalf@middle-earth.example/2SSrSj0CjMyGi0ekwcuxJa0Ttul38hLn'
+    type='result'>
+  <query xmlns='http://jabber.org/protocol/disco#info'>
+    ....
+    <feature var='urn:xmpp:p2p-sec:0'/>
+    <feature var='urn:xmpp:p2p-sec:tls:0'/>
+    ....
+  </query>
+</iq>
+  ]]></example>
+</section1>
+<section1 topic='Usage with Stream Initiation (SI)' anchor='ucsi'>
+  <section2 topic='Protocol Flow' anchor='ucsi-flow'>
+    <p>The basic flow is as follows:</p>
+    <code><![CDATA[
+initiator                                            responder
+    |                                                    |
+    | (1) SI offer                                       |
+    | -------------------------------------------------> |
+    |                                                    |
+    | (2) SI accept                                      |
+    | <------------------------------------------------- |
+    |                                                    |
+    | (3) Provide TLS server properties                  |
+    | -------------------------------------------------> |
+    |                                                    |
+    | (4) Provide TLS client properties                  |
+    | <------------------------------------------------- |
+    |                                                    |
+    | (5) Establish transport layer                      |
+    | <------------------------------------------------> |
+    |                                                    |
+    | (6) Establish TLS session                          |
+    | <================================================> |
+    |                                                    |
+    | (7) Exchange application data                      |
+    | <================================================> |
+    ]]></code>
+    <ol>
+      <li>First the initiator sends a <span class='ref'>XEP-0095</span> offer to the responder. This offer includes the security method "urn:xmpp:p2p-sec:tls:0" as one of the options for the &xep0020; form's "urn:xmpp:p2p-sec:0:form:method" field.</li>
+      <li>Then the responder sends a <span class='ref'>XEP-0095</span> accept to the initiator. This accept includes the security method "urn:xmpp:p2p-sec:tls:0" as the chosen security method.</li>
+      <li>Before negotiating the transport, the initiator provides any relevant TLS server properties<note>In <span class='ref'>XEP-0095</span>, the initiator always acts as the TLS server.</note>. Note that the collection of TLS server properties could be empty.</li>
+      <li>The responder then provides any relevant TLS client properties<note>In <span class='ref'>XEP-0095</span>, the responder always acts as the TLS client.</note>. Note that the collection of security properties for the responder could be empty.</li>
+      <li>The initiator and responder then establish the transport layer. The details are specific to the selected stream method (e.g., &xep0065;), and typically involve exchanging pre-application data over both XMPP and the data channel.</li>
+      <li>The TLS session is then established between the initiator and responder. This process occurs completely over the data channel according to <span class='ref'>RFC 5246</span>.</li>
+      <li>Once the security layer is established, the initiator and responder exchange application data.</li>
+    </ol>
+    <p>In this protocol, the initiator always acts as the TLS server and the responder always acts as the TLS client.</p>
+  </section2>
+  <section2 topic='SI Offer and Accept' anchor='ucsi-offeraccept'>
+    <p>According to <span class='ref'>XEP-0095</span>, the initiator begins the process by sending a SI offer to the responder. To negotiate this security method, the &xep0020; form MUST at a minimum include an option for "urn:xmpp:p2p-sec:tls:0":</p>
+    <example caption='Initiator Sends Offer to Responder'><![CDATA[
+<iq from='minas-tirith@gondor.example/library'
+    id='uPR5ONeL'
+    to='gandalf@middle-earth.example/2SSrSj0CjMyGi0ekwcuxJa0Ttul38hLn'
+    type='set'>
+  <query xmlns='http://jabber.org/protocol/si'
+         id='8f2f7141-7157-438f-a9ee-41be305edddf'
+         mime-type='text/plain'
+         profile='http://jabber.org/protocol/si/profile/file-transfer'>
+    <file xmlns='http://jabber.org/protocol/si/profile/file-transfer'
+          name='test.txt'
+          size='4092'/>
+    <feature xmlns='http://jabber.org/protocol/feature-neg'>
+      <x xmlns='jabber:x:data' type='form'>
+        <field type='list-single'
+               var='stream-method'>
+          <option><value>http://jabber.org/protocol/bytestreams</value></option>
+          <option><value>http://jabber.org/protocol/ibb</value></option>
+        </field>
+        <field type='list-single'
+               var='urn:xmpp:p2p-sec:0:form:method'>
+          <option><value>urn:xmpp:p2p-sec:tls:0</value></option>
+        </field>
+      </x>
+    </feature>
+  </query>
+</iq>
+    ]]></example>
+    <p>The responder sends the <span class='ref'>XEP-0095</span> SI accept response, selecting "urn:xmpp:p2p-sec:tls:0" as the security method (in addition to any other features necessary for <span class='ref'>XEP-0095</span> to continue):</p>
+    <example caption='Responder Sends SI Accept to Initiator'><![CDATA[
+<iq to='gandalf@middle-earth.example/2SSrSj0CjMyGi0ekwcuxJa0Ttul38hLn'
+    id='uPR5ONeL'
+    from='minas-tirith@gondor.example/library'
+    type='result'>
+  <query xmlns='http://jabber.org/protocol/si'>
+    <feature xmlns='http://jabber.org/protocol/feature-neg'>
+      <x xmlns='jabber:x:data' type='submit'>
+        <field var='stream-method'>
+          <value>http://jabber.org/protocol/bytestreams</value>
+        </field>
+        <field var='urn:xmpp:p2p-sec:0:form:method'>
+          <option><value>urn:xmpp:p2p-sec:tls:0</value></option>
+        </field>
+      </x>
+    </feature>
+  </query>
+</iq>
+    ]]></example>
+  </section2>
+  <section2 topic='Exchanging TLS Properties' anchor='ucsi-extlsprops'>
+    <p>Once the security and transport methods are chosen, the initiator and responder exchange TLS properties. Note that this information is not authenticated or protected beyond what might exist on the XMPP connection(s) between the initiator and responder.</p>
+    <p>The initiator begins the TLS information exchange by sending an IQ-set to the responder, containing a &lt;security/&gt; element qualified by the "urn:xmpp:p2p-sec:tls:0" namespace. The &lt;security/&gt; element from the initiator MAY contain any of the following elements (also qualified by the "urn:xmpp:p2p-sec:tls:0" namespace):</p>
+    <ul>
+      <li>Zero or one &lt;server/&gt; element, which details the expected identity of the TLS server (initiator).</li>
+      <li>Zero or more &lt;auth/&gt; elements, each of which details an acceptable mechanism to authenticate the TLS client (responder).</li>
+    </ul>
+    <example caption='Initiator Sends TLS Server Information to Responder'><![CDATA[
+<iq from='minas-tirith@gondor.example/library'
+    id='VjDJXLt3'
+    to='gandalf@middle-earth.example/2SSrSj0CjMyGi0ekwcuxJa0Ttul38hLn'
+    type='set'>
+  <security xmlns='urn:xmpp:p2p-sec:tls:0'
+              sid='8f2f7141-7157-438f-a9ee-41be305edddf'>
+    <server type='x509'
+            name='minas-tirith@gondor.example'>
+      <hash xmlns='urn:xmpp:hashes:0'
+            algo='sha-1'>B74rxyvtgTnzue3SM4H9LdlUfO0=</hash>
+    </server>
+    <auth type='x509'/>
+    <auth type='srp'/>
+  </security>
+</iq>
+    ]]></example>
+    <p>If the responder finds the information acceptable, it sends an IQ-result to the initiator, containing a &lt;security/&gt; element qualified by the "urn:xmpp:p2p-sec:tls:0" namespace. The &lt;security/&gt; element from the responder MAY contain any of the following elements (also qualified by the "urn:xmpp:p2p-sec:tls:0" namespace):</p>
+    <ul>
+      <li>Zero or more &lt;client/&gt; elements, each of which details an expected identity for the TLS client (responder).</li>
+      <li>Zero or more &lt;auth/&gt; elements, each of which specifies an acceptable mechanism to authenticate the TLS server (initiator).</li>
+    </ul>
+    <example caption='Responder Sends TLS Client Information to Initiator'><![CDATA[
+<iq to='gandalf@middle-earth.example/2SSrSj0CjMyGi0ekwcuxJa0Ttul38hLn'
+    id='VjDJXLt3'
+    from='minas-tirith@gondor.example/library'
+    type='result'>
+  <security xmlns='urn:xmpp:p2p-sec:tls:0'
+              sid='8f2f7141-7157-438f-a9ee-41be305edddf'>
+    <client type='x509'
+            name='galdalf@middle-earth.example'>
+      <hash xmlns='urn:xmpp:hashes:0'
+            algo='sha-1'>+NxNHFHyLAcftIN2W3igvB2dRUU=</hash>
+    </client>
+    <client type='srp'
+            name='gandalf@middle-earth.example'/>
+    <auth type='x509'/>
+    <auth type='srp'/>
+  </security>
+</iq>
+    ]]></example>
+  </section2>
+  <section2 topic='Establishing Transport Layer' anchor='ucsi-esttrans'>
+    <p>Once the initiator and responder have exchanged TLS properties, the transport layer is established. This process is specific to the stream method negotiated between the initiator and responder during the SI offer and accept.</p>
+  </section2>
+  <section2 topic='Establishing TLS Session' anchor='ucsi-extlssession'>
+    <p>Once the transport layer is established, the initiator and responder establish the TLS session. The responder begins by sending the TLS ClientHello message to the initiator to start the handshake. The initiator then sends its TLS ServerHello as well as any other messages needed to complete the initial TLS handshake. The initiator and responder then continue to exchange messages until the initial TLS handshake is complete.</p>
+    <p>If the initiator and/or responder provided any information during the TLS properties exchange, that same information MUST be used during the initial TLS handshake; the endpoints MAY include additional information in the TLS handshake that was not provided in the TLS properties exchange. If an endpoint detects a discrepancy of information between the TLS properties exchange and the TLS handshake, it MUST fail the handshake and abandon the data channel.</p>
+  </section2>
+  <section2 topic='Exchanging Application Data' anchor='ucsi-exdata'>
+    <p>Once the initial TLS handshake is successfully completed, the initiator and responder exchange the application data. The remainder of the process (including termination of data channels) is application-specific, and out of scope for this document.</p>
+  </section2>
+</section1>
+<section1 topic='Usage with Jingle' anchor='ucjingle'>
+  <p>TBD</p>
+</section1>
+<section1 topic='Formal Definition' anchor='formaldef'>
+  <section2 topic='&lt;security/&gt; Element' anchor='formaldef-props'>
+    <p>The &lt;security/&gt; element provides hints to the endpoints about the possible properties to expect during the initial TLS handshake. This element is qualified by the "urn:xmpp:p2p-sec:tls:0" namespace.</p>
+    <p>The &lt;security/&gt; element has the following attributes:</p>
+    <dl>
+      <dt>sid</dt>
+      <dd>Specifies the session ID this &lt;security/&gt; applied to, which MUST be the same value specified in the <span class='ref'>XEP-0095</span> &lt;query/&gt; element's 'id' attribute, or the <span class='ref'>XEP-0166</span> &lt;jingle/&gt; element's 'sid' attribute. This attribute is REQUIRED when used with <span class='ref'>XEP-0095</span>; OPTIONAL when used with <span class='ref'>XEP-0166</span>.</dd>
+    </dl>
+    <p>The &lt;security/&gt; element MAY have any of the following child elements:</p>
+    <dl>
+      <dt>&lt;client/&gt;</dt>
+      <dd>Describes an identity for the TLS client (typically the responder). Zero or more instances are allowed, but MUST NOT be specified by the TLS server.</dd>
+      <dt>&lt;server/&gt;</dt>
+      <dd>Describes an identity for the TLS server (typically the initiator). Zero or one instances are allowed, but MUST NOT be specified by the TLS client.</dd>
+      <dt>&lt;auth/&gt;</dt>
+      <dd>Describes an acceptable authentication mechanism for the TLS handshake. Zero or more instances are allowed.</dd>
+    </dl>
+  </section2>
+  <section2 topic='&lt;client/&gt; and &lt;server/&gt; Elements' anchor='formaldef-clientserver'>
+    <p>The &lt;client/&gt; and &lt;server/&gt; elements have the same syntactical information, but with different semantic meanings. The &lt;client/&gt; element specifies information about the TLS client's identity, while the &lt;server/&gt; element specifies information about the TLS server's identity. These elements are qualified by the "urn:xmpp:p2p-sec:tls:0" namespace.</p>
+    <p>Both elements have the following attributes:</p>
+    <dl>
+      <dt>type</dt>
+      <dd>The type of identity this represents. The value of this attribute MUST be one of the values from the "TLS authentication identity mechanisms" registry. This attribute is REQUIRED.</dd>
+      <dt>name</dt>
+      <dd>The identity itself. This attribute is RECOMMENDED.</dd>
+    </dl>
+    <p>Both elements MAY include zero or more &lt;hash/&gt; elements qualified by the "urn:xmpp:hashes:0" namespace (as defined in &xep0300;). Each element specifies a hash of the verification materials for this identity (e.g., the &rfc5280; PKIX X.509 certificate, or &rfc5054; SRP password verifier). Each &lt;hash xmlns='urn:xmpp:hashes:0'/&gt; element MUST be for a different hash algorithm.</p>
+  </section2>
+  <section2 topic='&lt;auth/&gt; Element' anchor='formaldef-server'>
+    <p>The &lt;auth/&gt; indicates an acceptable authentication mechanism for the TLS handshake. This element is qualified by the "urn:xmpp:p2p-sec:tls:0" namespace.</p>
+    <p>This element has the following attributes:</p>
+    <dl>
+      <dt>type</dt>
+      <dd>The type of authentication. The value of this attribute MUST be one of the values from the "TLS authentication identity mechanisms" registry. This attribute is REQUIRED.</dd>
+    </dl>
+  </section2>
+  <section2 topic='Authentication Identity Mechanisms' anchor='auth'>
+    <p>One of the most common properties desired for TLS is an indication of how the endpoint is to be authenticated.</p>
+    <p>This specification defines two authentication identity mechanisms:</p>
+    <dl>
+      <dt>x509</dt>
+      <dd>Identity and authentication performed using X.509 PKIX certificates</dd>
+      <dt>srp</dt>
+      <dd>Identity and authentication performed using Secure Remote Password (SRP)</dd>
+    </dl>
+    <section3 topic='"x509" Mechanism' anchor='auth-x509'>
+      <p>The "x509" authentication identity mechanism uses a PKIX X.509 certificate to authenticate the identify of an endpoint.  This mechanism can be used for authenticating both the TLS client and TLS server; it MAY be used in &lt;client/&gt; and &lt;server/&gt; elements.</p>
+      <p>Each &lt;hash xmlns='urn:xmpp:hashes:0'/&gt; child element included in a &lt;client/&gt; or &lt;server/&gt; element is output of a cryptographic hash algorithm performed over the DER encoding of the end-entity PKIX X.509 certificate.</p>
+    </section3>
+    <section3 topic='"srp" Mechanism' anchor='auth-srp'>
+      <p>The "srp" authentication identity mechanism uses a secret shared between the TLS client and TLS server to identify the TLS client.  This mechanism can only be used for authenticating TLS clients; it MUST NOT be used in &lt;server/&gt; elements.</p>
+      <p>Each &lt;hash xmlns='urn:xmpp:hashes:0'/&gt; child element included in a &lt;client/&gt; element is the output of a cryptographic hash algorithm performed over the octet representation of the SRP password verifier<note>While the SRP password verifier is itself the output of a cryptographic hash, a further hash is performed for consistency other authentication identity mechanisms.</note>.</p>
+    </section3>
+  </section2>
+</section1>
+<section1 topic='Business Rules' anchor='rules'>
+  <p>TBD</p>
+</section1>
+<section1 topic='Implementation Notes' anchor='impl'>
+  <p>TBD</p>
+</section1>
+<section1 topic='Internationalization Considerations' anchor='i18n'>
+  <p>The 'name' attribute for &lt;client/&gt; and &lt;server/&gt; can be internationalized, whether it represents a "CertID" reference identifier or a SRP identifier.</p>
+</section1>
+<section1 topic='Security Considerations' anchor='security'>
+  <p>This entire specification discusses security considerations. This specification also has the same considerations as <strong>{p2p-sec}</strong>.</p>
+  <section2 topic='TLS Properties Exchange' anchor='security-propex'>
+    <p>The TLS properties exchanged are merely hints, although endpoints are expected to make a good faith effort to provide properties that will be accurate for the data channel session. The integrity of the TLS properties is only as good as the XMPP connection used to exchange them. Even if the two endpoints are connected to the same XMPP server and are using TLS for that connection, the XMPP server can still see (and potentially manipulate) the properties exchanged. It is possible to improve the integrity by using digital signatures, such as those defined in &xep0285;, &xep0290; or &id-xmpp-e2e;</p>
+  </section2>
+  <section2 topic='Endpoint Verification' anchor='security-verify'>
+    <p>When two endpoints attempt to use TLS over a data channel, their authentication information might not succeed PKIX verification according to <span class='ref'>RFC 5280</span>. There are a few possibilities for proceeding:</p>
+    <ul>
+      <li>The endpoints could perform a leap of faith, accepting any verification materials provided as part of the TLS handshake. In this case, each endpoint MAY use the security properties received in the other's &lt;security/&gt; element to verify (subject to the caveats listed in the section <link url='#security-propex'>TLS Properties Exchange</link>).</li>
+      <li>The endpoints could exchange acceptable PKIX X.509 certificate hashes outside of both the XMPP channel and data channel (e.g., in-person key signing event). In this case, each endpoint MAY prematurely reject the data channel if none of the hashes provided in the other's &lt;security/&gt; properties match the agreed-to hashes.</li>
+      <li>The endpoints could exchange or agree to a secret known only to themselves.  In this case, the endpoints MUST support at least one SRP cipher. Exactly how the endpoints exchange or agree to the secret is outside the scope of this document.</li>
+    </ul>
+  </section2>
+  <section2 topic='Identities' anchor='security-idents'>
+    <p>The identity each endpoint asserts in the TLS handshake SHOULD be its JID; typically this is the bare JID (localpart@domainpart). An endpoint SHOULD NOT accept an identity that matches the data channel address unless it is sure the connection is not assisted or mediated.</p>
+    <p>An endpoint MAY use information from the other's &lt;security/&gt; element to determine and/or verify the expected TLS identity (subject to the caveats listed in the section <link url='#security-propex'>TLS Properties Exchange</link>). The endpoint MAY prematurely reject the data channel if the TLS identity does not match the other's bare JID, and MAY reject the data channel if the identity asserted during the TLS handshake does not match the identity expressed in the other's &lt;security/&gt; properties.</p>
+  </section2>
+</section1>
+<section1 topic='IANA Considerations' anchor='iana'>
+  <p>This specification requires no interaction with &IANA;.</p>
+</section1>
+<section1 topic='XMPP Registrar Considerations' anchor='registrar'>
+  <section2 topic='Protocol Namespaces' anchor='registrar-xmlns'>
+    <p>This specification defines the following XML namespaces:</p>
+    <ul>
+      <li>urn:xmpp:p2p-sec:tls:0</li>
+    </ul>
+    <p>The &REGISTRAR; includes the foregoing namespaces in its registry at &lt;<link href='http://xmpp.org/registrar/namespaces.html'>http://xmpp.org/registrar/namespaces.html</link>&gt;, as governed by &xep0053;.</p>
+  </section2>
+  <section2 topic='Authentication Identity Mechanisms' anchor='registrar-tlsauth'>
+    <p>The XMPP Registrar maintains a registry of TLS authentication identity mechanisms at &lt;<link href='http://xmpp.org/registrar/tls-auth-mechs.html'>http://xmpp.org/registrar/tls-auth-mechs.html</link>&gt;.</p>
+    <section3 topic='Process' anchor='registrar-tlsauth-process'>
+      <p>In order to submit new values to this registry, the registrant shall define an XML fragment of the following form and either include it in the relevant XMPP Extension Protocol or send it to the email address &lt;registrar@xmpp.org&gt;:</p>
+      <code><![CDATA[
+<tls-authmech>
+  <type>The TLS authentication identity mechanism</type>
+  <direction>
+    MUST be one of:
+    * "client" (for authenticating TLS clients),
+    * "server" (for authenticating TLS servers), or
+    * "both" (for authenticating either TLS clients or TLS servers)
+  </direction>
+  <desc>
+    A natural-language description of the TLS authentication identity
+    mechanism
+  </desc>
+  <doc>The specification that defines the profile</doc>
+</tls-authmech>
+      ]]></code>
+    </section3>
+    <section3 topic='Initial Submission' anchor='registrar-tlsauth-init'>
+      <p>As part of this document, the following TLS authentication identity mechanisms are registered:</p>
+      <code><![CDATA[
+<tls-authmech>
+  <type>x509</typ>
+  <direction>both</direction>
+  <desc>
+    Identity provided and verified using an PKIX X.509 Certificate,
+    following the &rfc6125; "CertID" requirements for reference
+    identifiers.
+  </desc>
+  <doc>[[This Document]]</doc>
+</tls-authmech>
+<tls-authmech>
+  <type>srp</typ>
+  <direction>client</direction>
+  <desc>
+    Identity provided and verified using Secure Remote Password (SRP).
+  </desc>
+  <doc>[[This Document]]</doc>
+</tls-authmech>
+      ]]></code>
+    </section3>
+  </section2>
+</section1>
+<section1 topic='XML Schema' anchor='schema'>
+  <code><![CDATA[
+<?xml version='1.0' encoding='UTF-8'?>
+
+<xs:schema
+    xmlns:xs='http://www.w3.org/2001/XMLSchema'
+    targetNamespace='urn:xmpp:p2p-sec:tls:0'
+    xmlns='urn:xmpp:p2p-sec:tls:0'
+    xmlns:hashes='urn:xmpp:hashes:0'
+    elementFormDefault='qualified'>
+
+  <xs:import namespace='urn:xmpp:hashes:0'/>
+  
+  <xs:element name='security'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref='client' minOccurs='0' maxOccurs='unbounded'/>
+        <xs:element ref='server' minOccurs='0' maxOccurs='1'/>
+        <xs:element ref='auth' minOccurs='0' maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:attribute name='id' type='xs:string' use='optional'/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name='auth'>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:restriction base='xs:base'>
+          <xs:enumeration value=''/>
+        </xs:restriction>
+      </xs:simpleContent>
+      <xs:attribute name='type' type='xs:string' use='required'/>
+    </xs:complexType>
+  <xs:element>
+
+  <xs:element name='client' type='identityType'/>
+
+  <xs:element name='server' type='identityType'/>
+
+  <xs:complexType name='identityType' abstract='true'>
+    <xs:sequence>
+      <xs:element ref='hashes:hash' minOccurs='0' maxOccurs='unbounded'/>
+    </xs:sequence>
+    <xs:attribute name='type' type='xs:string' use='required'/>
+    <xs:attribute name='name' type='xs:string' use='optional'/>
+  </xs:complexType>
+  
+  <xs:simpleType name='empty' abstract='true'>
+    <xs:restriction base='xs:string'>
+      <xs:enumeration value=''/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+</xs:schema>
+  ]]></code>
+</section1>
+</xep>

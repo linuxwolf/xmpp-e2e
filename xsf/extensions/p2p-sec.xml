@@ -1,0 +1,265 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE xep SYSTEM 'xep.dtd' [
+  <!ENTITY % ents SYSTEM 'xep.ent'>
+%ents;
+<!ENTITY p2p_tls "<span class='ref'><link url='p2p-tls.html'>Using Transport Layer Security (TLS) To Secure Data Channels ({p2p-tls})</link></span> <note>{p2p-tls}: Using Transport Layer Security (TLS) TO Secure Data Channels &lt;<link url='p2p-tls.html'>./p2p-tls.html</link>&gt;.</note>" >
+<!ENTITY id-xmpp-e2e "<span class='ref'><link url='http://tools.ietf.org/html/draft-miller-xmpp-e2e'>XMPP-E2E</link></span> <note>End-to-End Object Encryption and Signatures for the Extensible Messaging and Presence Protocol (XMPP) &lt;<link url='http://tools.ietf.org/html/draft-miller-xmpp-e2e'>http://tools.ietf.org/html/draft-miller-xmpp-e2e</link>&gt;.</note>" >
+]>
+<?xml-stylesheet type='text/xsl' href='xep.xsl'?>
+<xep>
+<header>
+  <title>Securing Data Channels</title>
+  <abstract>This specification provides a framework for negotiating security properties for data streams in XMPP, such as for <strong>Stream Initiation</strong> and <strong>Jingle</strong>.</abstract>
+  <legal>
+    <copyright>This XMPP Extension Protocol is copyright (c) 1999 - 2013 by the XMPP Standards Foundation (XSF).</copyright>
+    <permissions>Permission is hereby granted, free of charge, to any person obtaining a copy of this specification (the &quot;Specification&quot;), to make use of the Specification without restriction, including without limitation the rights to implement the Specification in a software program, deploy the Specification in a network service, and copy, modify, merge, publish, translate, distribute, sublicense, or sell copies of the Specification, and to permit persons to whom the Specification is furnished to do so, subject to the condition that the foregoing copyright notice and this permission notice shall be included in all copies or substantial portions of the Specification. Unless separate permission is granted, modified works that are redistributed shall not contain misleading information regarding the authors, title, number, or publisher of the Specification, and shall not claim endorsement of the modified works by the authors, any organization or project to which the authors belong, or the XMPP Standards Foundation.</permissions>
+    <warranty>## NOTE WELL: This Specification is provided on an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE. In no event shall the XMPP Standards Foundation or the authors of this Specification be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the Specification or the implementation, deployment, or other use of the Specification. ##</warranty>
+    <liability>In no event and under no legal theory, whether in tort (including negligence), contract, or otherwise, unless required by applicable law (such as deliberate and grossly negligent acts) or agreed to in writing, shall the XMPP Standards Foundation or any author of this Specification be liable for damages, including any direct, indirect, special, incidental, or consequential damages of any character arising out of the use or inability to use the Specification (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses), even if the XMPP Standards Foundation or such author has been advised of the possibility of such damages.</liability>
+    <conformance>This XMPP Extension Protocol has been contributed in full conformance with the XSF's Intellectual Property Rights Policy (a copy of which may be found at &lt;<link url='http://www.xmpp.org/extensions/ipr-policy.shtml'>http://www.xmpp.org/extensions/ipr-policy.shtml</link>&gt; or obtained by writing to XSF, P.O. Box 1641, Denver, CO 80201 USA).</conformance>
+  </legal>
+  <number>xxxx</number>
+  <status>ProtoXEP</status>
+  <type>Standards Track</type>
+  <sig>Standards</sig>
+  <approver>Council</approver>
+  <dependencies>
+    <spec>XMPP Core</spec>
+    <spec>XEP-0001</spec>
+    <spec>XEP-0030</spec>
+    <spec>XEP-0095</spec>
+    <spec>XEP-0166</spec>
+  </dependencies>
+  <supersedes/>
+  <supersededby/>
+  <shortname>NOT_YET_ASSIGNED</shortname>
+  &linuxwolf;
+  <revision>
+    <version>0.0.1</version>
+    <date>2013-09-23</date>
+    <initials>mam</initials>
+    <remark><p>First draft.</p></remark>
+  </revision>
+</header>
+<section1 topic='Introduction' anchor='intro'>
+  <p>Both &xep0095; and &xep0166; are protocols that allow two endpoints to establish data channels for exchanging data. It is desirable for the exchange to include confidentiality and/or integrity protection. However, neither protocol defines how the security properties for the established data streams are exchanged. Instead, such protection is left for the specific application of <span class='ref'>XEP-0095</span> or <span class='ref'>XEP-0166</span> to define.</p>
+  <p>This document attempts to establish a framework for negotiating a method of security to apply to the data channels. Specific security methods are defined in other documents, such as &p2p_tls;.</p>
+</section1>
+<section1 topic='Requirements' anchor='reqs'>
+  <p>This specification has the following requirements:</p>
+  <dl>
+    <dt>Peer-to-peer</dt>
+    <dd>Allow entities to negotiate a peer-to-peer security method.</dd>
+    <dt>Extensible</dt>
+    <dd>Allow for exchanging properties specific to the negotiated security method.</dd>
+    <dt>Opportunistic</dt>
+    <dd>Operate within the bounds of established data channel negotiation protocols, enhancing atop rather than changing within.</dd>
+    <dt>Adaptable</dt>
+    <dd>Allow for additional security methods and properties to be developed and supported in the future.</dd>
+  </dl>
+</section1>
+<section1 topic='Terminology' anchor='terms'>
+  <section2 topic='Glossary' anchor='terms-glossary'>
+    <p>This document reuses the terms from <span class='ref'>XEP-0166</span>. To align with the terminology from <span class='ref'>XEP-0095</span>; "sender" corresponds to <span class='ref'>XEP-0166</span> "intiator", and "receiver" corresponds to <span class='ref'>XEP-0166</span> "responder".</p>
+  </section2>
+  <section2 topic='Conventions' anchor='terms-conventions'>
+    <p>In diagrams, the following conventions are used:</p>
+    <ul>
+      <li>Single-dashed lines (---) represent signaling stanzas that are sent the XMPP channel.</li>
+      <li>Double-dashed lines (====) represent packets that are sent via the data channel, which is typically not an XMPP channel (although &xep0047; is an exception) but instead is a direct or mediated channel between the endpoints.</li>
+    </ul>
+  </section2>
+</section1>
+<section1 topic='Determining Support' anchor='disco'>
+  <p>If an entity supports this framework, it MUST advertise that fact in its responses to &xep0030; information requests ("disco#info") by returning a feature of "urn:xmpp:p2p-sec:0". It SHOULD also advertise the supported security methods, each as a feature:</p>
+  <example caption='Initiator Sends Service Discovery Request to Responder'><![CDATA[
+<iq from='minas-tirith@gondor.example/library'
+    id='hOgdP2Oo'
+    to='gandalf@middle-earth.example/2SSrSj0CjMyGi0ekwcuxJa0Ttul38hLn'
+    type='get'>
+  <query xmlns='http://jabber.org/protocol/disco#info'/>
+</iq>
+  ]]></example>
+  <example caption='Responder Replies to Service Discovery Request'><![CDATA[
+<iq from='minas-tirith@gondor.example/library'
+    id='hOgdP2Oo'
+    to='gandalf@middle-earth.example/2SSrSj0CjMyGi0ekwcuxJa0Ttul38hLn'
+    type='result'>
+  <query xmlns='http://jabber.org/protocol/disco#info'>
+    ....
+    <feature var='urn:xmpp:p2p-sec:0'/>
+    <feature var='urn:xmpp:p2p-sec:tls:0'/>
+    ....
+  </query>
+</iq>
+  ]]></example>
+</section1>
+<section1 topic='Usage with Stream Initiation (SI)' anchor='ucsi'>
+  <section2 topic='Protocol Flow' anchor='ucsi-flow'>
+    <p>The overall process is illustrated in the following diagram:</p>
+    <code><![CDATA[
+initiator                                            responder
+    |                                                    |
+    | (1) SI offer                                       |
+    | -------------------------------------------------> |
+    |                                                    |
+    | (2) SI accept                                      |
+    | <------------------------------------------------- |
+    |                                                    |
+    | (3) Provide initiator security properties          |
+    | -------------------------------------------------> |
+    |                                                    |
+    | (4) Provide responder security properties          |
+    | <------------------------------------------------- |
+    |                                                    |
+    | (5) Establish transport layer                      |
+    | <------------------------------------------------> |
+    |                                                    |
+    | (6) Establish security layer                       |
+    | <================================================> |
+    |                                                    |
+    | (7) Exchange application data                      |
+    | <================================================> |
+    ]]></code>
+    <ol>
+      <li>First the initiator sends a <span class='ref'>XEP-0095</span> offer to the responder. This offer includes the possible security methods in addition to the other <span class='ref'>XEP-0095</span>-related information and possible options (e.g., &xep0096; profile information, stream method options).</li>
+      <li>The responder then sends a <span class='ref'>XEP-0095</span> accept to the initiator. This accept includes the chosen security method in addition to the other <span class='ref'>XEP-0095</span>-related information and chosen options (<span class='ref'>XEP-0096</span> profile information, stream method choice).</li>
+      <li>Before negotiating the transport, the initiator provides any relevant properties specific to the selected security method (e.g., PKIX information for TLS). Note that the collection of security properties for the initiator could be empty.</li>
+      <li>The responder then provides any relevant properties specific to the selected security method. Note that the collection of security properties for the responder could be empty.</li>
+      <li>The initiator and responder then establish the transport layer. The details are specific to the selected stream method (e.g., &xep0065;), and typically involve exchanging pre-application data over both XMPP and the data channel.</li>
+      <li>The security layer is then established between the initiator and responder. This establishment typically involves exchanging non-application data over the data channel.</li>
+      <li>Once the security layer is established, the initiator and responder exchange application data.</li>
+    </ol>
+  </section2>
+  <section2 topic='SI Offer and Accept' anchor='ucsi-offeraccept'>
+    <p>The initiator begins the entire process by sending a <span class='ref'>XEP-0095</span> offer to the responder. In addition to the information mandated by <span class='ref'>XEP-0095</span>, the contained <span class='ref'>XEP-0020</span> form includes a &lt;field/&gt; element with a 'var' attribute value of "urn:xmpp:p2p-sec:0:form:method" (which SHOULD have a 'type' of "list-single"), and an &lt;option/&gt; element for each security method the initiator is willing and able to support; each &lt;option/&gt; element contains a single child &lt;value/&gt; element, whose content character data is the namespace that uniquely identifies a security method.</p>
+    <example caption='Initiator Sends Offer to Responder'><![CDATA[
+<iq from='minas-tirith@gondor.example/library'
+    id='uPR5ONeL'
+    to='gandalf@middle-earth.example/2SSrSj0CjMyGi0ekwcuxJa0Ttul38hLn'
+    type='set'>
+  <query xmlns='http://jabber.org/protocol/si'
+         id='8f2f7141-7157-438f-a9ee-41be305edddf'
+         mime-type='text/plain'
+         profile='http://jabber.org/protocol/si/profile/file-transfer'>
+    <file xmlns='http://jabber.org/protocol/si/profile/file-transfer'
+          name='test.txt'
+          size='4092'/>
+    <feature xmlns='http://jabber.org/protocol/feature-neg'>
+      <x xmlns='jabber:x:data' type='form'>
+        <field type='list-single'
+               var='stream-method'>
+          <option><value>http://jabber.org/protocol/bytestreams</value></option>
+          <option><value>http://jabber.org/protocol/ibb</value></option>
+        </field>
+        <field type='list-single'
+               var='urn:xmpp:p2p-sec:0:form:method'>
+          <option><value>urn:xmpp:p2p-sec:tls:0</value></option>
+        </field>
+      </x>
+    </feature>
+  </query>
+</iq>
+    ]]></example>
+    <p>The responder then selects the desired security method from those presented in the <span class='ref'>XEP-0020</span> form (in addition to any other feature selections necessary for stream initiation to continue), and sends the <span class='ref'>XEP-0095</span> accept result:</p>
+    <example caption='Responder Sends SI Accept to Initiator'><![CDATA[
+<iq from='gandalf@middle-earth.example/2SSrSj0CjMyGi0ekwcuxJa0Ttul38hLn'
+    id='uPR5ONeL'
+    to='minas-tirith@gondor.example/library'
+    type='result'>
+  <query xmlns='http://jabber.org/protocol/si'>
+    <feature xmlns='http://jabber.org/protocol/feature-neg'>
+      <x xmlns='jabber:x:data' type='submit'>
+        <field var='stream-method'>
+          <value>http://jabber.org/protocol/bytestreams</value>
+        </field>
+        <field var='urn:xmpp:p2p-sec:0:form:method'>
+          <option><value>urn:xmpp:p2p-sec:tls:0</value></option>
+        </field>
+      </x>
+    </feature>
+  </query>
+</iq>
+    ]]></example>
+  </section2>
+  <section2 topic='Exchanging Security Properties' anchor='ucsi-exsec'>
+    <p>Before the transport is established, the initiator and responder exchange security properties that might be relevant, such as a hash of the PKIX certificate to used. Note that the initiator and responder each might have no security properties to exchange with the other. The protocol for exchanging security properties is specific to the security method negotiated, however such methods SHOULD follow the general process outlined herein.</p>
+    <p>First the initiator sends the responder any relevant security properties (which could be none) within an IQ-set. For example, if "urn:xmpp:p2p-sec:tls:0" is the chosen security method, the initiator might send:</p>
+    <example caption='Initiator Sends Security Properties'><![CDATA[
+<iq from='minas-tirith@gondor.example/library'
+    id='xSDnReKP'
+    to='gandalf@middle-earth.example/2SSrSj0CjMyGi0ekwcuxJa0Ttul38hLn'
+    type='set'>
+  <security xmlns='urn:xmpp:p2p-sec:tls:0'
+              sid='8f2f7141-7157-438f-a9ee-41be305edddf'>
+    <server type='x509'
+            name='minas-tirith@gondor.example'>
+      <hash xmlns='urn:xmpp:hashes:0'
+            algo='sha-1'>B74rxyvtgTnzue3SM4H9LdlUfO0=</hash>
+    </server>
+    <auth type='x509'/>
+    <auth type='srp'/>
+  </security>
+  </security>
+</iq>
+    ]]></example>
+    <p>The properties are contained within a protocol-specific element whose namespace matches that of the security method. Even if the initiator has no security properties to send to the responder, it is RECOMMENDED to send an empty exchange; this serves as an explicit indication of what security properties might be relevant for the upcoming transport and security layer establishment, and allows the responder to provide its security properties.</p>
+    <p>The responder then sends its security properties to the initiator (which could be none) with an IQ-result. Continuing the above example, the responder might send:</p>
+    <example caption='Responder Sends Security Properties'><![CDATA[
+<iq from='gandalf@middle-earth.example/2SSrSj0CjMyGi0ekwcuxJa0Ttul38hLn'
+    id='xSDnReKP'
+    to='minas-tirith@gondor.example/library'
+    type='result'>
+  <security xmlns='urn:xmpp:p2p-sec:tls:0'
+              sid='8f2f7141-7157-438f-a9ee-41be305edddf'>
+    <client type='x509'
+            name='galdalf@middle-earth.example'>
+      <hash xmlns='urn:xmpp:hashes:0'
+            algo='sha-1'>+NxNHFHyLAcftIN2W3igvB2dRUU=</hash>
+    </client>
+    <client type='srp'
+            name='gandalf@middle-earth.example'/>
+    <auth type='x509'/>
+    <auth type='srp'/>
+  </security>
+</iq>
+    ]]></example>
+    <p>As with the security properties from the initiator, the responder's security properties are contained within a protocol-specific element whose namespace matches that of the security method. Even if the responder has no security properties to send to the initiator, it MUST send a response to the initiator, as mandated by section 8.2.3 of &rfc6120;.</p>
+  </section2>
+  <section2 topic='Establishing Transport Layer' anchor='ucsi-esttrans'>
+    <p>Once security properties have been exchanged, the transport layer is established. This process is specific to the stream method negotiated between the initiator and responder as part of the SI offer and accept. If the negotiated transport layer cannot be established, the initiator and responder MUST abandon the remainder of this process, although a new attempt (possibly with a different stream method) can be made with a new <span class='ref'>XEP-0095</span> SI offer and accept.</p>
+  </section2>
+  <section2 topic='Establishing Security Layer' anchor='ucsi-estsec'>
+    <p>Once the transport layer has been successfully established, the initiator and responder establish the security layer. This process is specific to the security method negotiated between the initiator and responder as part of the SI offer and accept. If the negotiated security layer cannot be established, the initiator and responder MUST abandon the remainder of this process, although a new attempt (possibly with a different security method) can be made with a new <span class='ref'>XEP-0095</span> SI offer and accept.</p>
+  </section2>
+  <section2 topic='Exchanging Application Data' anchor='ucsi-exdata'>
+    <p>Once the security layer is successfully established, the initiator and responder exchange the application data. The remainder of the process (including termination of data channels) is application-specific, and out of scope for this document.</p>
+  </section2>
+</section1>
+<section1 topic='Usage with Jingle' anchor='ucjingle'>
+  <p>TBD</p>
+</section1>
+<section1 topic='Business Rules' anchor='rules'>
+  <p>OPTIONAL.</p>
+</section1>
+<section1 topic='Implementation Notes' anchor='impl'>
+  <p>OPTIONAL.</p>
+</section1>
+<section1 topic='Accessibility Considerations' anchor='access'>
+  <p>OPTIONAL.</p>
+</section1>
+<section1 topic='Internationalization Considerations' anchor='i18n'>
+  <p>OPTIONAL.</p>
+</section1>
+<section1 topic='Security Considerations' anchor='security'>
+  <p>The security properties exchanged are merely hints, although endpoints are expected to make a good faith effort to provide properties that will be accurate for the data channel session. The integrity of the properties is only as good as the XMPP connection used to exchange them. Even if the two endpoints are connected to the same XMPP server and are using TLS for that connection, the XMPP server can still see (and potentially manipulate) the properties exchanged. It is possible to improve the integrity by using digital signatures, such as those defined in &xep0285;, &xep0290; or &id-xmpp-e2e;</p>
+</section1>
+<section1 topic='IANA Considerations' anchor='iana'>
+  <p>TBD.</p>
+</section1>
+<section1 topic='XMPP Registrar Considerations' anchor='registrar'>
+  <p>TBD</p>
+</section1>
+<section1 topic='XML Schema' anchor='schema'>
+  <p>TBD</p>
+</section1>
+</xep>
