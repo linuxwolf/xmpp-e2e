@@ -22,6 +22,12 @@
         <email>mamille2@cisco.com</email>
       </address>
     </author>
+    <author initials="C.W." surname="Wallace" fullname="Carl Wallace">
+      <organization>Red Hound Software, Inc.</organization>
+      <address>
+        <email>carl@redhoundsoftware.com</email>
+      </address>
+    </author>
     <date/>
     <area>RAI</area>
     <workgroup>XMPP</workgroup>
