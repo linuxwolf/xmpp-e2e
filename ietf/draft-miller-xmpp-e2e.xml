@@ -90,7 +90,7 @@
               <t>The plaintext stanza S<vspace blankLines="1"/></t>
             </list>
             </t>
-            <t>Converts the forwarding envelope (M) to a UTF-8 encoded string (M'), optionallly removing line breaks and other insignificant whitespace between elements and attributes, i.e. M' = UTF8-encode(M).  We call M' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
+            <t>Converts the forwarding envelope (M) to a UTF-8 encoded string (M'), optionally removing line breaks and other insignificant whitespace between elements and attributes, i.e. M' = UTF8-encode(M).  We call M' a "stanza-string" because for purposes of encryption and decryption it is treated not as XML but as an opaque string (this avoids the need for complex canonicalization of the XML input).<vspace blankLines="1"/></t>
             <t>Generates a Content Master Key (CMK). The CMK MUST have a length at least equal to that required by the content encryption algorithm in use and MUST be generated randomly. See <xref target="RFC4086"/> for considerations on generating random values.<vspace blankLines="1"/></t>
             <t>Generates any additional unprotected block cipher factors (IV); e.g., initialization vector/nonce.  A sending agent MUST ensure that no two sets of factors are used with the same CMK, and SHOULD NOT reuse such factors for other stanzas.<vspace blankLines="1"/></t>
             <t>Performs the message encryption steps from <xref target='JOSE-JWE'/> to generate the JWE Header (H), JWE Encrypted Key (E), JWE Ciphertext (C), and JWE Integrity Value (I); using the following inputs:<vspace blankLines="1"/>
@@ -433,7 +433,7 @@ Aj8lKdPMDE4U82UAhDJBaRrl3USmuzS2hfFOe_OBEv8
               <t>Performs the message validation steps from <xref target="JOSE-JWS"/>, with the following inputs:<vspace blankLines="1"/>
                 <list style="symbols">
                   <t>The JWS Header H from the &lt;sigheader/&gt; element's character data content.<vspace blankLines="1"/></t>
-                  <t>The JWS Playload M' from the &lt;data/&gt; element's character data content.<vspace blankLines="1"/></t>
+                  <t>The JWS payload M' from the &lt;data/&gt; element's character data content.<vspace blankLines="1"/></t>
                   <t>The JWS Signature from the &lt;sig/&gt; element's character data content.<vspace blankLines="1"/></t>
                 </list>
               </t>
@@ -670,7 +670,7 @@ fCi-IxySBtJJtPCqYAYW_IbrRFg
               <t>The "kty" parameter MUST be "oct".<vspace blankLines="1"/></t>
               <t>The "kid" parameter MUST be the SID.<vspace blankLines="1"/></t>
               <t>The "k" parameter MUST be the SMK, encoded as base64url.<vspace blankLines="1"/></t>
-              <t>The "use" parameter, if present, MUST be set to the algorithm in use for encrypting messages from <xref target="encryption-encrypt"/>.<vspace blankLines="1"/></t>
+              <t>The "alg" parameter, if present, MUST be set to the algorithm in use for encrypting messages from <xref target="encryption-encrypt"/>.<vspace blankLines="1"/></t>
               <t>The "use" parameter, if present, MUST be set to "enc".<vspace blankLines="1"/></t>
             </list>
           </t>
@@ -1282,23 +1282,6 @@ K5DMytv7XopsZsR9QFCDNGew
       </reference>
     </references>
     <references title="Informative References">
-      <reference anchor="RFC3610">
-        <front>
-          <title>Counter with CBC-MAC (CCM)</title>
-          <author initials="D." surname="Whiting" fullname="Doug Whiting">
-            <organization>Hifn</organization>
-          </author>
-          <author initials="R." surname="Housley" fullname="Russell Housley">
-            <organization>Vigil Security, LLC</organization>
-          </author>
-          <author initials="N." surname="Ferguson" fullname="Niels Ferguson">
-            <organization>MacFergus BV</organization>
-          </author>
-          <date year="2003" month="September"/>
-        </front>
-        <seriesInfo name="RFC" value="3923"/>
-        <format type="TXT" octets="51828" target="ftp://ftp.isi.edu/in-notes/rfc3923.txt"/>
-      </reference>
       <reference anchor="RFC3923">
         <front>
           <title>End-to-End Signing and Object Encryption for the Extensible Messaging and Presence Protocol (XMPP)</title>
@@ -1336,7 +1319,7 @@ K5DMytv7XopsZsR9QFCDNGew
         <seriesInfo name="RFC" value="4086"/>
         <format type="TXT" target="http://tools.ietf.org/rfc/rfc4086.txt"/>
       </reference>
-      <reference anchor="XEP-0160">
+      <!-- <reference anchor="XEP-0160">
         <front>
           <title>Best Practices for Handling Offline Messages</title>
           <author initials="P." surname="Saint-Andre" fullname="Peter Saint-Andre">
@@ -1349,7 +1332,7 @@ K5DMytv7XopsZsR9QFCDNGew
         </front>
         <seriesInfo name="XSF XEP" value="0160"/>
         <format type="HTML" target="http://xmpp.org/extensions/xep-0160.html"/>
-      </reference>
+      </reference> -->
       <reference anchor="XEP-0201">
         <front>
           <title>Best Practices for Message Threads</title>
