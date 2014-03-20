@@ -5,8 +5,8 @@
 XMPP                                                           M. Miller
 Internet-Draft                                       Cisco Systems, Inc.
 Intended status: Standards Track                              C. Wallace
-Expires: September 19, 2014                     Red Hound Software, Inc.
-                                                          March 18, 2014
+Expires: September 21, 2014                     Red Hound Software, Inc.
+                                                          March 20, 2014
 
 
 End-to-End Object Encryption and Signatures for the Extensible Messaging
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on September 19, 2014.
+   This Internet-Draft will expire on September 21, 2014.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Miller & Wallace       Expires September 19, 2014               [Page 1]
+Miller & Wallace       Expires September 21, 2014               [Page 1]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -69,60 +69,64 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
-   3.  Encryption  . . . . . . . . . . . . . . . . . . . . . . . . .   3
-     3.1.  Determining Support . . . . . . . . . . . . . . . . . . .   4
-     3.2.  Encrypting XMPP Stanzas . . . . . . . . . . . . . . . . .   4
-       3.2.1.  Prerequisites . . . . . . . . . . . . . . . . . . . .   4
-       3.2.2.  Process . . . . . . . . . . . . . . . . . . . . . . .   5
-     3.3.  Decrypting XMPP Stanzas . . . . . . . . . . . . . . . . .   7
-       3.3.1.  Protocol Not Understood . . . . . . . . . . . . . . .   7
-       3.3.2.  Process . . . . . . . . . . . . . . . . . . . . . . .   7
-       3.3.3.  Insufficient Information  . . . . . . . . . . . . . .   9
-       3.3.4.  Failed Decryption . . . . . . . . . . . . . . . . . .   9
-       3.3.5.  Timestamp Not Acceptable  . . . . . . . . . . . . . .  10
-       3.3.6.  Successful Decryption . . . . . . . . . . . . . . . .  11
-     3.4.  Example - Securing a Message  . . . . . . . . . . . . . .  11
-   4.  Signatures  . . . . . . . . . . . . . . . . . . . . . . . . .  15
-     4.1.  Determining Support . . . . . . . . . . . . . . . . . . .  15
-     4.2.  Signing XMPP Stanzas  . . . . . . . . . . . . . . . . . .  16
-       4.2.1.  Process . . . . . . . . . . . . . . . . . . . . . . .  16
-     4.3.  Verifying Signed XMPP Stanzas . . . . . . . . . . . . . .  18
-       4.3.1.  Protocol Not Understood . . . . . . . . . . . . . . .  18
-       4.3.2.  Process . . . . . . . . . . . . . . . . . . . . . . .  18
-       4.3.3.  Insufficient Information  . . . . . . . . . . . . . .  19
-       4.3.4.  Failed Verification . . . . . . . . . . . . . . . . .  20
-       4.3.5.  Timestamp Not Acceptable  . . . . . . . . . . . . . .  20
-       4.3.6.  Successful Verification . . . . . . . . . . . . . . .  21
-     4.4.  Example - Signing a Message . . . . . . . . . . . . . . .  21
-   5.  Requesting Session Keys . . . . . . . . . . . . . . . . . . .  24
-     5.1.  Request Process . . . . . . . . . . . . . . . . . . . . .  24
-     5.2.  Accept Process  . . . . . . . . . . . . . . . . . . . . .  25
-     5.3.  Error Conditions  . . . . . . . . . . . . . . . . . . . .  27
-     5.4.  Example of Successful Key Request . . . . . . . . . . . .  28
-   6.  Mulitple Operations . . . . . . . . . . . . . . . . . . . . .  32
-   7.  Inclusion and Checking of Timestamps  . . . . . . . . . . . .  32
-   8.  Interaction with Stanza Semantics . . . . . . . . . . . . . .  33
-   9.  Interaction with Offline Storage  . . . . . . . . . . . . . .  34
-   10. Mandatory-to-Implement Cryptographic Algorithms . . . . . . .  34
-   11. Security Considerations . . . . . . . . . . . . . . . . . . .  34
-     11.1.  Storage of Encrypted Stanzas . . . . . . . . . . . . . .  34
+   3.  End-point changes . . . . . . . . . . . . . . . . . . . . . .   4
+     3.1.  End-point procedures  . . . . . . . . . . . . . . . . . .   4
+     3.2.  End-point state . . . . . . . . . . . . . . . . . . . . .   5
+   4.  Key distribution  . . . . . . . . . . . . . . . . . . . . . .   5
+   5.  Encryption  . . . . . . . . . . . . . . . . . . . . . . . . .   7
+     5.1.  Determining Support . . . . . . . . . . . . . . . . . . .   7
+     5.2.  Encrypting XMPP Stanzas . . . . . . . . . . . . . . . . .   7
+       5.2.1.  Prerequisites . . . . . . . . . . . . . . . . . . . .   7
+       5.2.2.  Process . . . . . . . . . . . . . . . . . . . . . . .   8
+     5.3.  Decrypting XMPP Stanzas . . . . . . . . . . . . . . . . .  10
+       5.3.1.  Protocol Not Understood . . . . . . . . . . . . . . .  10
+       5.3.2.  Process . . . . . . . . . . . . . . . . . . . . . . .  11
+       5.3.3.  Insufficient Information  . . . . . . . . . . . . . .  12
+       5.3.4.  Failed Decryption . . . . . . . . . . . . . . . . . .  13
+       5.3.5.  Timestamp Not Acceptable  . . . . . . . . . . . . . .  13
+       5.3.6.  Successful Decryption . . . . . . . . . . . . . . . .  14
+     5.4.  Example - Securing a Message  . . . . . . . . . . . . . .  14
+   6.  Signatures  . . . . . . . . . . . . . . . . . . . . . . . . .  18
+     6.1.  Determining Support . . . . . . . . . . . . . . . . . . .  18
+     6.2.  Signing XMPP Stanzas  . . . . . . . . . . . . . . . . . .  19
+       6.2.1.  Process . . . . . . . . . . . . . . . . . . . . . . .  19
+     6.3.  Verifying Signed XMPP Stanzas . . . . . . . . . . . . . .  21
+       6.3.1.  Protocol Not Understood . . . . . . . . . . . . . . .  21
+       6.3.2.  Process . . . . . . . . . . . . . . . . . . . . . . .  21
+       6.3.3.  Insufficient Information  . . . . . . . . . . . . . .  22
+       6.3.4.  Failed Verification . . . . . . . . . . . . . . . . .  23
+       6.3.5.  Timestamp Not Acceptable  . . . . . . . . . . . . . .  23
+       6.3.6.  Successful Verification . . . . . . . . . . . . . . .  24
+     6.4.  Example - Signing a Message . . . . . . . . . . . . . . .  24
+   7.  Requesting Session Keys . . . . . . . . . . . . . . . . . . .  27
+     7.1.  Request Process . . . . . . . . . . . . . . . . . . . . .  27
+     7.2.  Accept Process  . . . . . . . . . . . . . . . . . . . . .  28
+     7.3.  Error Conditions  . . . . . . . . . . . . . . . . . . . .  30
+     7.4.  Example of Successful Key Request . . . . . . . . . . . .  31
+   8.  Mulitple Operations . . . . . . . . . . . . . . . . . . . . .  35
+   9.  Inclusion and Checking of Timestamps  . . . . . . . . . . . .  35
+   10. Interaction with Stanza Semantics . . . . . . . . . . . . . .  36
 
 
 
-Miller & Wallace       Expires September 19, 2014               [Page 2]
+Miller & Wallace       Expires September 21, 2014               [Page 2]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
 
-     11.2.  Re-use of Session Master Keys  . . . . . . . . . . . . .  34
-   12. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  35
-     12.1.  XML Namespaces Name for e2e Data in XMPP . . . . . . . .  35
-   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  36
-     13.1.  Normative References . . . . . . . . . . . . . . . . . .  36
-     13.2.  Informative References . . . . . . . . . . . . . . . . .  37
-   Appendix A.  Schema for urn:ietf:params:xml:ns:xmpp-e2e:6 . . . .  37
-   Appendix B.  Acknowledgements . . . . . . . . . . . . . . . . . .  40
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  40
+   11. Interaction with Offline Storage  . . . . . . . . . . . . . .  37
+   12. Mandatory-to-Implement Cryptographic Algorithms . . . . . . .  37
+   13. Security Considerations . . . . . . . . . . . . . . . . . . .  37
+     13.1.  Storage of Encrypted Stanzas . . . . . . . . . . . . . .  37
+     13.2.  Re-use of Session Master Keys  . . . . . . . . . . . . .  37
+   14. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  38
+     14.1.  XML Namespaces Name for e2e Data in XMPP . . . . . . . .  38
+   15. References  . . . . . . . . . . . . . . . . . . . . . . . . .  39
+     15.1.  Normative References . . . . . . . . . . . . . . . . . .  39
+     15.2.  Informative References . . . . . . . . . . . . . . . . .  40
+   Appendix A.  Schema for urn:ietf:params:xml:ns:xmpp-e2e:6 . . . .  40
+   Appendix B.  Acknowledgements . . . . . . . . . . . . . . . . . .  43
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  43
 
 1.  Introduction
 
@@ -141,7 +145,9 @@ Internet-Draft                  XMPP E2E                      March 2014
    signing communications between two entities which each might have
    multiple end-points.
 
-   Comments are solicited and should be addressed to
+   Comments are solicited and should be addressed to XMPP mailing list.
+   Information about the XMPP mailing list can be found here: https://
+   www.ietf.org/mailman/listinfo/xmpp.
 
 2.  Terminology
 
@@ -156,21 +162,196 @@ Internet-Draft                  XMPP E2E                      March 2014
    "OPTIONAL" in this document are to be interpreted as described in
    [RFC2119].
 
-3.  Encryption
 
 
 
-
-
-
-
-
-Miller & Wallace       Expires September 19, 2014               [Page 3]
+Miller & Wallace       Expires September 21, 2014               [Page 3]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
 
-3.1.  Determining Support
+3.  End-point changes
+
+3.1.  End-point procedures
+
+   Existing XMPP clients will need to implement some new procedures in
+   order to support end-to-end encryption and authentication.  Changes
+   for sending clients include:
+
+   o  Generate session master keys (SMKs)
+
+   o  Store SMKs for use during active sessions
+
+   o  Store SMKs to provide to peers and to support reading of saved
+      messages (may require use of storage key)
+
+   o  Accept requests for SMKs
+
+   o  Release SMKs to authorized requestors (where SMK may be requested
+      from multiple resources each using different means to
+      authenticate)
+
+   o  Generate content encryption keys (CEK)
+
+   o  Use SMK and CEK values to encrypt XMPP stanzas
+
+   o  Generate signing key (optional)
+
+   o  Use signing key to sign XMPP stanzas
+
+   Changes for receiving clients include:
+
+   o  Send request for SMK to peers
+
+   o  Store SMK for use during active session
+
+   o  Use SMK to decrypt CEK used to decrypt XMPP stanzas
+
+   o  Store session master keys retrieved from peers to support reading
+      of saved messages (may require use of storage key)
+
+   o  Provide indication to users when encryption is in use
+
+   o  Retrieve keys required to verify signatures on signed XMPP stanzas
+
+   o  Verify signatures and display indication of success/failure to
+      user
+
+
+
+
+
+Miller & Wallace       Expires September 21, 2014               [Page 4]
+
+Internet-Draft                  XMPP E2E                      March 2014
+
+
+   o  Store keys required to verify signature to support reading of
+      saved messages (may require use of storage key)
+
+3.2.  End-point state
+
+   End points utilizing end-to-end encryption are required to maintain
+   some new state information, and may find some additional information
+   helpful to maintain.  New state information includes:
+
+   o  Session master key table (required)
+
+   o  Public/private key store (required)
+
+   o  Trust anchor store (optional)
+
+   o  Intermediate certification authority (CA) store (optional)
+
+   Session master keys (SMKs) are used to encrypt XMPP stanzas.  An end-
+   point may have many active SMKs at any given point in time, but only
+   one SMK active per full JID.  Each SMK has a name generated by the
+   entity who generated the key.  The name MUST be unique from the
+   generator's perspective (i.e., full JID + SMK name MUST uniquely
+   identify a specific SMK).  When a new SMK is received, any previous
+   SMK stored for the full JID of the entity providing the SMK may be
+   destroyed.  Alternatively, previous SMKs may be preserved to support
+   future decryption of stored messages.  This specification places no
+   requirements on handling of stored messages.  Clients may re-encrypt
+   messages under a long-term storage key, store messages as-is
+   encrypted using an SMK or store plaintext messages.
+
+   Each end-point must have at least one public/private key pair used
+   for SMK distribution.
+
+   A trust anchor store or intermediate CA store may be useful to
+   support automated release of encrypted SMKs or to verify signed XMPP
+   stanzas.
+
+4.  Key distribution
+
+   Several different types of keys are used to support end-to-end
+   encryption and signatures.  These keys may be distinct from any keys
+   used to authenticate to XMPP servers and include the following:
+
+   o  Session master key
+
+   o  Content encryption keys (CEKs) for XMPP stanzas
+
+   o  Public/private key pair for SMK distribution
+
+
+
+Miller & Wallace       Expires September 21, 2014               [Page 5]
+
+Internet-Draft                  XMPP E2E                      March 2014
+
+
+   o  Content encryption keys for SMK distribution
+
+   o  Public/private key pair for signature generation
+
+   o  Trust anchor and intermediate certification authority (CA) public
+      keys
+
+   SMKs are symmetric keys generated by an end-point prior to utilizing
+   end-to-end encryption.  SMKs are used to encrypt the CEK used to
+   encrypt an XMPP stanza.  SMKs are stored in the SMK table and may be
+   distributed using one of the following mechanisms:
+
+   o  Manually pre-placed at some point prior to using end-to-end
+      encryption
+
+   o  Released to an end-point upon request after receiving an encrypted
+      XMPP stanza
+
+   o  Provided to an end-point using an IQ stanza sent prior to sending
+      encrypted XMPP stanzas
+
+   CEKs for XMPP stanzas are symmetric keys generated by an end-point to
+   encrypt an XMPP stanza.  CEKs are encrypted using the SMK and
+   included with encrypted XMPP data.
+
+   Public/private key pairs for SMK distribution are asymmetric keys
+   that may be generated by each end point or imported.  The public key
+   is distributed to XMPP peers for use when distributing SMKs.  The
+   public key is formatted as a JWK, which may include an X.509
+   certificate.  An end-point MUST establish trust in a public key prior
+   to releasing an SMK value.  Trust establishment mechanisms include
+   checking a key thumbprint provided via a trusted channel or by
+   validating an X.509 certificate to a trust anchor.  The public keys
+   may be distributed using one of the following mechanisms:
+
+   o  Manually pre-placed at some point prior to using for SMK release
+
+   o  Provided when requesting SMK after receiving an encrypted XMPP
+      stanza (the recipient may store the public key for use in
+      providing future encrypted SMK values prior to using the SMK to
+      encrypt XMPP stanzas
+
+   o  Provided upon request in response to an IQ get request in
+      preparation for receiving encrypted XMPP stanzas
+
+   CEKs for XMPP stanzas are symmetric keys generated by an end-point to
+   encrypt an XMPP stanza.  CEKs are encrypted using the public key used
+   for SMK distribution and included with encrypted SMK data.
+
+
+
+Miller & Wallace       Expires September 21, 2014               [Page 6]
+
+Internet-Draft                  XMPP E2E                      March 2014
+
+
+   Public/private key pairs for SMK distribution are asymmetric keys
+   that may be generated by each end point or imported.  The public key
+   is distributed to XMPP peers for use when verifying signatures.
+   Trust establishment may be performed by checking a key thumbprint
+   provided via a trusted channel or by validating an X.509 certificate
+   to a trust anchor.
+
+   Trust anchor and intermediate CA public keys may be used to validate
+   X.509 certificates in support of SMK release or verification of
+   signatures on signed XMPP stanzas.
+
+5.  Encryption
+
+5.1.  Determining Support
 
    If an agent supports receiving end-to-end object encryption, it MUST
    advertise that fact in its responses to [XEP-0030] information
@@ -191,19 +372,26 @@ Internet-Draft                  XMPP E2E                      March 2014
    To facilitate discovery, an agent SHOULD also include [XEP-0115]
    information in any directed or broadcast presence updates.
 
-3.2.  Encrypting XMPP Stanzas
+5.2.  Encrypting XMPP Stanzas
 
    The process that a sending agent follows for securing stanzas is the
    same regardless of the form of stanza (i.e., <iq/>, <message/>, or
    <presence/>).
 
-3.2.1.  Prerequisites
+5.2.1.  Prerequisites
 
    First, the sending agent prepares and retains the following:
 
 
    o  The JID of the sender (i.e. its own JID).  This SHOULD be the bare
       JID (localpart@domainpart).
+
+
+
+
+Miller & Wallace       Expires September 21, 2014               [Page 7]
+
+Internet-Draft                  XMPP E2E                      March 2014
 
 
    o  The JID of the recipient.  This SHOULD be the bare JID
@@ -216,22 +404,12 @@ Internet-Draft                  XMPP E2E                      March 2014
       generating random values.
 
 
-
-
-
-
-
-Miller & Wallace       Expires September 19, 2014               [Page 4]
-
-Internet-Draft                  XMPP E2E                      March 2014
-
-
    o  A SMK identifier (SID).  The SID MUST be unique for a given
       (sender, recipient, SMK) tuple, and MUST NOT be derived from SMK
       itself.
 
 
-3.2.2.  Process
+5.2.2.  Process
 
    For a given plaintext stanza (S), the sending agent performs the
    following:
@@ -244,7 +422,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
    2.  Notes the current UTC date and time (N) when this stanza is
-       constructed, formatted as described under Section 7.
+       constructed, formatted as described under Section 9.
 
 
    3.  Constructs a forwarding envelope (M) using a <forwarded/> element
@@ -264,6 +442,14 @@ Internet-Draft                  XMPP E2E                      March 2014
    4.  Converts the forwarding envelope (M) to a UTF-8 encoded string
        (M'), optionally removing line breaks and other insignificant
        whitespace between elements and attributes, i.e. M' =
+
+
+
+Miller & Wallace       Expires September 21, 2014               [Page 8]
+
+Internet-Draft                  XMPP E2E                      March 2014
+
+
        UTF8-encode(M).  We call M' a "stanza-string" because for
        purposes of encryption and decryption it is treated not as XML
        but as an opaque string (this avoids the need for complex
@@ -274,12 +460,6 @@ Internet-Draft                  XMPP E2E                      March 2014
        at least equal to that required by the content encryption
        algorithm in use and MUST be generated randomly.  See [RFC4086]
        for considerations on generating random values.
-
-
-
-Miller & Wallace       Expires September 19, 2014               [Page 5]
-
-Internet-Draft                  XMPP E2E                      March 2014
 
 
    6.  Generates any additional unprotected block cipher factors (IV);
@@ -296,7 +476,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
        *  The 'alg' property is set to an appropriate key wrapping
           algorithm (e.g., "A256KW" or "A128KW"); recipients use the key
-          request process in Section 5 to obtain the SMK.
+          request process in Section 7 to obtain the SMK.
 
 
        *  The 'enc' property is set to the intended content encryption
@@ -320,6 +500,12 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
+
+Miller & Wallace       Expires September 21, 2014               [Page 9]
+
+Internet-Draft                  XMPP E2E                      March 2014
+
+
        *  The attribute 'type' set to the value "enc".
 
 
@@ -329,13 +515,6 @@ Internet-Draft                  XMPP E2E                      March 2014
        *  The child element <encheader/> qualified by the
           "urn:ietf:params:xml:ns:xmpp-e2e:6" namespace and with XML
           character data as H, encoded base64url as per [RFC4648].
-
-
-
-
-Miller & Wallace       Expires September 19, 2014               [Page 6]
-
-Internet-Draft                  XMPP E2E                      March 2014
 
 
        *  The child element <cmk/> qualified by the
@@ -366,37 +545,37 @@ Internet-Draft                  XMPP E2E                      March 2014
        same value for its 'id' attribute.
 
 
-3.3.  Decrypting XMPP Stanzas
+5.3.  Decrypting XMPP Stanzas
 
-3.3.1.  Protocol Not Understood
+5.3.1.  Protocol Not Understood
 
    If the receiving agent does not understand the protocol, it MUST do
    one and only one of the following: (1) ignore the <e2e/> extension,
    (2) ignore the entire stanza, or (3) return a <service-unavailable/>
    error to the sender, as described in [RFC6120].
 
+
+
+
+Miller & Wallace       Expires September 21, 2014              [Page 10]
+
+Internet-Draft                  XMPP E2E                      March 2014
+
+
    NOTE: If the inbound stanza is an <iq/>, the receiving agent MUST
    return an error to the sending agent, to comply with the exchanging
    of IQ stanzas in [RFC6121].
 
-3.3.2.  Process
+5.3.2.  Process
 
    Upon receipt of an encrypted stanza, the receiving agent performs the
    following:
 
    1.  Determines if a valid SMK is available, associated with the SID
        specified by the 'id' attribute value of the <e2e/> element and
-
-
-
-Miller & Wallace       Expires September 19, 2014               [Page 7]
-
-Internet-Draft                  XMPP E2E                      March 2014
-
-
        the sending agent JID specified by the 'from' attribute of the
        wrapping stanza.  If the receiving agent does not already have
-       the SMK, it requests it according to Section 5.
+       the SMK, it requests it according to Section 7.
 
 
    2.  Performs the message decryption steps from [JOSE-JWE] to generate
@@ -429,9 +608,19 @@ Internet-Draft                  XMPP E2E                      March 2014
        element (M).
 
 
+
+
+
+
+
+Miller & Wallace       Expires September 21, 2014              [Page 11]
+
+Internet-Draft                  XMPP E2E                      March 2014
+
+
    4.  Obtains the UTC date and time (N) from the <delay/> child
        element, and verifies it is within the accepted range, as
-       specified in Section 7.
+       specified in Section 9.
 
 
    5.  Obtains the plaintext stanza (S), which is a child element node
@@ -441,16 +630,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
        .
 
-
-
-
-
-Miller & Wallace       Expires September 19, 2014               [Page 8]
-
-Internet-Draft                  XMPP E2E                      March 2014
-
-
-3.3.3.  Insufficient Information
+5.3.3.  Insufficient Information
 
    At step 1, if the receiving agent is unable to obtain the CMK, or the
    receiving agent could not otherwise determine the additional
@@ -486,25 +666,21 @@ Internet-Draft                  XMPP E2E                      March 2014
    (which MAY be to display a message informing the recipient that it
    has received a stanza that cannot be decrypted).
 
-3.3.4.  Failed Decryption
+
+
+
+Miller & Wallace       Expires September 21, 2014              [Page 12]
+
+Internet-Draft                  XMPP E2E                      March 2014
+
+
+5.3.4.  Failed Decryption
 
    At step 2, if the receiving agent is unable to successfully decrypt
    the stanza, the receiving agent SHOULD return a <bad-request/> error
    to the sending agent (as described in [RFC6120]), optionally
    supplemented by an application-specific error condition element of
    <decryption-failed/> (previously defined in [RFC3923]):
-
-
-
-
-
-
-
-
-Miller & Wallace       Expires September 19, 2014               [Page 9]
-
-Internet-Draft                  XMPP E2E                      March 2014
-
 
    <message xmlns='jabber:client'
             from='juliet@capulet.lit/balcony'
@@ -531,10 +707,10 @@ Internet-Draft                  XMPP E2E                      March 2014
    (which MAY be to display a message informing the recipient that it
    has received a stanza that cannot be decrypted).
 
-3.3.5.  Timestamp Not Acceptable
+5.3.5.  Timestamp Not Acceptable
 
    At step 4, if the stanza is successfully decrypted but the timestamp
-   fails the checks outlined in Section 7, the receiving agent MAY
+   fails the checks outlined in Section 9, the receiving agent MAY
    return a <not-acceptable/> error to the sender (as described in
    [RFC6120]), optionally supplemented by an application-specific error
    condition element of <bad-timestamp/> (previously defined in
@@ -549,15 +725,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-
-
-
-
-
-
-
-
-Miller & Wallace       Expires September 19, 2014              [Page 10]
+Miller & Wallace       Expires September 21, 2014              [Page 13]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -581,7 +749,7 @@ Internet-Draft                  XMPP E2E                      March 2014
      </error>
    </message>
 
-3.3.6.  Successful Decryption
+5.3.6.  Successful Decryption
 
    If the receiving agent successfully decrypted the payload, it MUST
    NOT return a stanza error.
@@ -591,7 +759,7 @@ Internet-Draft                  XMPP E2E                      March 2014
    encrypted response wrapped in an <iq/> of type "result", to prevent
    exposing information about the payload.
 
-3.4.  Example - Securing a Message
+5.4.  Example - Securing a Message
 
    NOTE: unless otherwise indicated, all line breaks are included for
    readability.
@@ -613,7 +781,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 11]
+Miller & Wallace       Expires September 21, 2014              [Page 14]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -647,7 +815,7 @@ Internet-Draft                  XMPP E2E                      March 2014
    o  SMK identifier (SID) as "835c92a8-94cd-4e96-b3f3-b2e75a438f92"
 
 
-   The sending agent performs steps 1, 2, and 3 from Section 3.2.2 to
+   The sending agent performs steps 1, 2, and 3 from Section 5.2.2 to
    generate the envelope:
 
 
@@ -669,7 +837,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 12]
+Miller & Wallace       Expires September 21, 2014              [Page 15]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -725,7 +893,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 13]
+Miller & Wallace       Expires September 21, 2014              [Page 16]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -781,7 +949,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 14]
+Miller & Wallace       Expires September 21, 2014              [Page 17]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -825,9 +993,9 @@ Internet-Draft                  XMPP E2E                      March 2014
      </e2e>
    </message>
 
-4.  Signatures
+6.  Signatures
 
-4.1.  Determining Support
+6.1.  Determining Support
 
    If an agent supports receiving end-to-end object signatures, it MUST
    advertise that fact in its responses to [XEP-0030] information
@@ -837,7 +1005,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 15]
+Miller & Wallace       Expires September 21, 2014              [Page 18]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -856,13 +1024,13 @@ Internet-Draft                  XMPP E2E                      March 2014
    To facilitate discovery, an agent SHOULD also include [XEP-0115]
    information in any directed or broadcast presence updates.
 
-4.2.  Signing XMPP Stanzas
+6.2.  Signing XMPP Stanzas
 
    The basic process that a sending agent follows for authenticating
    stanzas is the same regardless of the kind of stanza (i.e., <iq/>,
    <message/>, or <presence/>).
 
-4.2.1.  Process
+6.2.1.  Process
 
    For a given plaintext stanza (S), the sending agent performs the
    following:
@@ -874,7 +1042,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
    2.  Notes the current UTC date and time (N) when this stanza is
-       constructed, formatted as described under Section 7.
+       constructed, formatted as described under Section 9.
 
 
    3.  Constructs a forwarding envelope (M) using a <forwarded/> element
@@ -893,7 +1061,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 16]
+Miller & Wallace       Expires September 21, 2014              [Page 19]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -949,7 +1117,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 17]
+Miller & Wallace       Expires September 21, 2014              [Page 20]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -961,9 +1129,9 @@ Internet-Draft                  XMPP E2E                      March 2014
        has a value for the 'id' attribute, this stanza SHOULD NOT use
        the same value for its "id" attribute.
 
-4.3.  Verifying Signed XMPP Stanzas
+6.3.  Verifying Signed XMPP Stanzas
 
-4.3.1.  Protocol Not Understood
+6.3.1.  Protocol Not Understood
 
    If the receiving agent does not understand the protocol, it MUST do
    one and only one of the following: (1) ignore the <e2e/> extension,
@@ -974,7 +1142,7 @@ Internet-Draft                  XMPP E2E                      March 2014
    return an error to the sending agent, to comply with the exchanging
    of IQ stanzas in [RFC6121].
 
-4.3.2.  Process
+6.3.2.  Process
 
    Upon receipt of a signed stanza, the receiving agent performs the
    following:
@@ -1005,7 +1173,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 18]
+Miller & Wallace       Expires September 21, 2014              [Page 21]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1016,7 +1184,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
    4.  Obtains the UTC date and time N from the <delay/> child element,
        and verifies it is within the accepted range, as specified in
-       Section 7.
+       Section 9.
 
 
    5.  Obtains the plaintext stanza S, which is a child element node of
@@ -1024,7 +1192,7 @@ Internet-Draft                  XMPP E2E                      March 2014
        declrations from XMPP stanzas, to help distinguish it from other
        content within M.
 
-4.3.3.  Insufficient Information
+6.3.3.  Insufficient Information
 
    At step 1, if the receiving agent does not have the key used to sign
    the stanza, or the receiving agent could not otherwise determine it,
@@ -1061,12 +1229,12 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 19]
+Miller & Wallace       Expires September 21, 2014              [Page 22]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
 
-4.3.4.  Failed Verification
+6.3.4.  Failed Verification
 
    At step 2, if the receiving agent is unable to successfully verify
    the stanza, the receiving agent SHOULD return a <bad-request/> error
@@ -1099,10 +1267,10 @@ Internet-Draft                  XMPP E2E                      March 2014
    (which MAY be to display a message informing the recipient that it
    has received a stanza that cannot be verified).
 
-4.3.5.  Timestamp Not Acceptable
+6.3.5.  Timestamp Not Acceptable
 
    At step 4, if the stanza is successfully verified but the timestamp
-   fails the checks outlined in Section 7, the receiving agent MAY
+   fails the checks outlined in Section 9, the receiving agent MAY
    return a <not-acceptable/> error to the sender (as described in
    [RFC6120]), optionally supplemented by an application-specific error
    condition element of <bad-timestamp/> (previously defined in
@@ -1117,7 +1285,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 20]
+Miller & Wallace       Expires September 21, 2014              [Page 23]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1141,7 +1309,7 @@ Internet-Draft                  XMPP E2E                      March 2014
      </error>
    </message>
 
-4.3.6.  Successful Verification
+6.3.6.  Successful Verification
 
    If the receiving agent successfully verified the payload, it SHOULD
    NOT return a stanza error.  However, if the signed stanza is an <iq/>
@@ -1149,12 +1317,12 @@ Internet-Draft                  XMPP E2E                      March 2014
    receiving agent does not have an appropriate public-private key-pair.
 
    Otherwise, the receiving agent SHOULD send the <iq/> response signed
-   as per Section 4.2.1, with the 'type' attribute set to the value
+   as per Section 6.2.1, with the 'type' attribute set to the value
    "result", even if the response to the signed <iq/> stanza is of type
    "error".  The error applies to the signed stanza, not the wrapping
    stanza.
 
-4.4.  Example - Signing a Message
+6.4.  Example - Signing a Message
 
    NOTE: unless otherwise indicated, all line breaks are included for
    readability.
@@ -1173,7 +1341,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 21]
+Miller & Wallace       Expires September 21, 2014              [Page 24]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1192,7 +1360,7 @@ Internet-Draft                  XMPP E2E                      March 2014
      </body>
    </message>
 
-   Then the sending agent performs steps 1, 2, and 3 from Section 4.2.1
+   Then the sending agent performs steps 1, 2, and 3 from Section 6.2.1
    generate the envelope M:
 
    <forwarded xmlns='urn:xmpp:forward:0'>
@@ -1229,7 +1397,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 22]
+Miller & Wallace       Expires September 21, 2014              [Page 25]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1285,7 +1453,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 23]
+Miller & Wallace       Expires September 21, 2014              [Page 26]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1325,14 +1493,14 @@ Internet-Draft                  XMPP E2E                      March 2014
      </e2e>
    </message>
 
-5.  Requesting Session Keys
+7.  Requesting Session Keys
 
    Because of the dynamic nature of XMPP stanza routing, the protocol
    does not exchange session keys as part of the encrypted stanza.
    Instead, a separate protocol is used by receiving agents to request a
    particular session key from the sending agent.
 
-5.1.  Request Process
+7.1.  Request Process
 
    Before a SMK can be requested, the receiving agent MUST have at least
    one public key for which it also has the private key.  The public
@@ -1341,7 +1509,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 24]
+Miller & Wallace       Expires September 21, 2014              [Page 27]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1377,7 +1545,7 @@ Internet-Draft                  XMPP E2E                      March 2014
        uses to track the <iq/> response.
 
 
-5.2.  Accept Process
+7.2.  Accept Process
 
    If the sending agent approves the request, it performs the following
    steps:
@@ -1397,7 +1565,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 25]
+Miller & Wallace       Expires September 21, 2014              [Page 28]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1406,7 +1574,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
        *  The "alg" parameter, if present, MUST be set to the algorithm
-          in use for encrypting messages from Section 3.2.
+          in use for encrypting messages from Section 5.2.
 
 
        *  The "use" parameter, if present, MUST be set to "enc".
@@ -1453,7 +1621,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 26]
+Miller & Wallace       Expires September 21, 2014              [Page 29]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1490,7 +1658,7 @@ Internet-Draft                  XMPP E2E                      March 2014
        attribute.
 
 
-5.3.  Error Conditions
+7.3.  Error Conditions
 
    If the sending agent does not approve the request, it sends an <iq/>
    stanza of type "error" and containing the reason for denying the
@@ -1509,7 +1677,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 27]
+Miller & Wallace       Expires September 21, 2014              [Page 30]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1518,13 +1686,13 @@ Internet-Draft                  XMPP E2E                      March 2014
       sending agent understands.
 
 
-5.4.  Example of Successful Key Request
+7.4.  Example of Successful Key Request
 
    NOTE: unless otherwise indicated, all line breaks are included for
    readability.
 
    To begin a key request, the receiving agent performs step 1 from
-   Section 5.1 to generate the [JOSE-JWK]:
+   Section 7.1 to generate the [JOSE-JWK]:
 
    {
      "keys": [{
@@ -1565,7 +1733,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 28]
+Miller & Wallace       Expires September 21, 2014              [Page 31]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1593,7 +1761,7 @@ Internet-Draft                  XMPP E2E                      March 2014
    </iq>
 
    If the sending agent accepts this key request, it performs step 1
-   from Section 5.2 to generate JWK representation of the SMK:
+   from Section 7.2 to generate JWK representation of the SMK:
 
    {
      "kty":"oct",
@@ -1621,7 +1789,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 29]
+Miller & Wallace       Expires September 21, 2014              [Page 32]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1677,7 +1845,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 30]
+Miller & Wallace       Expires September 21, 2014              [Page 33]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1733,7 +1901,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 31]
+Miller & Wallace       Expires September 21, 2014              [Page 34]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1772,7 +1940,7 @@ Internet-Draft                  XMPP E2E                      March 2014
      </keyreq>
    </iq>
 
-6.  Mulitple Operations
+8.  Mulitple Operations
 
    The individual processes for encrypting and signing can be nested;
    the output of each process a complete stanza that could then be
@@ -1781,7 +1949,7 @@ Internet-Draft                  XMPP E2E                      March 2014
    signed stanza), and SHOULD handle multiple levels within reasonable
    limits for the receiving agent.
 
-7.  Inclusion and Checking of Timestamps
+9.  Inclusion and Checking of Timestamps
 
    Timestamps are included to help prevent replay attacks.  All
    timestamps MUST conform to [XEP-0082] and be presented as UTC with no
@@ -1789,7 +1957,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 32]
+Miller & Wallace       Expires September 21, 2014              [Page 35]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1818,9 +1986,9 @@ Internet-Draft                  XMPP E2E                      March 2014
       and the receiving entity MAY return a stanza error to the sender.
 
    Note the foregoing assumes the stanza is received while the receiving
-   agent is online; see Section 9 for offline storage considerations.
+   agent is online; see Section 11 for offline storage considerations.
 
-8.  Interaction with Stanza Semantics
+10.  Interaction with Stanza Semantics
 
    The following limitations and caveats apply:
 
@@ -1845,12 +2013,12 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 33]
+Miller & Wallace       Expires September 21, 2014              [Page 36]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
 
-9.  Interaction with Offline Storage
+11.  Interaction with Offline Storage
 
    The server makes its best effort to deliver stanzas.  When the
    receiving agent is offline at the time of delivery, the server might
@@ -1861,16 +2029,16 @@ Internet-Draft                  XMPP E2E                      March 2014
    o  If the sending agent is not also online when the message is
       delivered to the receiving agent from offline storage, then the
       decryption process fails for insufficient information as described
-      in Section 3.3.3.
+      in Section 5.3.3.
 
 
-   o  When performing the timestamp checks in Section 7, if the server
+   o  When performing the timestamp checks in Section 9, if the server
       includes delayed delivery data as specified in [XEP-0203] for when
       the server received the message, then the receiving agent SHOULD
       use the delayed delivery timestmap rather than the current time.
 
 
-10.  Mandatory-to-Implement Cryptographic Algorithms
+12.  Mandatory-to-Implement Cryptographic Algorithms
 
    All algorithms that MUST be implemented for [JOSE-JWE] and [JOSE-JWS]
    also MUST be implemented for this specification.  However, this
@@ -1882,15 +2050,15 @@ Internet-Draft                  XMPP E2E                      March 2014
    o  MUST implement the "RS256" JWS algorithm.
 
 
-11.  Security Considerations
+13.  Security Considerations
 
-11.1.  Storage of Encrypted Stanzas
+13.1.  Storage of Encrypted Stanzas
 
    The recipient's server might store any <message/> stanzas received
    until the recipient is next available; this duration could be
    anywhere from a few minutes to several months.
 
-11.2.  Re-use of Session Master Keys
+13.2.  Re-use of Session Master Keys
 
    A sender SHOULD NOT use the same SMK for stanzas intended for
    different recipients, as determined by the localpart and domainpart
@@ -1901,7 +2069,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 34]
+Miller & Wallace       Expires September 21, 2014              [Page 37]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -1915,9 +2083,9 @@ Internet-Draft                  XMPP E2E                      March 2014
    new SMK each time it generates a new ThreadID, as outlined in
    [XEP-0201].
 
-12.  IANA Considerations
+14.  IANA Considerations
 
-12.1.  XML Namespaces Name for e2e Data in XMPP
+14.1.  XML Namespaces Name for e2e Data in XMPP
 
    A number of URN sub-namespaces of encrypted and/or signed content for
    the Extensible Messaging and Presence Protocol (XMPP) is defined as
@@ -1957,14 +2125,14 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 35]
+Miller & Wallace       Expires September 21, 2014              [Page 38]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
 
-13.  References
+15.  References
 
-13.1.  Normative References
+15.1.  Normative References
 
    [E2E-REQ]  Saint-Andre, P., "Requirements for End-to-End Encryption
               in the Extensible Messaging and Presence Protocol (XMPP)",
@@ -2013,7 +2181,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 36]
+Miller & Wallace       Expires September 21, 2014              [Page 39]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -2038,7 +2206,7 @@ Internet-Draft                  XMPP E2E                      March 2014
               Wild, M. and K. Smith, "Stanza Forwarding", XSF XEP 0297,
               July 2012.
 
-13.2.  Informative References
+15.2.  Informative References
 
    [RFC3923]  Saint-Andre, P., "End-to-End Signing and Object Encryption
               for the Extensible Messaging and Presence Protocol
@@ -2069,7 +2237,7 @@ Appendix A.  Schema for urn:ietf:params:xml:ns:xmpp-e2e:6
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 37]
+Miller & Wallace       Expires September 21, 2014              [Page 40]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -2125,7 +2293,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 38]
+Miller & Wallace       Expires September 21, 2014              [Page 41]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -2181,7 +2349,7 @@ Internet-Draft                  XMPP E2E                      March 2014
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 39]
+Miller & Wallace       Expires September 21, 2014              [Page 42]
 
 Internet-Draft                  XMPP E2E                      March 2014
 
@@ -2237,4 +2405,4 @@ Authors' Addresses
 
 
 
-Miller & Wallace       Expires September 19, 2014              [Page 40]
+Miller & Wallace       Expires September 21, 2014              [Page 43]
