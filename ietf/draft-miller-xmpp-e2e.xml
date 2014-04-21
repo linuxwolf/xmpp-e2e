@@ -42,85 +42,189 @@
     <section title="Introduction" anchor="intro">
       <t>End-to-end protection and authentication of traffic sent over the Extensible Messaging and Presence Protocol <xref target="RFC6120"/> is a desirable goal.  Requirements and a threat analysis for XMPP encryption are provided in <xref target="E2E-REQ"/>. Many possible approaches to meet those (or similar) requirements have been proposed over the years, including methods based on PGP, S/MIME, SIGMA, and TLS.</t>
       <t>Most proposals have not been able to support multiple end-points for a given recipient. As more devices support XMPP, it becomes more desirable to allow an entity to communicate with another in a more secure manner, regardless of the number of agents the entity is employing. This document specifies an approach for encrypting and signing communications between two entities which each might have multiple end-points.</t>
+      <t>A primary challenge with supporting multiple end-points is key distribution.  This is complicated by the fact that some end points for a given recipient may share keys, some may use different keys, some may have no keys and some may not support encryption or signature verification at all.  To address these differences, this specification defines a symmetric key table that is managed via three mechanisms that enable a key to be pushed to an end point, to be pulled from an originator or negotiated.  The key table contains named master keys along with meta data describing usage of the key.  Encrypted XMPP messages use a named master key to encrypt a content encryption key.  Prior to decrypting a message, recipients of an encrypted message will either find the named key present in their key table (as the result of an earlier operation) or obtain the key from the sender.</t>
       <t>Comments are solicited and should be addressed to XMPP mailing list.  Information about the XMPP mailing list can be found here: https://www.ietf.org/mailman/listinfo/xmpp. </t>
     </section>
     <section title="Terminology" anchor="terms">
       <t>This document inherits XMPP-related terminology from <xref target="RFC6120"/>, JSON Web Algorithms (JWA)-related terminology from <xref target="JOSE-JWA"/>, JSON Web Encryption (JWE)-related terminology from <xref target="JOSE-JWE"/>, and JSON Web Key (JWK)-related terminology from <xref target="JOSE-JWK"/>.  Security-related terms are to be understood in the sense defined in <xref target="RFC4949"/>.</t>
       <t>The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
     </section>
-    <section title="End-point changes" anchor="changes">
+    <section title="Changes to existing clients" anchor="changes">
     <section title="End-point procedures" anchor="procedures">
 		<t>Existing XMPP clients will need to implement some new procedures in order to support end-to-end encryption and
 		authentication.  Changes for sending clients include:</t>
 
 		<t><list style="symbols">
-			<t>Generate session master keys (SMKs)</t>
-			<t>Store SMKs for use during active sessions</t>
-			<t>Store SMKs to provide to peers and to support reading of saved messages
+			<t>Generating session master keys (SMKs)</t>
+			<t>Storing SMKs for use during active sessions</t>
+			<t>Storing SMKs to provide to peers and to support reading of saved messages
 			(may require use of storage key)</t>
-			<t>Accept requests for SMKs</t>
-			<t>Release SMKs to authorized requestors (where SMK may be requested from
-			multiple resources each using different means to authenticate)</t>
-			<t>Generate content encryption keys (CEK)</t>
-			<t>Use SMK and CEK values to encrypt XMPP stanzas</t>
-			<t>Generate signing key (optional)</t>
-			<t>Use signing key to sign XMPP stanzas</t>
+			<t>Accepting requests for SMKs</t>
+			<t>Releasing SMKs to authorized requestors (where requests may be received from
+			multiple different resources associated with a single peer with each resource using a different means to authenticate)</t>
+			<t>Generating content encryption keys (CEK)</t>
+			<t>Using SMK and CEK values to encrypt XMPP stanzas</t>
+			<t>Generating a signing key (optional)</t>
+			<t>Using a signing key to sign XMPP stanzas</t>
+			<t>Generating and using a long term storage key (optional)</t>
 		 </list></t>
 
 		<t>Changes for receiving clients include:</t>
 
 		<t><list style="symbols">
-			<t>Send request for SMK to peers</t>
-			<t>Store SMK for use during active session</t>
-			<t>Use SMK to decrypt CEK used to decrypt XMPP stanzas</t>
-			<t>Store session master keys retrieved from peers to support reading of
+			<t>Sending requests for SMKs to peers</t>
+			<t>Accepting public key to use when encrypting an SMK from peers</t>
+			<t>Storing SMKs for use when decrypting XMPP stanzas during active session</t>
+			<t>Using an SMK to decrypt a CEK used to decrypt XMPP stanzas</t>
+			<t>Storing SMKs retrieved from peers to support reading of
 			saved messages (may require use of storage key)</t>
-			<t>Provide indication to users when encryption is in use</t>
-			<t>Retrieve keys required to verify signatures on signed XMPP stanzas</t>
-			<t>Verify signatures and display indication of success/failure to user</t>
-			<t>Store keys required to verify signature to support reading of saved
+			<t>Providing indication to users when encryption is in use</t>
+			<t>Retrieving keys required to verify signatures on signed XMPP stanzas</t>
+			<t>Verifying signatures and displaying indication of success/failure to user</t>
+			<t>Storing keys required to verify signature to support reading of saved
 			messages (may require use of storage key)</t>
+			<t>Generating and using a long term storage key (optional)</t>
 		 </list></t>
 	</section>    
     <section title="End-point state" anchor="state">
-		<t>End points utilizing end-to-end encryption are required to maintain some new state information, and may find some additional information helpful to maintain.  New state information includes:</t>    
+		<t>End points utilizing end-to-end encryption and signatures are required to maintain some new state information, and may find some additional information helpful to maintain.  New state information includes:</t>    
 		<t><list style="symbols">
 			<t>Session master key table (required)</t>
 			<t>Public/private key store (required)</t>
 			<t>Trust anchor store (optional)</t>
 			<t>Intermediate certification authority (CA) store (optional)</t>
+			<t>Long-term storage key (optional)</t>
 		 </list></t>
-		 <t>Session master keys (SMKs) are used to encrypt XMPP stanzas.  An end-point may have many active SMKs at any given point in time, but only one SMK active per full JID.  Each SMK has a name generated by the entity who generated the key.  The name MUST be unique from the generator's perspective (i.e., full JID + SMK name MUST uniquely identify a specific SMK).  When a new SMK is received, any previous SMK stored for the full JID of the entity providing the SMK may be destroyed.  Alternatively, previous SMKs may be preserved to support future decryption of stored messages.  This specification places no requirements on handling of stored messages.  Clients may re-encrypt messages under a long-term storage key, store messages as-is encrypted using an SMK or store plaintext messages.</t>
+		 <t>Session master keys (SMKs) are used to encrypt XMPP stanzas.  An end-point may have many active SMKs at any given point in time, but only one SMK active per bare JID (TODO: or should this be per full JID?).  Each SMK has a name generated by the entity who generated the key.  The name MUST be unique from the generator's perspective (i.e., full JID + SMK name MUST uniquely identify a specific SMK).  When a new SMK is received, any previous SMK stored for the full JID of the entity providing the SMK may be destroyed.  Alternatively, previous SMKs may be preserved to support future decryption of stored messages.  This specification places no requirements on handling of stored messages.  Clients may re-encrypt messages under a long-term storage key, store messages as-is encrypted using an SMK or store plaintext messages.</t>
 		 <t>Each end-point must have at least one public/private key pair used for SMK distribution.</t>
 		 <t>A trust anchor store or intermediate CA store may be useful to support automated release of encrypted SMKs or to verify signed XMPP stanzas.</t>
+		 <t>A long-term storage key may be used to either encrypt data stored in the key table or to re-encrypt encrypted messages prior to storing the message for future review.</t>
     </section>
     </section>
     <section title="Key distribution" anchor="keyDist">
 		<t>Several different types of keys are used to support end-to-end encryption and signatures.  These keys may be distinct from any keys used to authenticate to XMPP servers and include the following:</t>    
 		<t><list style="symbols">
-			<t>Session master key</t>
+			<t>Session master key (SMK)</t>
 			<t>Content encryption keys (CEKs) for XMPP stanzas</t>
 			<t>Public/private key pair for SMK distribution</t>
 			<t>Content encryption keys for SMK distribution</t>
 			<t>Public/private key pair for signature generation</t>
 			<t>Trust anchor and intermediate certification authority (CA) public keys</t>
+			<t>Long-term storage key</t>
 		 </list></t>
-		 <t>SMKs are symmetric keys generated by an end-point prior to utilizing end-to-end encryption.  SMKs are used to encrypt the CEK used to encrypt an XMPP stanza.  SMKs are stored in the SMK table and may be distributed using one of the following mechanisms:</t>
+		 <t>SMKs are symmetric keys generated by an end-point prior to utilizing end-to-end encryption (see <xref target="encrypt-prereq" />).  SMKs are used to encrypt the CEK used to encrypt an XMPP stanza.  SMKs are stored in the SMK table and may be distributed using one of the following mechanisms:</t>
 		<t><list style="symbols">
 			<t>Manually pre-placed at some point prior to using end-to-end encryption</t>
 			<t>Released to an end-point upon request after receiving an encrypted XMPP stanza</t>
 			<t>Provided to an end-point using an IQ stanza sent prior to sending encrypted XMPP stanzas</t>
 		 </list></t>
-		 <t>CEKs for XMPP stanzas are symmetric keys generated by an end-point to encrypt an XMPP stanza.  CEKs are encrypted using the SMK and included with encrypted XMPP data.</t>
-		 <t>Public/private key pairs for SMK distribution are asymmetric keys that may be generated by each end point or imported.  The public key is distributed to XMPP peers for use when distributing SMKs.  The public key is formatted as a JWK, which may include an X.509 certificate.  An end-point MUST establish trust in a public key prior to releasing an SMK value.  Trust establishment mechanisms include checking a key thumbprint provided via a trusted channel or by validating an X.509 certificate to a trust anchor.  The public keys may be distributed using one of the following mechanisms:</t>
+		 <t>CEKs for XMPP stanzas are symmetric keys generated by an end-point to encrypt an XMPP stanza (see item 5 in <xref target="encryption-encrypt-process" />).  CEKs are encrypted using the SMK and included with encrypted XMPP data.</t>
+		 <t>Public/private key pairs for SMK distribution are asymmetric keys that may be generated by an end point, imported into an end point or used via a hardware cryptographic module.  The public key is distributed to XMPP peers for use when distributing SMKs (see step 1 in <xref target="keyreq-process-request" />).  The public key is formatted as a JWK, which may include an X.509 certificate.  An end-point MUST establish trust in a public key prior to releasing an SMK value.  Trust establishment mechanisms include checking a key thumbprint provided via a trusted channel or by validating an X.509 certificate to a trust anchor.  The public keys may be distributed using one of the following mechanisms:</t>
 		<t><list style="symbols">
-			<t>Manually pre-placed at some point prior to using for SMK release</t>
-			<t>Provided when requesting SMK after receiving an encrypted XMPP stanza (the recipient may store the public key for use in providing future encrypted SMK values prior to using the SMK to encrypt XMPP stanzas</t>
-			<t>Provided upon request in response to an IQ get request in preparation for receiving encrypted XMPP stanzas</t>
+			<t>Manually pre-placed prior to using for SMK release (details for manual pre-placement are not defined by this specification)</t>
+			<t>Presented when requesting an SMK from a peer after receiving an encrypted XMPP stanza from the peer (the peer may store the public key for use in providing future encrypted SMK values prior to using the SMK to encrypt XMPP stanzas see <xref target="keyreq-process-request" />)</t>
+			<t>Provided upon request in response to an IQ get request in preparation for receiving encrypted XMPP stanzas (TODO: define IQ for pushing SMK)</t>
 		 </list></t>
-		 <t>CEKs for XMPP stanzas are symmetric keys generated by an end-point to encrypt an XMPP stanza.  CEKs are encrypted using the public key used for SMK distribution and included with encrypted SMK data.</t>
-		 <t>Public/private key pairs for SMK distribution are asymmetric keys that may be generated by each end point or imported.  The public key is distributed to XMPP peers for use when verifying signatures.  Trust establishment may be performed by checking a key thumbprint provided via a trusted channel or by validating an X.509 certificate to a trust anchor.</t>
+		 <t>CEKs for SMK distribution are symmetric keys generated by an end-point to encrypt an SMK (see item 3 in <xref target="keyreq-process-accept" />).  CEKs are encrypted using the public key used for SMK distribution and included with encrypted SMK data.</t>
+		 <t>Public/private key pairs for SMK distribution are asymmetric keys that may be generated by an end point, imported into an end point or used via a hardware cryptographic module (see bullet 4 of section 5.1 in <xref target="JOSE-JWE"/>).  The public key is distributed to XMPP peers for use when verifying signatures.  Trust establishment may be performed by checking a key thumbprint provided via a trusted channel or by validating an X.509 certificate to a trust anchor.</t>
 		 <t>Trust anchor and intermediate CA public keys may be used to validate X.509 certificates in support of SMK release or verification of signatures on signed XMPP stanzas.</t>
+		 <t>A long-term storage key may be used to encrypt information stored in the key table or to re-encrypt encrypted messages prior to storing the message for future review.  The long-term storage key may be a public/private key pair or a symmetric key.</t>
+    </section>
+    <section title="Key table" anchor="keyTable">
+    <t>The conceptual database for long-lived cryptographic keys described in <xref target="Key-Table"/> may be suitable for use in storing the SMKs described above for use in supporting end-to-end XMPP encryption.  The columns that the table consists of are listed as follows:</t>
+    
+    <t>TODO: figure out whether to read time values from JWKs.  If so, augment section 8.2.</t>
+    
+    <t>
+<list style="hanging" hangIndent="6">
+
+      <t hangText="AdminKeyName:">
+         The AdminKeyName field contains a human-readable string meant
+         to identify the key for the user. Implementations can use this
+         field to uniquely identify rows in the key table. The same
+         string can be used on the local system and peer systems, but
+         this is not required. </t>
+
+      <t hangText="LocalKeyName:">
+         The LocalKeyName field contains a string identifying the key.
+         It can be used to retrieve the key in the local database when
+         received in a message.  For SMKs, this is the value of the 'id' attribute value of the &lt;e2e/&gt; element (see <xref target="encryption-decrypt"/>).</t>
+
+      <t hangText="PeerKeyName:">
+         PeerKeyName is not used as the name is the same at each end point.</t>
+
+      <t hangText="Peers:">
+         This field lists the full JID of each peer systems that has this key in their database.  The peer name is read from the 'from' attribute of the wrapping stanza  (see <xref target="encryption-decrypt"/>).</t>
+
+      <t hangText="Interfaces:">
+         This field is not used and must be set to "all".</t>
+
+      <t hangText="Protocol:">
+         The Protocol field identifies XMPP the protocol where
+         this key may be used to provide cryptographic protection. (TODO: registry entry for the protocol?)</t>
+
+      <t hangText="ProtocolSpecificInfo:">
+         This field is not used and must be be empty.</t>
+
+      <t hangText="KDF:">
+         The KDF field is not used and must be set to "none". (TODO: define a use for this field?)</t>
+
+      <t hangText="AlgID:">
+         The AlgID field indicates which cryptographic algorithm to be
+         used with the security protocol for the specified peer or
+         peers.  Such an algorithm can be an encryption algorithm and
+         mode (e.g., AES-128-CBC), an authentication algorithm (e.g.,
+         HMAC-SHA1-96 or AES-128-CMAC), or any other symmetric
+         cryptographic algorithm needed by a security protocol. (TODO: identify source for algorithm strings)</t>
+
+      <t hangText="Key:">
+         The Key field contains a long-lived symmetric cryptographic key
+         in the format of a lower-case hexadecimal string.  The size of
+         the Key depends on the KDF and the AlgID.  For instance, a
+         KDF=none and AlgID=AES128 requires a 128-bit key, which is
+         represented by 32 hexadecimal digits.</t>
+
+      <t hangText="Direction:">
+         The Direction field indicates whether this key may be used for
+         inbound traffic, outbound traffic,  both, or whether the key
+         has been disabled and may not currently be used at all.  The
+         supported values are "in", "out", "both", and "disabled",
+         respectively.</t>
+
+      <t hangText="SendLifetimeStart:">
+         The SendLifetimeStart field specifies the earliest date and
+         time in Coordinated Universal Time (UTC) at which this key
+         should be considered for use when sending traffic.  The format
+         is YYYYMMDDHHSSZ, where four digits specify the year, two
+         digits specify the month, two digits specify the day, two
+         digits specify the hour,  two digits specify the minute, and
+         two digits specify the second.  The "Z" is included as a clear
+         indication that the time is in UTC.</t>
+
+      <t hangText="SendLifeTimeEnd:">
+         The SendLifeTimeEnd field specifies the latest date and time at
+         which this key should be considered for use when sending
+         traffic.  The format is the same as the SendLifetimeStart
+         field.</t>
+
+      <t hangText="AcceptLifeTimeStart:">
+         The AcceptLifeTimeStart field specifies the earliest date and
+         time in Coordinated Universal Time (UTC) at which this key
+         should be considered for use when processing received traffic.
+         The format is YYYYMMDDHHSSZ, where four digits specify the
+         year, two digits specify the month, two digits specify the day,
+         two digits specify the hour, two digits specify the minute, and
+         two digits specify the second.  The "Z" is included as a clear
+         indication that the time is in UTC.</t>
+
+      <t hangText="AcceptLifeTimeEnd:">
+         The AcceptLifeTimeEnd field specifies the latest date and time
+         at which this key should be considered for use when processing
+         the received traffic.  The format of this field is identical to
+         the format of AcceptLifeTimeStart.</t>
+ </list>
+
+    </t>
     </section>
     <section title="Encryption" anchor="encryption">
       <section title="Determining Support" anchor="encryption-disco">
@@ -1432,6 +1536,37 @@ K5DMytv7XopsZsR9QFCDNGew
         </front>
         <seriesInfo name="XSF XEP" value="0203"/>
         <format type="HTML" target="http://xmpp.org/extensions/xep-0203.html"/>
+      </reference>
+      <reference anchor="Key-Table">
+        <front>
+          <title>Database of Long-Lived Symmetric Cryptographic Keys</title>
+          <author initials="R." surname="Housley" fullname="Russell Housley">
+            <organization/>
+            <address>
+              <email>housley@vigilsec.com</email>
+            </address>
+          </author>
+          <author initials="T." surname="Polk" fullname="Tim Polk">
+            <organization/>
+            <address>
+              <email>tim.polk@nist.gov</email>
+            </address>
+          </author>
+          <author initials="S." surname="Hartman" fullname="Sam Hartman">
+            <organization/>
+            <address>
+              <email>hartmans@painless-security.com</email>
+            </address>
+          </author>
+          <author initials="D." surname="Zhang" fullname="Dacheng Zhang">
+            <organization/>
+            <address>
+              <email>zhangdacheng@huawei.com</email>
+            </address>
+          </author>
+          <date day="4" month="December" year="2013"/>
+        </front>
+        <format type="HTML" target="http://tools.ietf.org/html/draft-ietf-karp-crypto-key-table-10"/>
       </reference>
     </references>
     <section title="Schema for urn:ietf:params:xml:ns:xmpp-e2e:6" anchor="schemas-e2e">
